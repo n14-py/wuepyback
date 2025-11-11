@@ -148,7 +148,7 @@
 
     <!-- ===== BOTÓN DE WHATSAPP FLOTANTE ===== -->
     <!-- Reemplaza '5959xxxxxxxx' con tu número de WhatsApp -->
-    <a href="https://wa.me/595986950201?text=Hola%2C%20vengo%20de%20su%20sitio%20web%20y%20quisiera%20consultar%20sobre%20un%20proyecto."
+    <a href="https://wa.me/595976679954?text=Hola%2C%2Bvengo%2Bde%2Bsu%2Bsitio%2Bweb%2By%2Bquisiera%2Bconsultar%2Bsobre%2Bun%2Bproyecto."
        target="_blank"
        class="fixed bottom-6 right-6 z-50 bg-whatsapp-green hover:bg-green-600 text-white rounded-full p-4 shadow-lg animate-float transition-all duration-300">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
@@ -179,11 +179,25 @@
                 </div>
                 <!-- Botón (Mobile) - Se puede implementar un menú desplegable aquí -->
                 <div class="sm:hidden">
-                    <button class="text-gray-400 hover:text-white">
+                    <button id="mobile-menu-button" class="text-gray-400 hover:text-white p-2 rounded-md">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
                         </svg>
                     </button>
+                </div>
+            </div>
+            
+            <!-- Menú Desplegable (Mobile) -->
+            <div id="mobile-menu" class="hidden sm:hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <a href="#sobre" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Sobre Nosotros</a>
+                    <a href="#servicios" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Servicios</a>
+                    <a href="#portafolio" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Portafolio</a>
+                    <a href="#precios-desarrollo" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Precios</a>
+                    <a href="#planes" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Planes</a>
+                    <a href="#tecnologias" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Tecnologías</a>
+                    <a href="#faq" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">FAQ</a>
+                    <a href="#contacto" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
                 </div>
             </div>
         </nav>
@@ -201,12 +215,9 @@
                 <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white mb-4">
                     LFAF TECH
                 </h1>
-                <p class="text-xl md:text-3xl text-gray-300 mb-8 max-w-3xl mx-auto">
-                    De la idea a la realidad digital.
-                    <span class="font-bold animate-pulse-glow">Si puedes pensarlo, podemos crearlo.</span>
-                </p>
+                <!-- TEXTO ELIMINADO POR SOLICITUD -->
                 <!-- El toque de Paraguay -->
-                <div class="text-2xl md:text-4xl font-bold">
+                <div class="text-2xl md:text-4xl font-bold mt-6">
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-paraguay-red via-white to-paraguay-blue">
                         Innovación Tecnológica desde Paraguay
                     </span>
@@ -219,8 +230,8 @@
 
         <!-- ===== SOBRE NOSOTROS (NUEVA SECCIÓN) ===== -->
         <section id="sobre" class="py-24 px-4 bg-dark-card/50">
-            <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                <div class="reveal">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 items-center">
+                <div class="reveal text-center max-w-3xl mx-auto">
                     <h2 class="text-sm font-bold uppercase text-tech-blue tracking-wider">Sobre Nosotros</h2>
                     <p class="text-4xl md:text-5xl font-extrabold text-white mt-2">Somos tu Equipo de Desarrollo</p>
                     <p class="text-lg text-gray-400 mt-6">
@@ -229,12 +240,6 @@
                     <p class="text-lg text-gray-400 mt-4">
                         Nuestra misión es simple: ofrecer soluciones tecnológicas de alto nivel con <span class="text-white">transparencia total</span>, <span class="text-white">código limpio</span> y un <span class="text-white">soporte humano</span>. Nos alejamos de las plantillas genéricas para crear productos a medida que realmente solucionan problemas y escalan con tu negocio.
                     </p>
-                </div>
-                <div class="reveal card-border-glow rounded-2xl">
-                    <img src="https://placehold.co/600x400/161B22/30D5C8?text=Equipo+LFAF+Tech" 
-                         alt="Equipo de LFAF Tech trabajando" 
-                         class="rounded-2xl shadow-2xl object-cover w-full h-full">
-                         <!--  -->
                 </div>
             </div>
         </section>
@@ -813,10 +818,17 @@
                     <h2 class="text-sm font-bold uppercase text-tech-blue tracking-wider">Contacto</h2>
                     <p class="text-4xl md:text-5xl font-extrabold text-white mt-2">Cotiza tu Proyecto</p>
                     <p class="text-lg text-gray-400 mt-4">
-                        Cuéntanos tu idea y te enviaremos un presupuesto sin compromiso. O escríbenos directo al WhatsApp.
+                        Cuéntanos tu idea y te enviaremos un presupuesto sin compromiso.
+                    </p>
+                    <p class="text-lg text-gray-400 mt-2">
+                        O escríbenos directo al
+                        <a href="https://wa.me/595976679954?text=Hola%2C%2Bvengo%2Bde%2Bsu%2Bsitio%2Bweb%2By%2Bquisiera%2Bconsultar%2Bsobre%2Bun%2Bproyecto." target="_blank" class="font-bold text-whatsapp-green hover:underline">WhatsApp</a>
+                        o al
+                        <a href="mailto:lfaftech@gmail.com" class="font-bold text-tech-blue hover:underline">email</a>.
                     </p>
                 </div>
                 
+                <!-- Para que este formulario funcione, se debe configurar un servicio de backend (ej. Netlify Forms o Formspree) -->
                 <form class="reveal mt-12 space-y-6" action="#" method="POST">
                     <!-- Este es un formulario estático. Para que funcione, necesitaría un backend o un servicio como Netlify Forms. -->
                     <div>
@@ -844,19 +856,54 @@
 
     <!-- ===== FOOTER ===== -->
     <footer class="bg-dark-card/50 border-t border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
-            <p class="text-gray-400 text-sm">
-                &copy; 2024 LFAF Tech. Todos los derechos reservados.
-            </p>
-            <p class="text-gray-400 text-sm mt-4 md:mt-0">
-                Hecho con <span class="text-paraguay-red">❤</span> en Paraguay
-            </p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+                <!-- Columna 1: Logo y Copyright -->
+                <div>
+                    <span class="text-2xl font-extrabold text-white">
+                        LFAF<span class="text-tech-blue">.</span>TECH
+                    </span>
+                    <p class="text-gray-400 text-sm mt-2">
+                        &copy; 2024 LFAF Tech. Todos los derechos reservados.<br>
+                        Hecho con <span class="text-paraguay-red">❤</span> en Paraguay
+                    </p>
+                </div>
+                
+                <!-- Columna 2: Links (Opcional, se puede añadir) -->
+                <div>
+                    <h4 class="text-sm font-semibold text-white uppercase tracking-wider">Navegación</h4>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#servicios" class="text-gray-400 hover:text-tech-blue text-sm">Servicios</a></li>
+                        <li><a href="#portafolio" class="text-gray-400 hover:text-tech-blue text-sm">Portafolio</a></li>
+                        <li><a href="#planes" class="text-gray-400 hover:text-tech-blue text-sm">Planes</a></li>
+                        <li><a href="#faq" class="text-gray-400 hover:text-tech-blue text-sm">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 3: Contacto -->
+                <div>
+                    <h4 class="text-sm font-semibold text-white uppercase tracking-wider">Contacto</h4>
+                    <ul class="mt-4 space-y-2">
+                        <li>
+                            <a href="mailto:lfaftech@gmail.com" class="text-gray-400 hover:text-tech-blue text-sm">
+                                lfaftech@gmail.com
+                            </a>
+                        </li>
+                        <li>
+                            <a href="httpsa://wa.me/595976679954" class="text-gray-400 hover:text-tech-blue text-sm">
+                                +595 976 679 954
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </footer>
 
     <!-- ===== SCRIPT DE ANIMACIÓN ===== -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- Script de Animación de Scroll ---
             const sections = document.querySelectorAll('.reveal');
 
             const observer = new IntersectionObserver((entries, observer) => {
@@ -878,6 +925,23 @@
                 // Prepara el estado inicial (movido 30px hacia abajo)
                 section.style.transform = 'translateY(30px)';
                 observer.observe(section);
+            });
+
+            // --- Script de Menú Móvil ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+
+            // Toggle para el botón de hamburguesa
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Cerrar menú al hacer clic en un enlace
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
             });
         });
     </script>
