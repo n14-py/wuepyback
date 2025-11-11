@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LFAF Tech - Desarrollo Web Avanzado en Paraguay</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Configuración de Tailwind (para animaciones y colores) -->
     <script>
         tailwind.config = {
             theme: {
@@ -63,7 +60,6 @@
         }
     </script>
 
-    <!-- Estilos CSS personalizados -->
     <style>
         body {
             /* Fondo sutil con patrón de puntos (como un circuito) */
@@ -146,38 +142,32 @@
 
 <body class="bg-dark-bg text-gray-300 antialiased">
 
-    <!-- ===== BOTÓN DE WHATSAPP FLOTANTE ===== -->
-    <!-- Reemplaza '5959xxxxxxxx' con tu número de WhatsApp -->
     <a href="https://wa.me/595976679954?text=Hola%2C%2Bvengo%2Bde%2Bsu%2Bsitio%2Bweb%2By%2Bquisiera%2Bconsultar%2Bsobre%2Bun%2Bproyecto."
        target="_blank"
        class="fixed bottom-6 right-6 z-50 bg-whatsapp-green hover:bg-green-600 text-white rounded-full p-4 shadow-lg animate-float transition-all duration-300">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.996 0-3.903-.52-5.586-1.45L.057 24zM6.611 17.5l.351.2c1.615.93 3.464 1.439 5.367 1.439 5.405 0 9.78-4.373 9.78-9.778 0-5.404-4.373-9.779-9.779-9.779-5.404 0-9.778 4.374-9.778 9.779 0 1.962.588 3.831 1.66 5.385l.233.363-1.025 3.733 3.804-1z"/>
-        </svg>
+         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
+             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.996 0-3.903-.52-5.586-1.45L.057 24zM6.611 17.5l.351.2c1.615.93 3.464 1.439 5.367 1.439 5.405 0 9.78-4.373 9.78-9.778 0-5.404-4.373-9.779-9.779-9.779-5.404 0-9.778 4.374-9.778 9.779 0 1.962.588 3.831 1.66 5.385l.233.363-1.025 3.733 3.804-1z"/>
+         </svg>
     </a>
 
-    <!-- ===== HEADER ===== -->
     <header class="sticky top-0 z-50 w-full sticky-header">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
                     <span class="text-2xl font-extrabold text-white">
                         LFAF<span class="text-tech-blue">.</span>TECH
                     </span>
                 </div>
-                <!-- Links (Desktop) -->
                 <div class="hidden sm:ml-6 sm:flex flex-wrap sm:space-x-8">
                     <a href="#sobre" class="text-gray-300 hover:text-tech-blue inline-flex items-center px-1 pt-1 text-sm font-medium">Sobre Nosotros</a>
                     <a href="#servicios" class="text-gray-300 hover:text-tech-blue inline-flex items-center px-1 pt-1 text-sm font-medium">Servicios</a>
                     <a href="#portafolio" class="text-gray-300 hover:text-tech-blue inline-flex items-center px-1 pt-1 text-sm font-medium">Portafolio</a>
                     <a href="#precios-desarrollo" class="text-gray-300 hover:text-tech-blue inline-flex items-center px-1 pt-1 text-sm font-medium">Precios</a>
-                    <a href="#planes" class="text-gray-300 hover:text-tech-blue inline-flex items-center px-1 pt-1 text-sm font-medium">Planes</a>
+                    <a href="#planes" class="text-gray-300 hover:text-tech-blue inline-flex items-center px-1 pt-1 text-sm font-medium">Planes de Mantenimiento</a>
                     <a href="#tecnologias" class="text-gray-300 hover:text-tech-blue inline-flex items-center px-1 pt-1 text-sm font-medium">Tecnologías</a>
                     <a href="#faq" class="text-gray-300 hover:text-tech-blue inline-flex items-center px-1 pt-1 text-sm font-medium">FAQ</a>
                     <a href="#contacto" class="text-gray-300 hover:text-tech-blue inline-flex items-center px-1 pt-1 text-sm font-medium">Contacto</a>
                 </div>
-                <!-- Botón (Mobile) - Se puede implementar un menú desplegable aquí -->
                 <div class="sm:hidden">
                     <button id="mobile-menu-button" class="text-gray-400 hover:text-white p-2 rounded-md">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -187,14 +177,13 @@
                 </div>
             </div>
             
-            <!-- Menú Desplegable (Mobile) -->
             <div id="mobile-menu" class="hidden sm:hidden">
                 <div class="px-2 pt-2 pb-3 space-y-1">
                     <a href="#sobre" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Sobre Nosotros</a>
                     <a href="#servicios" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Servicios</a>
                     <a href="#portafolio" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Portafolio</a>
                     <a href="#precios-desarrollo" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Precios</a>
-                    <a href="#planes" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Planes</a>
+                    <a href="#planes" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Planes de Mantenimiento</a>
                     <a href="#tecnologias" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Tecnologías</a>
                     <a href="#faq" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">FAQ</a>
                     <a href="#contacto" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Contacto</a>
@@ -203,10 +192,8 @@
         </nav>
     </header>
 
-    <!-- ===== HERO SECTION ===== -->
     <main>
         <section class="min-h-screen flex items-center justify-center text-center px-4 relative overflow-hidden">
-            <!-- Fondo animado sutil -->
             <div class="absolute inset-0 z-0">
                 <div class="absolute inset-0 bg-gradient-to-r from-dark-bg via-tech-purple/10 to-dark-bg animate-hero-pan" style="background-size: 200% 200%;"></div>
             </div>
@@ -215,8 +202,6 @@
                 <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white mb-4">
                     LFAF TECH
                 </h1>
-                <!-- TEXTO ELIMINADO POR SOLICITUD -->
-                <!-- El toque de Paraguay -->
                 <div class="text-2xl md:text-4xl font-bold mt-6">
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-paraguay-red via-white to-paraguay-blue">
                         Innovación Tecnológica desde Paraguay
@@ -228,7 +213,6 @@
             </div>
         </section>
 
-        <!-- ===== SOBRE NOSOTROS (NUEVA SECCIÓN) ===== -->
         <section id="sobre" class="py-24 px-4 bg-dark-card/50">
             <div class="max-w-7xl mx-auto grid grid-cols-1 items-center">
                 <div class="reveal text-center max-w-3xl mx-auto">
@@ -236,7 +220,7 @@
                     <p class="text-4xl md:text-5xl font-extrabold text-white mt-2">Somos tu Equipo de Desarrollo</p>
                     <p class="text-lg text-gray-400 mt-6">
                         LFAF Tech no es una agencia de marketing más. Somos un equipo de programadores y desarrolladores paraguayos apasionados por construir software que funciona, es rápido y es seguro.
-                    </p>
+                    </D>
                     <p class="text-lg text-gray-400 mt-4">
                         Nuestra misión es simple: ofrecer soluciones tecnológicas de alto nivel con <span class="text-white">transparencia total</span>, <span class="text-white">código limpio</span> y un <span class="text-white">soporte humano</span>. Nos alejamos de las plantillas genéricas para crear productos a medida que realmente solucionan problemas y escalan con tu negocio.
                     </p>
@@ -244,7 +228,6 @@
             </div>
         </section>
 
-        <!-- ===== SERVICIOS ===== -->
         <section id="servicios" class="py-24 px-4">
             <div class="max-w-7xl mx-auto">
                 <div class="reveal text-center">
@@ -253,7 +236,6 @@
                 </div>
 
                 <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Card 1: Desarrollo -->
                     <div class="reveal bg-dark-card p-8 rounded-2xl card-border-glow">
                         <div class="w-12 h-12 bg-tech-blue/10 text-tech-blue rounded-lg flex items-center justify-center mb-6">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
@@ -263,17 +245,15 @@
                             Sitios 100% personalizados. Creamos todo desde cero con código limpio, optimizado para SEO y listo para escalar. Incluye diseño responsive, SEO técnico básico y carga optimizada.
                         </p>
                     </div>
-                    <!-- Card 2: Hosting -->
                     <div class="reveal bg-dark-card p-8 rounded-2xl card-border-glow" style="animation-delay: 0.2s;">
                         <div class="w-12 h-12 bg-tech-blue/10 text-tech-blue rounded-lg flex items-center justify-center mb-6">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
                         </div>
-                        <h3 class="text-2xl font-bold text-white mb-3">Hosting LFAF Tech</h3>
+                        <h3 class="text-2xl font-bold text-white mb-3">Infraestructura y Hosting</h3>
                         <p class="text-gray-400">
-                            Alojamiento de alto rendimiento en nuestra propia infraestructura. Olvídate de intermediarios. Ofrecemos velocidad superior, seguridad SSL automática, CDN global y disponibilidad 24/7.
+                            Alojamiento de alto rendimiento en **infraestructura cloud moderna**. Olvídate de la gestión técnica. Ofrecemos velocidad superior, seguridad SSL automática, CDN global y disponibilidad 24/7.
                         </p>
                     </div>
-                    <!-- Card 3: Mantenimiento -->
                     <div class="reveal bg-dark-card p-8 rounded-2xl card-border-glow" style="animation-delay: 0.4s;">
                         <div class="w-12 h-12 bg-tech-blue/10 text-tech-blue rounded-lg flex items-center justify-center mb-6">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4v6a2 2 0 00-2 2H8a2 2 0 00-2 2v2a2 2 0 002 2h8a2 2 0 002-2v-2a2 2 0 00-2-2h-2a2 2 0 00-2-2V6z"></path></svg>
@@ -287,7 +267,6 @@
             </div>
         </section>
 
-        <!-- ===== PORTAFOLIO (NUEVA SECCIÓN) ===== -->
         <section id="portafolio" class="py-24 px-4 bg-dark-card/50">
             <div class="max-w-7xl mx-auto">
                 <div class="reveal text-center max-w-3xl mx-auto">
@@ -299,7 +278,6 @@
                 </div>
 
                 <div class="reveal mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- Proyecto 1 -->
                     <a href="https://turadio.lat" target="_blank" rel="noopener noreferrer" class="block bg-dark-card rounded-2xl overflow-hidden shadow-lg card-border-glow transition-transform transform hover:-translate-y-2">
                         <img src="https://placehold.co/600x400/161B22/A78BFA?text=turadio.lat" alt="Proyecto TuRadio.lat" class="w-full h-48 object-cover">
                         <div class="p-6">
@@ -307,7 +285,6 @@
                             <p class="text-gray-400 mt-2">Plataforma que agrupa todas las radios de Latinoamérica en un solo lugar.</p>
                         </div>
                     </a>
-                    <!-- Proyecto 2 -->
                     <a href="https://noticias.lat" target="_blank" rel="noopener noreferrer" class="block bg-dark-card rounded-2xl overflow-hidden shadow-lg card-border-glow transition-transform transform hover:-translate-y-2">
                         <img src="https://placehold.co/600x400/161B22/30D5C8?text=noticias.lat" alt="Proyecto Noticias.lat" class="w-full h-48 object-cover">
                         <div class="p-6">
@@ -315,7 +292,6 @@
                             <p class="text-gray-400 mt-2">Portal de noticias 100% automatizado que cubre toda Latinoamérica.</p>
                         </div>
                     </a>
-                    <!-- Proyecto 3 -->
                     <a href="https://donaparaguay.com" target="_blank" rel="noopener noreferrer" class="block bg-dark-card rounded-2xl overflow-hidden shadow-lg card-border-glow transition-transform transform hover:-translate-y-2">
                         <img src="https://placehold.co/600x400/161B22/A78BFA?text=donaparaguay.com" alt="Proyecto DonaParaguay.com" class="w-full h-48 object-cover">
                         <div class="p-6">
@@ -323,9 +299,7 @@
                             <p class="text-gray-400 mt-2">Plataforma de donaciones para publicar casos y recibir ayuda.</p>
                         </div>
                     </a>
-                    <!-- Proyecto 4 -->
                     <a href="https://desderelaxstation.com" target="_blank" rel="noopener noreferrer" class="block bg-dark-card rounded-2xl overflow-hidden shadow-lg card-border-glow transition-transform transform hover:-translate-y-2">
-                        <!-- Asumo .com, si es otra extensión avísame -->
                         <img src="https://placehold.co/600x400/161B22/30D5C8?text=DesdeRelaxStation" alt="Proyecto DesdeRelaxStation" class="w-full h-48 object-cover">
                         <div class="p-6">
                             <h3 class="text-2xl font-bold text-white">DesdeRelaxStation</h3>
@@ -336,20 +310,18 @@
             </div>
         </section>
 
-        <!-- ===== PRECIOS DESARROLLO ===== -->
         <section id="precios-desarrollo" class="py-24 px-4">
             <div class="max-w-7xl mx-auto">
                 <div class="reveal text-center max-w-3xl mx-auto">
-                    <h2 class="text-sm font-bold uppercase text-tech-blue tracking-wider">Desarrollo Web</h2>
-                    <p class="text-4xl md:text-5xl font-extrabold text-white mt-2">Precios Estimados</p>
+                    <h2 class="text-sm font-bold uppercase text-tech-blue tracking-wider">Desarrollo Web (Pago Único)</h2>
+                    <p class="text-4xl md:text-5xl font-extrabold text-white mt-2">Precios Estimados de Creación</p>
                     <p class="text-lg text-gray-400 mt-4">
-                        Soluciones transparentes. El precio final depende de la complejidad y funciones específicas.
+                        Este es el costo inicial por **construir tu sitio web**. Soluciones transparentes. El precio final depende de la complejidad y funciones específicas.
                     </p>
                 </div>
                 
-                <!-- Ejemplo Real -->
                 <div class="reveal mt-12 bg-dark-card border-l-4 border-tech-blue p-6 rounded-lg max-w-4xl mx-auto">
-                    <p class="text-lg font-medium text-white">💡 Ejemplos Reales:</p>
+                    <p class="text-lg font-medium text-white">💡 Ejemplos Reales (Pago Único):</p>
                     <p class="text-gray-300 mt-2">
                         <span class="font-bold text-tech-blue">Sitio Básico (como esta web):</span> Un sitio informativo estático, desarrollado en aprox. 3 días. <span class="font-bold text-white">Costo aprox: $120 USD.</span>
                     </p>
@@ -358,7 +330,6 @@
                     </p>
                 </div>
 
-                <!-- Tabla de Precios -->
                 <div class="reveal mt-12 table-responsive bg-dark-card rounded-xl p-4 border border-gray-700">
                     <table class="min-w-full divide-y divide-gray-700">
                         <thead class="bg-dark-bg/50">
@@ -366,7 +337,7 @@
                                 <th scope="col" class="px-6 py-4 text-left text-sm font-semibold text-white uppercase">Tipo de Sitio</th>
                                 <th scope="col" class="px-6 py-4 text-left text-sm font-semibold text-white uppercase">Descripción</th>
                                 <th scope="col" class="px-6 py-4 text-left text-sm font-semibold text-tech-purple uppercase">Tiempo Estimado</th>
-                                <th scope="col" class="px-6 py-4 text-left text-sm font-semibold text-tech-blue uppercase">Precio (USD)</th>
+                                <th scope="col" class="px-6 py-4 text-left text-sm font-semibold text-tech-blue uppercase">Precio (USD) - Pago Único</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-800">
@@ -406,20 +377,17 @@
             </div>
         </section>
         
-        <!-- ===== HOSTING / PLANES ===== -->
         <section id="planes" class="py-24 px-4 bg-dark-card/50">
             <div class="max-w-7xl mx-auto">
                 <div class="reveal text-center max-w-3xl mx-auto">
-                    <h2 class="text-sm font-bold uppercase text-tech-blue tracking-wider">Hosting y Mantenimiento</h2>
-                    <p class="text-4xl md:text-5xl font-extrabold text-white mt-2">Planes Mensuales</p>
+                    <h2 class="text-sm font-bold uppercase text-tech-blue tracking-wider">Planes de Mantenimiento e Infraestructura</h2>
+                    <p class="text-4xl md:text-5xl font-extrabold text-white mt-2">Tu Sitio Siempre Online y Rápido</p>
                     <p class="text-lg text-gray-400 mt-4">
-                        Alojamos tu web en nuestra infraestructura de alto rendimiento para garantizar velocidad y disponibilidad 24/7.
+                        Una vez construido tu sitio, estos planes mensuales cubren **todo lo necesario** para que funcione: servidor, base de datos, almacenamiento de archivos, CDN, seguridad y nuestro soporte técnico.
                     </p>
                 </div>
                 
-                <!-- Ventajas -->
                 <div class="reveal mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Lista de ventajas -->
                     <div class="flex items-start space-x-3 p-4">
                         <svg class="w-6 h-6 text-tech-blue flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <div>
@@ -464,60 +432,90 @@
                     </div>
                 </div>
 
-                <!-- Planes de Hosting + Mantenimiento -->
-                <div class="reveal mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Plan Básico -->
+                <div class="reveal mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    
                     <div class="bg-dark-card rounded-2xl p-8 border-2 border-gray-700 flex flex-col">
-                        <h3 class="text-lg font-semibold uppercase" style="color: #2ECC71;">🟢 Básico</h3>
-                        <p class="mt-4 text-5xl font-extrabold text-white">$50</p>
+                        <h3 class="text-lg font-semibold uppercase" style="color: #95A5A6;">⚪ Estático</h3>
+                        <p class="mt-4 text-5xl font-extrabold text-white">$25</p>
                         <p class="text-gray-400">/ mes</p>
+                        <p class="text-sm text-gray-500 mt-2">Ideal para Landing Pages y sitios informativos.</p>
                         <ul class="mt-6 space-y-2 text-gray-300">
-                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Hosting Profesional</span></li>
-                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Certificado SSL</span></li>
-                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>1 cambio pequeño/mes</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Hosting (Servidor)</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Certificado SSL y CDN</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>1 GB Almacenamiento</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>10 GB Ancho de Banda</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg><span class="text-gray-500">Sin Base de Datos</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg><span class="text-gray-500">Sin cambios incluidos</span></li>
                         </ul>
                     </div>
-                    <!-- Plan Pro (Destacado) -->
-                    <div class="bg-dark-card rounded-2xl p-8 border-2 border-tech-blue shadow-2xl shadow-tech-blue/20 flex flex-col scale-105">
+
+                    <div class="bg-dark-card rounded-2xl p-8 border-2 border-gray-700 flex flex-col">
+                        <h3 class="text-lg font-semibold uppercase" style="color: #2ECC71;">🟢 Esencial</h3>
+                        <p class="mt-4 text-5xl font-extrabold text-white">$50</p>
+                        <p class="text-gray-400">/ mes</p>
+                        <p class="text-sm text-gray-500 mt-2">Ideal para Webs Institucionales y Blogs.</p>
+                        <ul class="mt-6 space-y-2 text-gray-300">
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Todo en Estático +</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Base de Datos NoSQL</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>5 GB Almacenamiento</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>25 GB Ancho de Banda</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>1 cambio pequeño/mes</span></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-dark-card rounded-2xl p-8 border-2 border-tech-blue shadow-2xl shadow-tech-blue/20 flex flex-col md:scale-105">
                         <h3 class="text-lg font-semibold uppercase" style="color: #F1C40F;">🟡 Pro</h3>
                         <p class="mt-4 text-5xl font-extrabold text-white">$80</p>
                         <p class="text-gray-400">/ mes</p>
+                        <p class="text-sm text-gray-500 mt-2">Ideal para Tiendas, Catálogos y Plataformas.</p>
                         <ul class="mt-6 space-y-2 text-gray-300">
-                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Todo en Básico +</span></li>
-                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>3 cambios pequeños/mes</span></li>
-                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>O 1 cambio mediano</span></li>
-                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Soporte Prioritario</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Todo en Esencial +</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>BD de mayor capacidad</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>15 GB Almacenamiento</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>50 GB Ancho de Banda</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>3 cambios pequeños/mes</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Soporte Prioritario</span></li>
                         </ul>
                     </div>
-                    <!-- Plan Empresarial -->
+                    
                     <div class="bg-dark-card rounded-2xl p-8 border-2 border-gray-700 flex flex-col">
                         <h3 class="text-lg font-semibold uppercase" style="color: #3498DB;">🔵 Empresarial</h3>
                         <p class="mt-4 text-5xl font-extrabold text-white">$120</p>
                         <p class="text-gray-400">/ mes</p>
+                        <p class="text-sm text-gray-500 mt-2">Ideal para Aplicaciones Web y Alto Tráfico.</p>
                         <ul class="mt-6 space-y-2 text-gray-300">
-                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Todo en Pro +</span></li>
-                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Cambios menores ilimitados</span></li>
-                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Monitoreo SEO Básico</span></li>
-                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Soporte Completo</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Todo en Pro +</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Infraestructura Escalable</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>30 GB Almacenamiento</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>100 GB Ancho de Banda</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Cambios menores ilimitados</span></li>
+                            <li class="flex space-x-2"><svg class="w-5 h-5 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg><span>Monitoreo SEO Básico</span></li>
                         </ul>
                     </div>
                 </div>
+
+                <div class="reveal mt-12 text-center bg-dark-card border border-gray-700 p-6 rounded-lg max-w-4xl mx-auto">
+                    <h4 class="text-xl font-medium text-white">¿Ya tienes un sitio web y solo necesitas mantenimiento?</h4>
+                    <p class="text-gray-300 mt-2">
+                        Si tu sitio web no fue desarrollado por LFAF Tech, contáctanos. Podemos analizar tu código (HTML/CSS/JS, React, Node.js, etc.) y ofrecerte un plan de migración y mantenimiento a medida.
+                    </p>
+                    <a href="#contacto" class="mt-4 inline-block text-tech-blue font-bold hover:underline">Consultar por Migración</a>
+                </div>
+
             </div>
         </section>
 
-        <!-- ===== MEJORAS PERSONALIZADAS ===== -->
         <section id="mejoras" class="py-24 px-4">
             <div class="max-w-7xl mx-auto">
                 <div class="reveal text-center max-w-3xl mx-auto">
                     <h2 class="text-sm font-bold uppercase text-tech-blue tracking-wider">Extras</h2>
-                    <p class="text-4xl md:text-5xl font-extrabold text-white mt-2">Cambios y Mejoras</p>
+                    <p class="text-4xl md:text-5xl font-extrabold text-white mt-2">Cambios y Mejoras (Pago Único)</p>
                     <p class="text-lg text-gray-400 mt-4">
-                        ¿Necesitas algo fuera de tu plan mensual? Lo cotizamos de forma transparente.
+                        ¿Necesitas algo fuera de tu plan mensual o estás en el Plan Estático? Lo cotizamos de forma transparente.
                     </p>
                 </div>
 
                 <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Pequeño -->
                     <div class="reveal bg-dark-card p-8 rounded-2xl card-border-glow">
                         <h3 class="text-2xl font-bold text-white mb-3">Pequeño</h3>
                         <p class="text-3xl font-extrabold text-tech-blue mb-4">$10 – $20</p>
@@ -525,7 +523,6 @@
                             Ej: Cambiar textos, actualizar imágenes, modificar precios o ajustar colores.
                         </p>
                     </div>
-                    <!-- Mediano -->
                     <div class="reveal bg-dark-card p-8 rounded-2xl card-border-glow" style="animation-delay: 0.2s;">
                         <h3 class="text-2xl font-bold text-white mb-3">Mediano</h3>
                         <p class="text-3xl font-extrabold text-tech-blue mb-4">$30 – $60</p>
@@ -533,7 +530,6 @@
                             Ej: Añadir una nueva sección completa (como "Galería" o "Servicios"), integrar un nuevo producto.
                         </p>
                     </div>
-                    <!-- Grande -->
                     <div class="reveal bg-dark-card p-8 rounded-2xl card-border-glow" style="animation-delay: 0.4s;">
                         <h3 class="text-2xl font-bold text-white mb-3">Grande</h3>
                         <p class="text-3xl font-extrabold text-tech-blue mb-4">$100 – $300+</p>
@@ -546,7 +542,6 @@
         </section>
 
 
-        <!-- ===== TECNOLOGÍAS ===== -->
         <section id="tecnologias" class="py-24 px-4 bg-dark-card/50">
             <div class="max-w-7xl mx-auto">
                 <div class="reveal text-center max-w-3xl mx-auto">
@@ -558,31 +553,26 @@
                 </div>
                 
                 <div class="reveal mt-16 grid grid-cols-2 md:grid-cols-4 gap-8">
-                    <!-- Tech Card -->
                     <div class="bg-dark-card p-6 rounded-2xl text-center card-border-glow">
                         <h3 class="text-2xl font-bold text-white">Frontend</h3>
                         <p class="mt-2 text-gray-400">HTML5, CSS3, JavaScript (ES6+), React, Vue.js, Tailwind CSS.</p>
                     </div>
-                    <!-- Tech Card -->
                     <div class="bg-dark-card p-6 rounded-2xl text-center card-border-glow">
                         <h3 class="text-2xl font-bold text-white">Backend</h3>
                         <p class="mt-2 text-gray-400">Node.js, Express, Python (Django/Flask), API REST, GraphQL.</p>
                     </div>
-                    <!-- Tech Card -->
                     <div class="bg-dark-card p-6 rounded-2xl text-center card-border-glow">
                         <h3 class="text-2xl font-bold text-white">Bases de Datos</h3>
                         <p class="mt-2 text-gray-400">PostgreSQL, MySQL, MongoDB, Firebase/Firestore.</p>
                     </div>
-                    <!-- Tech Card -->
                     <div class="bg-dark-card p-6 rounded-2xl text-center card-border-glow">
                         <h3 class="text-2xl font-bold text-white">Despliegue</h3>
-                        <p class="mt-2 text-gray-400">Infraestructura Cloud, Docker, CI/CD, Nginx, Linux.</p>
+                        <p class="mt-2 text-gray-400">Infraestructura Cloud, CI/CD, Despliegue en Servidores (VPS/PaaS), Nginx, Linux, Gestión de Assets (CDN).</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ===== PROCESO ===== -->
         <section id="proceso" class="py-24 px-4">
             <div class="max-w-7xl mx-auto">
                 <div class="reveal text-center max-w-3xl mx-auto">
@@ -590,7 +580,6 @@
                     <p class="text-4xl md:text-5xl font-extrabold text-white mt-2">Nuestro Proceso</p>
                 </div>
                 
-                <!-- Timeline -->
                 <div class="reveal mt-16 max-w-3xl mx-auto">
                     <ol class="relative border-l border-gray-700">                  
                         <li class="mb-10 ml-8">
@@ -619,14 +608,13 @@
                                 4
                             </span>
                             <h3 class="text-2xl font-semibold text-white">Mantenimiento Continuo</h3>
-                            <p class="mt-1 text-gray-400">Supervisamos velocidad, seguridad y actualizaciones cada mes. Estamos a un mensaje de distancia para cualquier cambio.</p>
+                            <p class="mt-1 text-gray-400">Supervisamos velocidad, seguridad y actualizaciones cada mes (según tu plan). Estamos a un mensaje de distancia para cualquier cambio.</p>
                         </li>
                     </ol>
                 </div>
             </div>
         </section>
         
-        <!-- ===== BENEFICIOS ===== -->
         <section id="beneficios" class="py-24 px-4 bg-dark-card/50">
             <div class="max-w-7xl mx-auto">
                 <div class="reveal text-center max-w-3xl mx-auto">
@@ -635,7 +623,6 @@
                 </div>
 
                 <div class="reveal mt-16 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                    <!-- Beneficio -->
                     <div class="flex items-center space-x-3">
                         <svg class="w-6 h-6 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         <span class="text-lg text-gray-300">Sitio moderno, rápido y profesional</span>
@@ -654,7 +641,7 @@
                     </div>
                     <div class="flex items-center space-x-3">
                         <svg class="w-6 h-6 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="text-lg text-gray-300">Alojamiento en nuestra infraestructura</span>
+                        <span class="text-lg text-gray-300">Alojamiento en infraestructura cloud</span>
                     </div>
                     <div class="flex items-center space-x-3">
                         <svg class="w-6 h-6 text-tech-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -664,7 +651,6 @@
             </div>
         </section>
 
-        <!-- ===== FAQ (NUEVA SECCIÓN) ===== -->
         <section id="faq" class="py-24 px-4">
             <div class="max-w-4xl mx-auto">
                 <div class="reveal text-center max-w-3xl mx-auto">
@@ -673,13 +659,12 @@
                 </div>
 
                 <div class="reveal mt-16 space-y-6">
-                    <!-- Pregunta 1 -->
                     <details class="group bg-dark-card rounded-xl border border-gray-700 p-6 cursor-pointer">
                         <summary class="flex justify-between items-center list-none">
                             <span class="text-xl font-medium text-white group-hover:text-tech-blue">¿Qué necesito para empezar mi proyecto?</span>
                             <span class="text-tech-blue group-open:rotate-180 transition-transform">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </span>
                         </summary>
@@ -688,13 +673,12 @@
                         </p>
                     </details>
                     
-                    <!-- Pregunta 2 -->
                     <details class="group bg-dark-card rounded-xl border border-gray-700 p-6 cursor-pointer">
                         <summary class="flex justify-between items-center list-none">
                             <span class="text-xl font-medium text-white group-hover:text-tech-blue">¿El dominio y el email están incluidos?</span>
                             <span class="text-tech-blue group-open:rotate-180 transition-transform">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </span>
                         </summary>
@@ -703,13 +687,12 @@
                         </p>
                     </details>
 
-                    <!-- Pregunta 3 -->
                     <details class="group bg-dark-card rounded-xl border border-gray-700 p-6 cursor-pointer">
                         <summary class="flex justify-between items-center list-none">
                             <span class="text-xl font-medium text-white group-hover:text-tech-blue">¿Puedo ver mi sitio web antes de que esté terminado?</span>
                             <span class="text-tech-blue group-open:rotate-180 transition-transform">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </span>
                         </summary>
@@ -718,28 +701,26 @@
                         </p>
                     </details>
 
-                    <!-- Pregunta 4 -->
                     <details class="group bg-dark-card rounded-xl border border-gray-700 p-6 cursor-pointer">
                         <summary class="flex justify-between items-center list-none">
                             <span class="text-xl font-medium text-white group-hover:text-tech-blue">¿Qué pasa si quiero cancelar mi plan de mantenimiento?</span>
                             <span class="text-tech-blue group-open:rotate-180 transition-transform">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </span>
                         </summary>
                         <p class="mt-4 text-gray-400">
-                            No hay problema. El pago inicial del desarrollo es por tu sitio web, te pertenece. Si decides cancelar el plan mensual, te entregamos el código fuente completo. Perderías el hosting con nosotros y el soporte, pero eres libre de llevarte tu sitio a otro proveedor si así lo deseas.
+                            No hay problema. El pago inicial del desarrollo es por tu sitio web, te pertenece. Si decides cancelar el plan mensual, te entregamos el código fuente completo. Perderías la infraestructura (hosting, BD) con nosotros y el soporte, pero eres libre de llevarte tu sitio a otro proveedor si así lo deseas.
                         </p>
                     </details>
 
-                    <!-- Pregunta 5 (NUEVA) -->
                     <details class="group bg-dark-card rounded-xl border border-gray-700 p-6 cursor-pointer">
                         <summary class="flex justify-between items-center list-none">
                             <span class="text-xl font-medium text-white group-hover:text-tech-blue">¿Por qué LFAF Tech y no un creador de sitios como Wix?</span>
                             <span class="text-tech-blue group-open:rotate-180 transition-transform">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </span>
                         </summary>
@@ -748,13 +729,12 @@
                         </p>
                     </details>
                     
-                    <!-- Pregunta 6 (NUEVA) -->
                     <details class="group bg-dark-card rounded-xl border border-gray-700 p-6 cursor-pointer">
                         <summary class="flex justify-between items-center list-none">
                             <span class="text-xl font-medium text-white group-hover:text-tech-blue">¿Qué es "desarrollo a medida"?</span>
                             <span class="text-tech-blue group-open:rotate-180 transition-transform">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </span>
                         </summary>
@@ -763,13 +743,12 @@
                         </p>
                     </details>
                     
-                    <!-- Pregunta 7 (NUEVA) -->
                     <details class="group bg-dark-card rounded-xl border border-gray-700 p-6 cursor-pointer">
                         <summary class="flex justify-between items-center list-none">
                             <span class="text-xl font-medium text-white group-hover:text-tech-blue">¿Mi sitio va a aparecer en Google? (SEO)</span>
                             <span class="text-tech-blue group-open:rotate-180 transition-transform">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </span>
                         </summary>
@@ -781,7 +760,6 @@
             </div>
         </section>
 
-        <!-- ===== VISIÓN (Toque de Paraguay) ===== -->
         <section id="vision" class="py-32 px-4">
             <div class="max-w-4xl mx-auto text-center reveal">
                 <p class="text-3xl md:text-4xl font-semibold text-white leading-relaxed">
@@ -789,7 +767,7 @@
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-paraguay-red via-white to-paraguay-blue">
                         paraguaya
                     </span>
-                    más confiable para desarrollo, hosting y automatización web, ofreciendo soluciones rápidas, seguras y con enfoque humano.”
+                     más confiable para desarrollo, hosting y automatización web, ofreciendo soluciones rápidas, seguras y con enfoque humano.”
                 </p>
                 <p class="mt-8 text-xl text-gray-400 font-medium">
                     - Visión de LFAF Tech
@@ -797,7 +775,6 @@
             </div>
         </section>
 
-        <!-- ===== CTA (NUEVA SECCIÓN) ===== -->
         <section id="cta" class="py-24 px-4 bg-dark-card/50">
             <div class="max-w-4xl mx-auto text-center reveal">
                 <h2 class="text-4xl md:text-5xl font-extrabold text-white">¿Tienes una Idea Compleja?</h2>
@@ -811,7 +788,6 @@
             </div>
         </section>
         
-        <!-- ===== CONTACTO (NUEVA SECCIÓN) ===== -->
         <section id="contacto" class="py-24 px-4">
             <div class="max-w-3xl mx-auto">
                 <div class="reveal text-center max-w-3xl mx-auto">
@@ -828,9 +804,7 @@
                     </p>
                 </div>
                 
-                <!-- Para que este formulario funcione, se debe configurar un servicio de backend (ej. Netlify Forms o Formspree) -->
                 <form class="reveal mt-12 space-y-6" action="#" method="POST">
-                    <!-- Este es un formulario estático. Para que funcione, necesitaría un backend o un servicio como Netlify Forms. -->
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-300">Nombre</label>
                         <input type="text" id="name" name="name" required class="mt-1 form-input">
@@ -854,22 +828,19 @@
 
     </main>
 
-    <!-- ===== FOOTER ===== -->
     <footer class="bg-dark-card/50 border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-                <!-- Columna 1: Logo y Copyright -->
                 <div>
                     <span class="text-2xl font-extrabold text-white">
                         LFAF<span class="text-tech-blue">.</span>TECH
                     </span>
                     <p class="text-gray-400 text-sm mt-2">
-                        &copy; 2024 LFAF Tech. Todos los derechos reservados.<br>
+                        &copy; 2025 LFAF Tech. Todos los derechos reservados.<br>
                         Hecho con <span class="text-paraguay-red">❤</span> en Paraguay
                     </p>
                 </div>
                 
-                <!-- Columna 2: Links (Opcional, se puede añadir) -->
                 <div>
                     <h4 class="text-sm font-semibold text-white uppercase tracking-wider">Navegación</h4>
                     <ul class="mt-4 space-y-2">
@@ -880,7 +851,6 @@
                     </ul>
                 </div>
 
-                <!-- Columna 3: Contacto -->
                 <div>
                     <h4 class="text-sm font-semibold text-white uppercase tracking-wider">Contacto</h4>
                     <ul class="mt-4 space-y-2">
@@ -900,7 +870,6 @@
         </div>
     </footer>
 
-    <!-- ===== SCRIPT DE ANIMACIÓN ===== -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- Script de Animación de Scroll ---
