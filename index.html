@@ -185,7 +185,7 @@
                 </div>
             </div>
             
-            <div id="mobile-menu" class="hidden sm:hidden">
+            <div id="mobile-menu" class="hidden sm:hidden transition-all duration-300 transform -translate-y-4 opacity-0">
                 <div class="px-2 pt-2 pb-3 space-y-1">
                     <a href="#sobre" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Sobre Nosotros</a>
                     <a href="#servicios" class="text-gray-300 hover:bg-dark-card hover:text-tech-blue block px-3 py-2 rounded-md text-base font-medium">Servicios</a>
@@ -202,12 +202,17 @@
     </header>
 
     <main>
-        <section class="min-h-screen flex items-center justify-center text-center px-4 relative overflow-hidden">
+        <section class="min-h-screen flex items-start md:items-center justify-center text-center px-4 relative overflow-hidden pt-48 md:pt-0">
             <div class="absolute inset-0 z-0">
                 <div class="absolute inset-0 bg-gradient-to-r from-dark-bg via-tech-purple/10 to-dark-bg animate-hero-pan" style="background-size: 200% 200%;"></div>
             </div>
             
             <div class="relative z-10 reveal active">
+                
+                <svg class="w-16 h-16 md:w-20 md:h-20 text-tech-blue mx-auto mb-6 animate-float" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                </svg>
+
                 <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white mb-4">
                     LFAF TECH
                 </h1>
@@ -227,8 +232,9 @@
                 <div class="reveal text-center max-w-3xl mx-auto">
                     <h2 class="text-sm font-bold uppercase text-tech-blue tracking-wider">Sobre Nosotros</h2>
                     <p class="text-4xl md:text-5xl font-extrabold text-white mt-2">Somos tu Equipo de Desarrollo</p>
+                    
                     <p class="text-lg text-gray-400 mt-6">
-                        LFAF Tech no es una agencia de marketing más. Somos un equipo de programadores y desarrolladores paraguayos apasionados por construir software que funciona, es rápido y es seguro.
+                        Somos un equipo de programadores y desarrolladores paraguayos, 100% enfocados en construir software que funciona, es rápido y es seguro.
                     </p>
                     <p class="text-lg text-gray-400 mt-4">
                         Nuestra misión es simple: ofrecer soluciones tecnológicas de alto nivel con <span class="text-white">transparencia total</span>, <span class="text-white">código limpio</span> y un <span class="text-white">soporte humano</span>. Nos alejamos de las plantillas genéricas para crear productos a medida que realmente solucionan problemas y escalan con tu negocio.
@@ -836,25 +842,31 @@
                     </p>
                 </div>
                 
-                <form class="reveal mt-12 space-y-6" action="#" method="POST">
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-300">Nombre</label>
-                        <input type="text" id="name" name="name" required class="mt-1 form-input">
-                    </div>
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-300">Email o Celular</label>
-                        <input type="text" id="email" name="email" required class="mt-1 form-input">
-                    </div>
-                    <div>
-                        <label for="message" class="block text-sm font-medium text-gray-300">Cuéntanos tu idea</label>
-                        <textarea id="message" name="message" rows="5" required class="mt-1 form-input"></textarea>
-                    </div>
-                    <div>
-                        <button type="submit" class="w-full bg-tech-blue text-dark-bg font-bold py-3 px-8 rounded-lg text-lg transform transition-transform hover:scale-105 hover:shadow-2xl hover:shadow-tech-blue/30">
-                            Enviar Cotización
-                        </button>
-                    </div>
-                </form>
+                <form class="reveal mt-12 space-y-6"
+      action="https://formspree.io/f/xanayvbk"
+      method="POST">
+    
+    <div>
+        <label for="name" class="block text-sm font-medium text-gray-300">Nombre</label>
+        <input type="text" id="name" name="name" required class="mt-1 form-input">
+    </div>
+    
+    <div>
+        <label for="email" class="block text-sm font-medium text-gray-300">Email o Celular</label>
+        <input type="text" id="email" name="email" required class="mt-1 form-input">
+    </div>
+    
+    <div>
+        <label for="message" class="block text-sm font-medium text-gray-300">Cuéntanos tu idea</label>
+        <textarea id="message" name="message" rows="5" required class="mt-1 form-input"></textarea>
+    </div>
+    
+    <div>
+        <button type="submit" class="w-full bg-tech-blue text-dark-bg font-bold py-3 px-8 rounded-lg text-lg transform transition-transform hover:scale-105 hover:shadow-2xl hover:shadow-tech-blue/30">
+            Enviar Cotización
+        </button>
+    </div>
+</form>
             </div>
         </section>
 
@@ -926,20 +938,40 @@
                 observer.observe(section);
             });
 
-            // --- Script de Menú Móvil ---
+            // --- CAMBIO: Script de Menú Móvil Mejorado ---
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
             const mobileMenuLinks = mobileMenu.querySelectorAll('a');
 
             mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
+                if (mobileMenu.classList.contains('hidden')) {
+                    // Mostrar menú
+                    mobileMenu.classList.remove('hidden');
+                    setTimeout(() => { // Necesario para que la transición funcione después de quitar 'hidden'
+                        mobileMenu.classList.remove('-translate-y-4');
+                        mobileMenu.classList.remove('opacity-0');
+                    }, 10);
+                } else {
+                    // Ocultar menú
+                    mobileMenu.classList.add('-translate-y-4');
+                    mobileMenu.classList.add('opacity-0');
+                    setTimeout(() => { // Esperar que termine la transición antes de ocultarlo
+                        mobileMenu.classList.add('hidden');
+                    }, 300);
+                }
             });
 
+            // Ocultar menú al hacer clic en un enlace
             mobileMenuLinks.forEach(link => {
                 link.addEventListener('click', () => {
-                    mobileMenu.classList.add('hidden');
+                    mobileMenu.classList.add('-translate-y-4');
+                    mobileMenu.classList.add('opacity-0');
+                    setTimeout(() => {
+                        mobileMenu.classList.add('hidden');
+                    }, 300);
                 });
             });
+            
         });
     </script>
 </body>
