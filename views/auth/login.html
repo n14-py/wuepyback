@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión | LFAFTECH</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Estilos exclusivos para Auth */
+        .auth-wrapper {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at top right, #1e293b 0%, #0f172a 100%);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Efecto de fondo sutil */
+        .auth-wrapper::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233b82f6' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+
+        .auth-header { text-align: center; margin-bottom: 2rem; }
+        .auth-header h2 { font-size: 1.8rem; color: var(--secondary-color); margin-bottom: 0.5rem; }
+        .auth-header p { color: var(--text-muted); }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; color: var(--text-main); }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+
+        .auth-footer { text-align: center; margin-top: 2rem; font-size: 0.9rem; color: var(--text-muted); }
+        .auth-footer a { color: var(--primary-color); font-weight: 600; }
+        .auth-footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <%- include('../partials/header.html') %>
+
+    <div class="auth-wrapper">
+        <div class="auth-card animate-fade-in-down">
+            
+            <div class="auth-header">
+                <h2>Bienvenido de nuevo</h2>
+                <p>Accede a tu panel de control LFAFTECH</p>
+            </div>
+
+            <% if(error && error.length > 0) { %>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> <%= error %>
+                </div>
+            <% } %>
+            <% if(success_msg && success_msg.length > 0) { %>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> <%= success_msg %>
+                </div>
+            <% } %>
+
+            <form action="/login" method="POST">
+                <div class="form-group">
+                    <label for="email" class="form-label">Correo Electrónico</label>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="ejemplo@lfaftech.com" required>
+                </div>
+
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label for="password" class="form-label" style="margin-bottom: 0;">Contraseña</label>
+                        <a href="#" style="font-size: 0.85rem; color: var(--primary-color);">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" style="padding: 1rem;">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                ¿Aún no tienes cuenta? <a href="/register">Regístrate Gratis</a>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/footer.html') %>
+
+</body>
+</html>

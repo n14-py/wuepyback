@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= site.name %></title>
+</head>
+<body class="bg-slate-950 text-slate-200">
+
+    <%- include('./partials/header.html') %>
+
+    <section class="relative py-24 lg:py-32 overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand opacity-10 blur-[120px] rounded-full pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 text-center relative z-10">
+            <span class="inline-block px-4 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-brand text-xs font-bold uppercase tracking-widest mb-6 animate-pulse">
+                Nueva Colección 2026
+            </span>
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-8 leading-tight tracking-tight">
+                <%= site.content.heroTitle %>
+            </h1>
+            <p class="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
+                <%= site.content.heroSubtitle %>
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="/search" class="bg-brand text-white px-8 py-4 rounded-xl font-bold text-lg hover:brightness-110 transition shadow-lg shadow-brand/20">
+                    Ver Catálogo
+                </a>
+                <a href="#destacados" class="bg-slate-900 text-white border border-slate-800 px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-800 transition">
+                    Explorar
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="border-y border-slate-900 bg-slate-900/30">
+        <div class="max-w-7xl mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div class="p-6">
+                    <div class="w-14 h-14 mx-auto bg-slate-900 rounded-full flex items-center justify-center text-brand text-2xl mb-4 border border-slate-800">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3 class="text-white font-bold mb-2">Envío Rápido</h3>
+                    <p class="text-sm text-slate-500">Entregas en todo el país.</p>
+                </div>
+                <div class="p-6">
+                    <div class="w-14 h-14 mx-auto bg-slate-900 rounded-full flex items-center justify-center text-brand text-2xl mb-4 border border-slate-800">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 class="text-white font-bold mb-2">Pago Seguro</h3>
+                    <p class="text-sm text-slate-500">Transacciones protegidas.</p>
+                </div>
+                <div class="p-6">
+                    <div class="w-14 h-14 mx-auto bg-slate-900 rounded-full flex items-center justify-center text-brand text-2xl mb-4 border border-slate-800">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <h3 class="text-white font-bold mb-2">Soporte 24/7</h3>
+                    <p class="text-sm text-slate-500">Atención personalizada.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="destacados" class="py-24">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Destacados</h2>
+                    <p class="text-slate-400 mt-2">Nuestros productos favoritos.</p>
+                </div>
+                <a href="/search" class="text-brand font-bold hover:underline hidden md:block">Ver todos &rarr;</a>
+            </div>
+
+            <% if(products.length === 0) { %>
+                <div class="bg-slate-900 rounded-2xl p-12 text-center border border-slate-800 border-dashed">
+                    <p class="text-slate-500 text-lg">Próximamente agregaremos productos...</p>
+                </div>
+            <% } else { %>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <% products.forEach(product => { %>
+                        <a href="/p/<%= product._id %>" class="group block bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-brand transition-all duration-300 hover:shadow-2xl hover:shadow-brand/5">
+                            <div class="aspect-square bg-slate-800 overflow-hidden relative">
+                                <img src="<%= product.imageUrl %>" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
+                                <% if(product.stock <= 0) { %>
+                                    <span class="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded">AGOTADO</span>
+                                <% } %>
+                            </div>
+                            <div class="p-5">
+                                <p class="text-xs font-bold text-slate-500 uppercase mb-1"><%= product.category %></p>
+                                <h3 class="text-lg font-bold text-white truncate mb-2 group-hover:text-brand transition"><%= product.name %></h3>
+                                <p class="text-xl font-bold text-white">$<%= product.price %></p>
+                            </div>
+                        </a>
+                    <% }) %>
+                </div>
+            <% } %>
+            
+            <div class="mt-8 text-center md:hidden">
+                <a href="/search" class="btn bg-slate-800 text-white px-6 py-3 rounded-lg w-full block font-bold">Ver Todo</a>
+            </div>
+        </div>
+    </section>
+
+    <%- include('./partials/footer.html') %>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= site.name %> | Boutique</title>
+</head>
+<body class="font-sans">
+
+    <%- include('./partials/header.html') %>
+
+    <div class="relative min-h-[80vh] flex items-center justify-center overflow-hidden m-4 rounded-[3rem]">
+        <div class="absolute inset-0">
+            <img src="https://images.unsplash.com/photo-1490481651871-32d2e76f89a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-white/40 backdrop-blur-[2px]"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
+        </div>
+        
+        <div class="relative z-10 text-center px-6 max-w-4xl">
+            <p class="font-serif italic text-2xl md:text-3xl text-stone-800 mb-6 animate-fade-in-up">Bienvenidos a <%= site.name %></p>
+            <h1 class="text-5xl md:text-8xl font-serif font-bold text-stone-900 mb-8 leading-tight tracking-tight drop-shadow-sm">
+                <%= site.content.heroTitle %>
+            </h1>
+            <p class="text-lg md:text-xl text-stone-700 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+                <%= site.content.heroSubtitle %>
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/search" class="btn-soft text-sm uppercase tracking-widest px-10 py-4 shadow-xl">
+                    Ver Colección
+                </a>
+                <a href="#about" class="bg-white text-stone-800 rounded-full px-10 py-4 text-sm font-bold uppercase tracking-widest hover:bg-stone-50 transition shadow-lg">
+                    Conocenos
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <section class="py-20 max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div class="text-center p-8 bg-white rounded-[2rem] shadow-soft border border-stone-50 group hover:-translate-y-2 transition duration-300">
+                <div class="w-16 h-16 bg-brand/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand text-2xl group-hover:bg-brand group-hover:text-white transition">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <h3 class="font-serif font-bold text-xl text-stone-800 mb-2">Calidad Premium</h3>
+                <p class="text-stone-500 font-light text-sm">Seleccionamos cada pieza con cuidado y amor.</p>
+            </div>
+            <div class="text-center p-8 bg-white rounded-[2rem] shadow-soft border border-stone-50 group hover:-translate-y-2 transition duration-300">
+                <div class="w-16 h-16 bg-brand/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand text-2xl group-hover:bg-brand group-hover:text-white transition">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h3 class="font-serif font-bold text-xl text-stone-800 mb-2">Envío Rápido</h3>
+                <p class="text-stone-500 font-light text-sm">Llega a tu puerta seguro y a tiempo.</p>
+            </div>
+            <div class="text-center p-8 bg-white rounded-[2rem] shadow-soft border border-stone-50 group hover:-translate-y-2 transition duration-300">
+                <div class="w-16 h-16 bg-brand/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand text-2xl group-hover:bg-brand group-hover:text-white transition">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3 class="font-serif font-bold text-xl text-stone-800 mb-2">Atención Cálida</h3>
+                <p class="text-stone-500 font-light text-sm">Estamos para ayudarte en todo momento.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 py-12">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 px-4">
+            <div>
+                <span class="text-brand font-bold uppercase tracking-widest text-xs block mb-2">Novedades</span>
+                <h2 class="text-4xl md:text-5xl font-serif italic text-stone-800">Recién Llegados</h2>
+            </div>
+            <a href="/search" class="hidden md:block border-b border-stone-300 pb-1 text-stone-500 hover:text-brand hover:border-brand transition italic font-serif text-lg">Ver todo el catálogo</a>
+        </div>
+
+        <% if(products.length === 0) { %>
+            <div class="text-center py-32 bg-white rounded-[3rem] shadow-inner">
+                <i class="fas fa-box-open text-4xl text-stone-300 mb-4"></i>
+                <p class="font-serif italic text-stone-400 text-xl">Estamos preparando cosas hermosas para ti...</p>
+            </div>
+        <% } else { %>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                <% products.forEach(product => { %>
+                    <a href="/p/<%= product._id %>" class="group block bg-white p-4 rounded-[2.5rem] hover:shadow-xl transition duration-500 border border-stone-50">
+                        <div class="relative overflow-hidden rounded-[2rem] mb-6 aspect-[4/5]">
+                            <img src="<%= product.imageUrl %>" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-1000">
+                            <div class="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/10 transition duration-500"></div>
+                            
+                            <% if(product.stock <= 0) { %>
+                                <div class="absolute top-4 left-4 bg-white/90 backdrop-blur text-stone-800 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest shadow-sm">Agotado</div>
+                            <% } else { %>
+                                <div class="absolute bottom-4 right-4 bg-white text-stone-800 w-10 h-10 rounded-full flex items-center justify-center shadow-lg translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-300">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="text-center px-2 pb-4">
+                            <p class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-2"><%= product.category %></p>
+                            <h3 class="text-2xl font-serif text-stone-800 group-hover:text-brand transition italic"><%= product.name %></h3>
+                            <p class="text-stone-600 mt-2 font-bold text-lg">$<%= product.price %></p>
+                        </div>
+                    </a>
+                <% }) %>
+            </div>
+        <% } %>
+        
+        <div class="text-center mt-16 md:hidden">
+            <a href="/search" class="btn-soft px-8 py-3 text-xs uppercase tracking-widest">Ver Todo</a>
+        </div>
+    </section>
+
+    <section id="about" class="py-24 bg-[#ffffff]">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="bg-brand/5 rounded-[3rem] p-8 md:p-20 flex flex-col md:flex-row items-center gap-12 border border-brand/10">
+                <div class="md:w-1/2">
+                    <div class="aspect-square rounded-full overflow-hidden border-8 border-white shadow-2xl rotate-3 hover:rotate-0 transition duration-700">
+                        <% if(site.logoUrl) { %>
+                            <img src="<%= site.logoUrl %>" class="w-full h-full object-cover">
+                        <% } else { %>
+                            <img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" class="w-full h-full object-cover">
+                        <% } %>
+                    </div>
+                </div>
+                <div class="md:w-1/2 text-center md:text-left">
+                    <span class="text-brand font-bold uppercase tracking-widest text-xs mb-4 block">Nuestra Historia</span>
+                    <h2 class="text-4xl md:text-5xl font-serif font-bold text-stone-800 mb-6 leading-tight">Más que una tienda, un estilo de vida.</h2>
+                    <p class="text-stone-600 font-light text-lg mb-8 leading-relaxed">
+                        <%= site.content.aboutText %>
+                    </p>
+                    <a href="https://wa.me/<%= site.contact.whatsapp %>" class="text-stone-800 font-bold border-b-2 border-brand pb-1 hover:text-brand transition">
+                        Contáctanos para saber más
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('./partials/footer.html') %>
+</body>
+</html>

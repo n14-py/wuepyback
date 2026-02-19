@@ -1,0 +1,73 @@
+<footer class="bg-slate-950 border-t border-slate-900 pt-16 pb-8 text-slate-400 text-sm relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="mb-16 p-8 rounded-2xl bg-slate-900 border border-slate-800 relative overflow-hidden text-center md:text-left md:flex md:items-center md:justify-between gap-6 group">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-brand opacity-5 rounded-full blur-3xl -mr-16 -mt-16 transition group-hover:opacity-10"></div>
+            
+            <div class="relative z-10">
+                <h3 class="text-xl font-bold text-white mb-1">¿Te gusta esta tienda?</h3>
+                <p class="text-slate-400">Crea tu propio sitio web profesional como este en minutos.</p>
+            </div>
+            
+            <a href="http://lfaftech.com" class="relative z-10 inline-flex items-center gap-2 bg-white text-slate-950 px-6 py-3 rounded-xl font-bold hover:bg-brand hover:text-white transition shadow-lg transform hover:-translate-y-1">
+                <i class="fas fa-magic"></i> Crear mi tienda ahora
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+            
+            <div class="space-y-4">
+                <h3 class="text-2xl font-bold text-white"><%= site.name %></h3>
+                <p class="leading-relaxed"><%= site.content.aboutText %></p>
+                <div class="flex gap-4 pt-2">
+                    <% if(site.social.facebook) { %> <a href="<%= site.social.facebook %>" target="_blank" class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-brand hover:text-white transition"><i class="fab fa-facebook-f"></i></a> <% } %>
+                    <% if(site.social.instagram) { %> <a href="<%= site.social.instagram %>" target="_blank" class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-brand hover:text-white transition"><i class="fab fa-instagram"></i></a> <% } %>
+                    <% if(site.social.tiktok) { %> <a href="<%= site.social.tiktok %>" target="_blank" class="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-brand hover:text-white transition"><i class="fab fa-tiktok"></i></a> <% } %>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold mb-6 text-lg">Tienda</h4>
+                <ul class="space-y-3">
+                    <li><a href="/" class="hover:text-brand transition flex items-center gap-2"><i class="fas fa-chevron-right text-xs"></i> Inicio</a></li>
+                    <li><a href="/search" class="hover:text-brand transition flex items-center gap-2"><i class="fas fa-chevron-right text-xs"></i> Catálogo</a></li>
+                    <li><a href="/search?category=Ofertas" class="hover:text-brand transition flex items-center gap-2"><i class="fas fa-chevron-right text-xs"></i> Ofertas</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold mb-6 text-lg">Contáctanos</h4>
+                <ul class="space-y-4">
+                    <% if(site.contact.address) { %>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-map-marker-alt mt-1 text-brand"></i>
+                            <span><%= site.contact.address %></span>
+                        </li>
+                    <% } %>
+                    <li class="flex items-start gap-3">
+                        <i class="fab fa-whatsapp mt-1 text-brand"></i>
+                        <span><%= site.contact.phone %></span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="far fa-envelope mt-1 text-brand"></i>
+                        <span><%= site.contact.email %></span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="text-white font-bold mb-6 text-lg">Novedades</h4>
+                <p class="mb-4 text-xs">Suscríbete para recibir ofertas.</p>
+                <form onsubmit="event.preventDefault(); alert('Gracias por suscribirte!');" class="space-y-2">
+                    <input type="email" placeholder="Tu correo" class="w-full bg-slate-900 border border-slate-800 rounded px-4 py-2 focus:ring-1 focus:ring-brand focus:border-transparent">
+                    <button class="w-full bg-slate-800 hover:bg-brand hover:text-white text-slate-300 py-2 rounded font-bold transition">Suscribirse</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="border-t border-slate-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+            <p>&copy; <%= new Date().getFullYear() %> <%= site.name %>. Todos los derechos reservados.</p>
+            <p>Tecnología por <a href="http://lfaftech.com" class="text-slate-500 hover:text-white font-bold">LFAFTECH</a></p>
+        </div>
+    </div>
+</footer>

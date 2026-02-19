@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= site.name %> | SYSTEM</title>
+</head>
+<body class="font-sans antialiased">
+
+    <%- include('./partials/header.html') %>
+
+    <section class="relative min-h-[70vh] flex items-center justify-center overflow-hidden border-b border-gray-800">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-cyber via-transparent to-cyber"></div>
+        
+        <div class="absolute left-10 top-0 w-px h-full bg-gradient-to-b from-transparent via-brand to-transparent opacity-20"></div>
+        <div class="absolute right-10 top-0 w-px h-full bg-gradient-to-b from-transparent via-brand to-transparent opacity-20"></div>
+
+        <div class="relative z-10 text-center max-w-5xl px-4">
+            <div class="inline-block border border-brand/50 bg-brand/5 text-brand px-4 py-1 text-xs font-mono mb-6 uppercase tracking-widest">
+                System_Update_2.0: New Collection Loaded
+            </div>
+            <h1 class="text-5xl md:text-8xl font-bold text-white mb-6 uppercase tracking-tighter leading-none hover-glitch transition-all cursor-default">
+                <%= site.content.heroTitle %>
+            </h1>
+            <p class="text-gray-400 font-mono text-sm md:text-base max-w-2xl mx-auto mb-10 border-l-2 border-brand pl-4 text-left md:text-center md:border-none">
+                >> <%= site.content.heroSubtitle %>
+            </p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="/search" class="btn-cyber px-8 py-4 font-bold tracking-widest text-sm">
+                    ACCESS_CATALOG
+                </a>
+                <a href="#featured" class="px-8 py-4 text-gray-400 hover:text-white border border-transparent hover:border-gray-700 font-mono text-sm transition">
+                    SCROLL_DOWN v
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <div class="border-b border-gray-800 bg-panel">
+        <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-center font-mono text-xs">
+            <div class="border border-gray-800 p-4">
+                <i class="fas fa-shield-alt text-2xl text-brand mb-2"></i>
+                <div class="text-gray-500">SECURITY</div>
+                <div class="text-white font-bold">ENCRYPTED</div>
+            </div>
+            <div class="border border-gray-800 p-4">
+                <i class="fas fa-bolt text-2xl text-brand mb-2"></i>
+                <div class="text-gray-500">DELIVERY</div>
+                <div class="text-white font-bold">HYPER_SPEED</div>
+            </div>
+            <div class="border border-gray-800 p-4">
+                <i class="fas fa-cube text-2xl text-brand mb-2"></i>
+                <div class="text-gray-500">QUALITY</div>
+                <div class="text-white font-bold">PREMIUM_GRD</div>
+            </div>
+            <div class="border border-gray-800 p-4">
+                <i class="fas fa-headset text-2xl text-brand mb-2"></i>
+                <div class="text-gray-500">SUPPORT</div>
+                <div class="text-white font-bold">ONLINE</div>
+            </div>
+        </div>
+    </div>
+
+    <section id="featured" class="max-w-7xl mx-auto px-4 py-20">
+        <div class="flex items-end justify-between mb-12 border-b border-gray-800 pb-4">
+            <div>
+                <h2 class="text-3xl font-bold text-white uppercase tracking-tighter">New_Arrivals</h2>
+                <p class="text-xs text-brand font-mono mt-1">>> SCANNING DATABASE...</p>
+            </div>
+            <a href="/search" class="hidden md:block text-xs font-mono text-gray-500 hover:text-white">[VIEW_ALL]</a>
+        </div>
+
+        <% if(products.length === 0) { %>
+            <div class="border border-brand border-dashed p-12 text-center bg-brand/5">
+                <p class="text-brand font-mono">ERROR: NO_DATA_FOUND. Please try again later.</p>
+            </div>
+        <% } else { %>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <% products.forEach(product => { %>
+                    <a href="/p/<%= product._id %>" class="group relative block bg-panel border border-gray-800 hover:border-brand transition duration-300 overflow-hidden">
+                        <div class="absolute top-2 left-2 z-10 text-[10px] font-mono text-brand bg-black px-1 opacity-0 group-hover:opacity-100 transition">ID: <%= product._id.toString().slice(-4) %></div>
+                        
+                        <div class="aspect-square bg-black relative overflow-hidden">
+                            <img src="<%= product.imageUrl %>" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-110 transition duration-500">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-brand/50 shadow-neon -translate-y-full group-hover:translate-y-[300px] transition-transform duration-1000"></div>
+                            
+                            <% if(product.stock <= 0) { %>
+                                <div class="absolute inset-0 bg-black/80 flex items-center justify-center">
+                                    <span class="border border-red-500 text-red-500 px-2 py-1 font-mono text-xs font-bold bg-red-900/20">OFFLINE</span>
+                                </div>
+                            <% } %>
+                        </div>
+                        
+                        <div class="p-4 border-t border-gray-800 relative bg-cyber">
+                            <p class="text-[10px] font-mono text-gray-500 uppercase mb-1">> <%= product.category %></p>
+                            <h3 class="text-white font-bold truncate text-lg group-hover:text-brand transition"><%= product.name %></h3>
+                            <div class="flex justify-between items-center mt-3">
+                                <span class="text-xl font-mono text-brand font-bold">$<%= product.price %></span>
+                                <i class="fas fa-plus text-gray-600 group-hover:text-white text-xs border border-gray-700 p-1"></i>
+                            </div>
+                        </div>
+                    </a>
+                <% }) %>
+            </div>
+        <% } %>
+    </section>
+
+    <section class="border-y border-gray-800 bg-panel py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-2xl text-white font-bold uppercase mb-4 tracking-widest">System_Information</h2>
+            <p class="text-gray-400 font-mono text-sm leading-relaxed mb-8">
+                <%= site.content.aboutText %>
+            </p>
+            <a href="https://wa.me/<%= site.contact.whatsapp %>" target="_blank" class="inline-block border border-gray-600 text-gray-300 px-6 py-2 font-mono text-xs hover:border-brand hover:text-brand transition">
+                [ INITIATE_COMMUNICATION ]
+            </a>
+        </div>
+    </section>
+
+    <%- include('./partials/footer.html') %>
+</body>
+</html>

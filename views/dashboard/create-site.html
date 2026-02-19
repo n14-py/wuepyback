@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Tienda Profesional | LFAFTECH</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        .main-header { position: relative; z-index: 50; }
+        [x-cloak] { display: none !important; }
+        /* Animaciones suaves para las plantillas */
+        .template-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .template-card:hover { transform: translateY(-5px); }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+<%- include('../partials/header.html') %>
+
+<div class="min-h-screen bg-slate-50 py-12" x-data="{ 
+    step: 1, 
+    selectedTemplate: 'template1',
+    subdomain: '',
+    siteName: '',
+    whatsapp: '',
+    
+    nextStep() {
+        if (this.step === 1 && (!this.siteName || !this.subdomain)) return alert('Completa el nombre y el subdominio para continuar.');
+        if (this.step === 3 && !this.whatsapp) return alert('El WhatsApp es obligatorio para que puedas vender.');
+        this.step++;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}">
+    
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Crea tu Tienda Profesional</h1>
+            <p class="mt-2 text-lg text-slate-500">Configura tu presencia digital en 5 sencillos pasos.</p>
+        </div>
+
+        <div class="mb-8 max-w-4xl mx-auto">
+            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-slate-200">
+                <div :style="'width: ' + ((step / 5) * 100) + '%'" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-600 transition-all duration-500 ease-in-out"></div>
+            </div>
+            <div class="grid grid-cols-5 text-xs font-medium text-slate-500 uppercase tracking-wide text-center">
+                <span :class="{ 'text-blue-600 font-bold': step >= 1 }">1. Identidad</span>
+                <span :class="{ 'text-blue-600 font-bold': step >= 2 }">2. Diseño</span>
+                <span :class="{ 'text-blue-600 font-bold': step >= 3 }">3. Contacto</span>
+                <span :class="{ 'text-blue-600 font-bold': step >= 4 }">4. Redes</span>
+                <span :class="{ 'text-blue-600 font-bold': step >= 5 }">5. Contenido</span>
+            </div>
+        </div>
+
+        <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-slate-200 relative min-h-[600px]">
+            
+            <form action="/dashboard/site/create" method="POST" enctype="multipart/form-data">
+                
+                <div x-show="step === 1" x-transition:enter="transition ease-out duration-300" class="p-8">
+                    <div class="text-center mb-8">
+                        <div class="mx-auto h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-store text-blue-600 text-2xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-900">Datos del Negocio</h2>
+                        <p class="text-slate-500">Lo primero es lo primero. ¿Cómo te llamaremos?</p>
+                    </div>
+
+                    <div class="max-w-lg mx-auto space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Nombre de tu Marca</label>
+                            <input type="text" name="name" x-model="siteName" required class="block w-full px-4 py-3 rounded-lg border-slate-300 focus:ring-blue-500 focus:border-blue-500 shadow-sm" placeholder="Ej: Moda Asunción">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Dirección Web (Subdominio)</label>
+                            <div class="flex rounded-md shadow-sm">
+                                <input type="text" name="subdomain" x-model="subdomain" required class="flex-1 min-w-0 block w-full px-4 py-3 rounded-l-lg border-slate-300 focus:ring-blue-500 focus:border-blue-500" placeholder="modaasuncion">
+                                <span class="inline-flex items-center px-4 rounded-r-lg border border-l-0 border-slate-300 bg-slate-50 text-slate-500 font-bold text-sm">.lfaftech.com</span>
+                            </div>
+                            <p class="mt-2 text-xs text-slate-500">Así te encontrarán tus clientes en internet.</p>
+                        </div>
+                        
+                        <input type="hidden" name="appType" value="store">
+                        <input type="hidden" name="currency" value="PYG"> 
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Logo del Negocio (Opcional)</label>
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-lg hover:bg-slate-50 transition cursor-pointer relative">
+                                <input id="file-upload" name="logo" type="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                <div class="space-y-1 text-center pointer-events-none">
+                                    <i class="fas fa-cloud-upload-alt text-slate-400 text-3xl"></i>
+                                    <div class="text-sm text-slate-600">
+                                        <span class="font-medium text-blue-600">Sube un archivo</span> o arrástralo aquí
+                                    </div>
+                                    <p class="text-xs text-slate-500">PNG, JPG hasta 5MB</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="step === 2" x-transition:enter="transition ease-out duration-300" style="display: none;" class="p-8 bg-slate-50/50">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold text-slate-900">Elige la personalidad de tu tienda</h2>
+                        <p class="text-slate-500">Selecciona una plantilla base. Podrás cambiar los colores después.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                        
+                        <div @click="selectedTemplate = 'template1'" 
+                             class="template-card relative group cursor-pointer border-2 rounded-xl overflow-hidden"
+                             :class="selectedTemplate === 'template1' ? 'border-blue-600 ring-4 ring-blue-600/20 scale-[1.02]' : 'border-slate-200 hover:border-blue-400 hover:shadow-lg'">
+                            <div class="h-40 bg-slate-900 p-4 flex flex-col justify-between relative overflow-hidden">
+                                <div class="flex justify-between items-center opacity-50">
+                                    <div class="w-8 h-2 bg-white rounded"></div>
+                                    <div class="flex gap-1"><div class="w-4 h-2 bg-white rounded"></div><div class="w-4 h-2 bg-white rounded"></div></div>
+                                </div>
+                                <div class="text-center relative z-10">
+                                    <div class="w-24 h-3 bg-blue-500 rounded-full mx-auto mb-2 opacity-80"></div>
+                                    <div class="w-16 h-2 bg-slate-600 rounded mx-auto"></div>
+                                </div>
+                                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-blue-500 blur-[40px] opacity-30"></div>
+                            </div>
+                            <div class="p-4 bg-white">
+                                <div class="flex justify-between items-center mb-1">
+                                    <h3 class="font-bold text-slate-900">Modern Dark</h3>
+                                    <span class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-600 font-medium">Top</span>
+                                </div>
+                                <p class="text-xs text-slate-500">Elegante, fondo oscuro y acentos neón.</p>
+                            </div>
+                            <div x-show="selectedTemplate === 'template1'" class="absolute top-2 right-2 bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-sm"><i class="fas fa-check text-xs"></i></div>
+                        </div>
+
+                        <div @click="selectedTemplate = 'template2'" 
+                             class="template-card relative group cursor-pointer border-2 rounded-xl overflow-hidden"
+                             :class="selectedTemplate === 'template2' ? 'border-blue-600 ring-4 ring-blue-600/20 scale-[1.02]' : 'border-slate-200 hover:border-blue-400 hover:shadow-lg'">
+                            <div class="h-40 bg-white p-4 flex flex-col relative border-b border-slate-100">
+                                <div class="w-full h-1 bg-blue-600 absolute top-0 left-0"></div>
+                                <div class="flex justify-between items-center mt-2 mb-6">
+                                    <div class="w-10 h-3 bg-slate-800 rounded-sm"></div>
+                                    <div class="w-20 h-2 bg-slate-200 rounded"></div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <div class="w-1/2 h-16 bg-slate-100 rounded"></div>
+                                    <div class="w-1/2 flex flex-col justify-center">
+                                        <div class="w-16 h-2 bg-slate-800 rounded mb-2"></div>
+                                        <div class="w-10 h-2 bg-blue-600 rounded"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-white">
+                                <div class="flex justify-between items-center mb-1">
+                                    <h3 class="font-bold text-slate-900">Classic Clean</h3>
+                                    <span class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-600 font-medium">Minimal</span>
+                                </div>
+                                <p class="text-xs text-slate-500">Limpio, fondo blanco, estilo Shopify.</p>
+                            </div>
+                            <div x-show="selectedTemplate === 'template2'" class="absolute top-2 right-2 bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-sm"><i class="fas fa-check text-xs"></i></div>
+                        </div>
+
+                        <div @click="selectedTemplate = 'template3'" 
+                             class="template-card relative group cursor-pointer border-2 rounded-xl overflow-hidden"
+                             :class="selectedTemplate === 'template3' ? 'border-black ring-4 ring-slate-200 scale-[1.02]' : 'border-slate-200 hover:border-black hover:shadow-lg'">
+                            <div class="h-40 bg-white p-4 flex flex-col relative border-b-2 border-black">
+                                <div class="border-2 border-black p-1 mb-2 bg-black text-white text-[9px] font-black text-center uppercase">Nueva Colección</div>
+                                <div class="grid grid-cols-2 gap-2 h-full">
+                                    <div class="border-2 border-black bg-slate-200"></div>
+                                    <div class="border-2 border-black bg-white flex items-center justify-center">
+                                        <div class="w-6 h-6 rounded-full border-2 border-black bg-yellow-400"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-white">
+                                <div class="flex justify-between items-center mb-1">
+                                    <h3 class="font-black uppercase text-slate-900">Urban Bold</h3>
+                                    <span class="text-xs border border-black px-2 py-0.5 font-bold text-black bg-yellow-300">COOL</span>
+                                </div>
+                                <p class="text-xs text-slate-500 font-medium">Bordes gruesos, estilo streetwear.</p>
+                            </div>
+                            <div x-show="selectedTemplate === 'template3'" class="absolute top-2 right-2 bg-black text-white w-6 h-6 flex items-center justify-center border border-white shadow-sm"><i class="fas fa-check text-xs"></i></div>
+                        </div>
+
+                        <div @click="selectedTemplate = 'template4'" 
+                             class="template-card relative group cursor-pointer border-2 rounded-3xl overflow-hidden"
+                             :class="selectedTemplate === 'template4' ? 'border-pink-300 ring-4 ring-pink-100 scale-[1.02]' : 'border-slate-200 hover:border-pink-300 hover:shadow-lg'">
+                            <div class="h-40 bg-[#fdfbf7] p-4 flex flex-col items-center justify-center relative">
+                                <div class="w-14 h-14 rounded-full border border-pink-200 flex items-center justify-center mb-2 bg-white shadow-sm">
+                                    <i class="fas fa-heart text-pink-300 text-xs"></i>
+                                </div>
+                                <div class="w-20 h-1 bg-pink-300 rounded-full mb-1"></div>
+                                <div class="w-12 h-1 bg-slate-200 rounded-full"></div>
+                            </div>
+                            <div class="p-4 bg-white text-center">
+                                <h3 class="font-serif italic font-bold text-slate-900 mb-1">Soft Boutique</h3>
+                                <p class="text-xs text-slate-500">Delicado, curvas suaves y tonos pastel.</p>
+                            </div>
+                            <div x-show="selectedTemplate === 'template4'" class="absolute top-3 right-3 bg-pink-400 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-sm"><i class="fas fa-check text-xs"></i></div>
+                        </div>
+
+                        <div @click="selectedTemplate = 'template5'" 
+                             class="template-card relative group cursor-pointer border-2 rounded-xl overflow-hidden bg-black"
+                             :class="selectedTemplate === 'template5' ? 'border-green-500 ring-4 ring-green-900/50 scale-[1.02]' : 'border-slate-800 hover:border-green-500 hover:shadow-[0_0_15px_rgba(34,197,94,0.3)]'">
+                            <div class="h-40 bg-black p-4 relative overflow-hidden">
+                                <div class="absolute inset-0" style="background-image: linear-gradient(rgba(0,255,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,0,0.1) 1px, transparent 1px); background-size: 20px 20px;"></div>
+                                <div class="relative z-10 border border-green-500/50 p-2 h-full flex flex-col justify-end">
+                                    <div class="text-[8px] text-green-500 font-mono mb-1">SYSTEM_READY...</div>
+                                    <div class="w-full h-2 bg-green-500/20 overflow-hidden">
+                                        <div class="h-full w-2/3 bg-green-500"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-gray-900 border-t border-gray-800">
+                                <div class="flex justify-between items-center mb-1">
+                                    <h3 class="font-mono font-bold text-green-400 uppercase tracking-wider">Cyber Tech</h3>
+                                    <i class="fas fa-microchip text-gray-600"></i>
+                                </div>
+                                <p class="text-xs text-gray-400 font-mono">Futurista, técnico y gamer.</p>
+                            </div>
+                            <div x-show="selectedTemplate === 'template5'" class="absolute top-2 right-2 bg-green-500 text-black w-6 h-6 flex items-center justify-center font-bold shadow-[0_0_10px_rgba(34,197,94,0.8)]"><i class="fas fa-check text-xs"></i></div>
+                        </div>
+
+                        <div @click="selectedTemplate = 'template6'" 
+                             class="template-card relative group cursor-pointer border-2 rounded-xl overflow-hidden"
+                             :class="selectedTemplate === 'template6' ? 'border-pink-500 ring-4 ring-pink-200 scale-[1.02]' : 'border-slate-200 hover:border-pink-300 hover:shadow-lg'">
+                            <div class="h-40 bg-pink-50 p-4 flex flex-col items-center justify-center relative border-b border-pink-100">
+                                <div class="font-serif italic text-2xl text-pink-500 mb-2">Chic</div>
+                                <div class="flex gap-2">
+                                    <div class="w-8 h-10 bg-white rounded-lg shadow-sm border border-white"></div>
+                                    <div class="w-8 h-10 bg-white rounded-lg shadow-sm border border-white"></div>
+                                    <div class="w-8 h-10 bg-white rounded-lg shadow-sm border border-white"></div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-white">
+                                <div class="flex justify-between items-center mb-1">
+                                    <h3 class="font-bold text-slate-900 font-serif">Pink Glam</h3>
+                                    <span class="text-xs bg-pink-100 text-pink-600 px-2 py-1 rounded font-bold">Cute</span>
+                                </div>
+                                <p class="text-xs text-slate-500">Femenino, script fonts y rosa pastel.</p>
+                            </div>
+                            <div x-show="selectedTemplate === 'template6'" class="absolute top-2 right-2 bg-pink-500 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-sm"><i class="fas fa-check text-xs"></i></div>
+                        </div>
+
+                    </div>
+                    
+                    <input type="hidden" name="template" :value="selectedTemplate">
+
+                    <div class="mt-10 pt-8 border-t border-slate-200 max-w-4xl mx-auto">
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">Colores de Marca (Opcional)</h3>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Color Principal</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" name="primaryColor" value="#3b82f6" class="h-10 w-16 rounded border border-slate-300 p-1 cursor-pointer">
+                                    <span class="text-xs text-slate-500">Botones y destacados</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Color Secundario</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" name="secondaryColor" value="#1e293b" class="h-10 w-16 rounded border border-slate-300 p-1 cursor-pointer">
+                                    <span class="text-xs text-slate-500">Fondos y textos</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="step === 3" x-transition:enter="transition ease-out duration-300" style="display: none;" class="p-8">
+                    <div class="text-center mb-8">
+                        <div class="mx-auto h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fab fa-whatsapp text-green-600 text-3xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-900">Canal de Ventas</h2>
+                        <p class="text-slate-500">¿Dónde quieres recibir los pedidos?</p>
+                    </div>
+
+                    <div class="max-w-lg mx-auto space-y-6">
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-5">
+                            <label class="block text-sm font-bold text-blue-900 mb-1">Número de WhatsApp (Obligatorio)</label>
+                            <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-green-600">
+                                    <i class="fab fa-whatsapp text-lg"></i>
+                                </div>
+                                <input type="text" name="whatsapp" x-model="whatsapp" required class="block w-full pl-10 py-3 border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: 595981123456 (con código país)">
+                            </div>
+                            <p class="mt-2 text-xs text-blue-700 font-medium">Los botones de 'Comprar' abrirán un chat contigo.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Correo de Contacto</label>
+                            <input type="email" name="contactEmail" value="<%= user.email %>" class="block w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Horario</label>
+                                <input type="text" name="schedule" class="block w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm focus:ring-blue-500" placeholder="08:00 - 18:00">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Ciudad</label>
+                                <input type="text" name="address" class="block w-full px-4 py-2 border border-slate-300 rounded-lg shadow-sm focus:ring-blue-500" placeholder="Tu ciudad">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="step === 4" x-transition:enter="transition ease-out duration-300" style="display: none;" class="p-8">
+                    <div class="text-center mb-8">
+                        <div class="mx-auto h-16 w-16 bg-pink-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-hashtag text-pink-600 text-2xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-900">Conecta tus Redes</h2>
+                        <p class="text-slate-500">Pega los enlaces de tus perfiles.</p>
+                    </div>
+
+                    <div class="max-w-lg mx-auto space-y-4">
+                        <div class="flex rounded-md shadow-sm">
+                            <span class="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-slate-300 bg-slate-50 text-slate-500"><i class="fab fa-facebook-f text-lg"></i></span>
+                            <input type="text" name="facebook" class="flex-1 block w-full px-4 py-3 rounded-r-lg border border-slate-300 focus:ring-blue-500 focus:border-blue-500" placeholder="https://facebook.com/tu-pagina">
+                        </div>
+
+                        <div class="flex rounded-md shadow-sm">
+                            <span class="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-slate-300 bg-slate-50 text-slate-500"><i class="fab fa-instagram text-lg"></i></span>
+                            <input type="text" name="instagram" class="flex-1 block w-full px-4 py-3 rounded-r-lg border border-slate-300 focus:ring-blue-500 focus:border-blue-500" placeholder="https://instagram.com/tu-usuario">
+                        </div>
+
+                        <div class="flex rounded-md shadow-sm">
+                            <span class="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-slate-300 bg-slate-50 text-slate-500"><i class="fab fa-tiktok text-lg"></i></span>
+                            <input type="text" name="tiktok" class="flex-1 block w-full px-4 py-3 rounded-r-lg border border-slate-300 focus:ring-blue-500 focus:border-blue-500" placeholder="https://tiktok.com/@tu-usuario">
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="step === 5" x-transition:enter="transition ease-out duration-300" style="display: none;" class="p-8">
+                    <div class="text-center mb-8">
+                        <div class="mx-auto h-16 w-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-pen-nib text-orange-600 text-2xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-900">Personaliza la Portada</h2>
+                        <p class="text-slate-500">¿Qué mensaje quieres dar a tus visitantes?</p>
+                    </div>
+
+                    <div class="max-w-lg mx-auto space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Título Principal (Hero)</label>
+                            <input type="text" name="heroTitle" class="block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: La mejor tecnología a tu alcance">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Subtítulo</label>
+                            <input type="text" name="heroSubtitle" class="block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Ej: Envíos gratis en compras mayores a $50">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-1">Sobre Nosotros</label>
+                            <textarea name="aboutText" rows="4" class="block w-full px-4 py-3 border border-slate-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Cuenta brevemente tu historia..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-8 py-5 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                    <button type="button" @click="step--" x-show="step > 1" class="inline-flex items-center px-6 py-3 border border-slate-300 shadow-sm text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                        <i class="fas fa-arrow-left mr-2"></i> Atrás
+                    </button>
+                    <div x-show="step === 1"></div> 
+
+                    <button type="button" @click="nextStep()" x-show="step < 5" class="ml-auto inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                        Siguiente <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+
+                    <button type="submit" x-show="step === 5" class="ml-auto inline-flex items-center px-8 py-3 border border-transparent text-lg font-bold rounded-lg shadow-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-500/50 transition transform hover:-translate-y-1">
+                        <i class="fas fa-check-circle mr-2"></i> CREAR TIENDA
+                    </button>
+                </div>
+
+            </form>
+        </div>
+        
+        <p class="text-center text-sm text-slate-400 mt-8">
+            <a href="/dashboard" class="hover:text-slate-600 font-medium">Cancelar y volver al panel</a>
+        </p>
+    </div>
+</div>
+
+<%- include('../partials/footer.html') %>
+
+</body>
+</html>

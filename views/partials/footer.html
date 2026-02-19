@@ -1,0 +1,74 @@
+<footer class="main-footer">
+    <div class="container">
+        <div class="footer-grid">
+            
+            <div class="footer-col">
+                <a href="/" class="logo" style="color: white; font-size: 1.8rem; display: block; margin-bottom: 1rem;">
+                    LFAF<span>TECH</span>
+                </a>
+                <p style="opacity: 0.7; font-size: 0.9rem; max-width: 300px; margin-bottom: 1.5rem;">
+                    El ecosistema digital para emprendedores que no se detienen.
+                    Crea, gestiona y escala tu negocio desde un solo lugar.
+                </p>
+                <div style="display: flex; gap: 0.8rem;">
+                    <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-tiktok"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Productos</h4>
+                <ul>
+                    <li><a href="#"><i class="fas fa-store" style="margin-right:8px; color: var(--primary-color);"></i> LFAF Store</a></li>
+                    <li><a href="#" style="opacity: 0.5; cursor: default;"><i class="fas fa-calendar" style="margin-right:8px;"></i> Booking <small style="font-size: 0.7em; background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 4px;">Pronto</small></a></li>
+                    <li><a href="#" style="opacity: 0.5; cursor: default;"><i class="fas fa-utensils" style="margin-right:8px;"></i> Menu <small style="font-size: 0.7em; background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 4px;">Pronto</small></a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Compañía</h4>
+                <ul>
+                    <li><a href="/login">Iniciar Sesión</a></li>
+                    <li><a href="/register">Crear Cuenta</a></li>
+                    <li><a href="/contact">Contacto</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacidad</a></li>
+                    <li><a href="#">Términos de Uso</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; margin-top: 2rem; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.85rem;">
+            <p>&copy; <%= new Date().getFullYear() %> LFAFTECH. Todos los derechos reservados.</p>
+            <p style="margin-top: 0.5rem;">
+                Hecho con <i class="fas fa-bolt" style="color: var(--warning-color);"></i> en Paraguay 🇵🇾 para el mundo.
+            </p>
+        </div>
+    </div>
+</footer>
+
+<style>
+    /* Estilos Mini para Footer (si no cargan del style.css) */
+    .social-btn {
+        width: 36px;
+        height: 36px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .social-btn:hover {
+        background: var(--primary-color);
+        transform: translateY(-3px);
+    }
+</style>

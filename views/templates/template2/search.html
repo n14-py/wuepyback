@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda | <%= site.name %></title>
+</head>
+<body class="bg-white text-gray-800">
+
+    <%- include('./partials/header.html') %>
+
+    <div class="bg-gray-50 py-12 mb-8 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h1 class="text-3xl font-bold text-gray-900 uppercase tracking-wide">
+                <%= searchQuery ? `Buscar: "${searchQuery}"` : (currentCategory || 'Nuestra Colección') %>
+            </h1>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 pb-20 flex flex-col lg:flex-row gap-12">
+        
+        <aside class="w-full lg:w-64 flex-shrink-0">
+            <div class="lg:sticky lg:top-24">
+                <h3 class="font-bold text-gray-900 uppercase tracking-wider text-xs border-b border-gray-200 pb-2 mb-4">Filtrar por</h3>
+                
+                <div class="flex lg:flex-col gap-2 overflow-x-auto pb-2">
+                    <a href="/search" class="text-sm py-2 px-3 rounded <%= !currentCategory ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100' %>">
+                        Todo
+                    </a>
+                    <% categories.forEach(cat => { %>
+                        <a href="/search?category=<%= cat %>" class="text-sm py-2 px-3 rounded <%= currentCategory === cat ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100' %>">
+                            <%= cat %>
+                        </a>
+                    <% }) %>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1">
+            <% if(products.length === 0) { %>
+                <div class="text-center py-20 border border-gray-200 rounded">
+                    <p class="text-gray-500">No hay productos que coincidan.</p>
+                    <a href="/search" class="text-brand font-bold mt-2 hover:underline">Limpiar filtros</a>
+                </div>
+            <% } else { %>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+                    <% products.forEach(product => { %>
+                        <a href="/p/<%= product._id %>" class="group block">
+                            <div class="relative overflow-hidden mb-4 bg-gray-100 aspect-[3/4]">
+                                <img src="<%= product.imageUrl %>" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-700">
+                                <% if(product.stock <= 0) { %>
+                                    <div class="absolute bottom-0 left-0 w-full bg-gray-900 text-white text-center py-2 text-xs font-bold uppercase">Agotado</div>
+                                <% } %>
+                            </div>
+                            <div>
+                                <h3 class="text-gray-900 font-medium group-hover:text-brand transition"><%= product.name %></h3>
+                                <div class="flex justify-between items-center mt-1">
+                                    <p class="text-gray-500 text-sm">$<%= product.price %></p>
+                                </div>
+                            </div>
+                        </a>
+                    <% }) %>
+                </div>
+            <% } %>
+        </main>
+    </div>
+
+    <%- include('./partials/footer.html') %>
+
+</body>
+</html>

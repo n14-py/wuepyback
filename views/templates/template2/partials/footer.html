@@ -1,0 +1,71 @@
+<div class="bg-gray-900 py-8 border-t border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
+        <div class="flex items-center gap-3">
+            <div class="bg-white/10 p-3 rounded-full text-white">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <div>
+                <p class="text-white font-bold text-lg">Crea tu propia tienda online</p>
+                <p class="text-gray-400 text-sm">Empieza gratis con LFAFTECH hoy mismo.</p>
+            </div>
+        </div>
+        <a href="http://lfaftech.com" class="bg-white text-gray-900 px-6 py-2 rounded-full font-bold text-sm hover:bg-brand hover:text-white transition shadow-lg">
+            EMPEZAR AHORA &rarr;
+        </a>
+    </div>
+</div>
+
+<footer id="footer" class="bg-gray-50 pt-16 pb-8 text-gray-500 text-sm font-light">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            
+            <div class="col-span-1 md:col-span-1">
+                <h3 class="text-xl font-bold text-gray-900 mb-4"><%= site.name %></h3>
+                <p class="mb-6 leading-relaxed text-gray-600"><%= site.content.aboutText %></p>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-gray-900 uppercase tracking-wider text-xs mb-6">Navegación</h4>
+                <ul class="space-y-3">
+                    <li><a href="/" class="hover:text-brand transition hover:underline">Inicio</a></li>
+                    <li><a href="/search" class="hover:text-brand transition hover:underline">Todos los productos</a></li>
+                    <li><a href="/search?category=Nuevos" class="hover:text-brand transition hover:underline">Nuevos Ingresos</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-gray-900 uppercase tracking-wider text-xs mb-6">Atención al Cliente</h4>
+                <ul class="space-y-4">
+                    <% if(site.contact.address) { %>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-map-pin mt-1 text-gray-400"></i>
+                            <span><%= site.contact.address %></span>
+                        </li>
+                    <% } %>
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-phone mt-1 text-gray-400"></i>
+                        <span><%= site.contact.phone %></span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="far fa-envelope mt-1 text-gray-400"></i>
+                        <span><%= site.contact.email %></span>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-gray-900 uppercase tracking-wider text-xs mb-6">Boletín</h4>
+                <p class="mb-4 text-xs">Suscríbete para recibir descuentos exclusivos.</p>
+                <form class="flex" onsubmit="event.preventDefault();">
+                    <input type="email" placeholder="Email" class="w-full bg-white border border-gray-300 rounded-l px-3 py-2 text-sm focus:outline-none focus:border-brand">
+                    <button class="bg-gray-900 text-white px-4 py-2 rounded-r hover:bg-brand transition">OK</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+            <p>&copy; <%= new Date().getFullYear() %> <%= site.name %>. Todos los derechos reservados.</p>
+            <a href="http://lfaftech.com" class="text-gray-400 hover:text-brand font-bold">Powered by LFAFTECH</a>
+        </div>
+    </div>
+</footer>

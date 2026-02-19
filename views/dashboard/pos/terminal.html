@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Terminal de Ventas - LFAF Sales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; overscroll-behavior: contain; }
+        .cart-height { height: calc(100vh - 340px); }
+        @media (min-width: 768px) { .cart-height { height: calc(100vh - 380px); } }
+        .numpad-btn { @apply h-16 bg-white border border-gray-200 rounded-2xl text-xl font-bold active:bg-indigo-100 transition-colors; }
+        #reader { width: 100% !important; border: none !important; }
+        #reader video { border-radius: 20px; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="flex flex-col md:flex-row h-screen overflow-hidden">
+        
+        <div class="flex-1 flex flex-col h-full bg-gray-100 border-r border-gray-200">
+            <div class="p-4 bg-white shadow-sm z-10">
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="productSearch" placeholder="Nombre o código..." 
+                               class="w-full pl-11 pr-4 py-3 bg-gray-100 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <button onclick="startScanner()" class="bg-indigo-600 text-white px-5 rounded-2xl shadow-lg shadow-indigo-200">
+                        <i class="fas fa-barcode"></i>
+                    </button>
+                    <a href="/dashboard/pos/inventory" class="bg-white border border-gray-200 text-gray-500 px-5 rounded-2xl flex items-center">
+                        <i class="fas fa-boxes"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4" id="productsGrid">
+                <% products.forEach(product => { %>
+                    <div onclick="handleProductClick('<%= JSON.stringify(product) %>')" 
+                         class="bg-white p-3 rounded-2xl shadow-sm border border-transparent hover:border-indigo-500 transition-all cursor-pointer group">
+                        <div class="h-24 w-full bg-gray-50 rounded-xl mb-3 flex items-center justify-center text-3xl text-gray-300 group-hover:scale-105 transition-transform">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                        <h4 class="font-bold text-sm text-gray-900 truncate"><%= product.name %></h4>
+                        <p class="text-indigo-600 font-bold text-xs"><%= product.salePrice.toLocaleString('es-PY') %> ₲</p>
+                        <span class="text-[9px] text-gray-400 uppercase font-bold"><%= product.stock %> Disp.</span>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+
+        <div class="w-full md:w-[400px] bg-white flex flex-col shadow-2xl z-20">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold flex items-center gap-2">
+                    <i class="fas fa-shopping-cart text-indigo-600"></i> Carrito
+                </h3>
+                <button onclick="clearCart()" class="text-xs font-bold text-red-400 uppercase tracking-wider">Vaciar</button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 cart-height" id="cartItems">
+                <div class="text-center py-20 text-gray-300 italic">
+                    <i class="fas fa-cart-plus text-5xl mb-4 block"></i>
+                    El carrito está vacío
+                </div>
+            </div>
+
+            <div class="p-6 bg-gray-50 border-t border-gray-200 space-y-4">
+                <div class="flex justify-between items-center text-gray-500">
+                    <span>Subtotal</span>
+                    <span id="subtotalLabel">0 ₲</span>
+                </div>
+                <div class="flex justify-between items-center text-2xl font-black text-gray-900">
+                    <span>TOTAL</span>
+                    <span id="totalLabel" class="text-indigo-600">0 ₲</span>
+                </div>
+                
+                <button onclick="openCheckoutModal()" id="btnCobrar" disabled
+                        class="w-full py-5 bg-gray-300 text-white rounded-3xl font-black text-xl shadow-xl transition-all flex justify-between px-8 items-center">
+                    <span>COBRAR</span>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="scannerModal" class="fixed inset-0 bg-black/90 z-[100] hidden flex-col items-center justify-center p-6 backdrop-blur-md">
+        <div class="w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-2xl">
+            <div id="reader"></div>
+            <div class="p-6 text-center">
+                <p class="text-gray-500 font-medium mb-4">Apunta al código de barras</p>
+                <button onclick="stopScanner()" class="w-full py-3 bg-red-50 text-red-500 rounded-xl font-bold">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="weightModal" class="fixed inset-0 bg-black/60 z-[110] hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-xs rounded-3xl p-6 shadow-2xl animate-in zoom-in duration-200">
+            <h3 id="weightProductName" class="text-lg font-bold text-center mb-1">Producto</h3>
+            <p class="text-center text-indigo-600 font-bold mb-6" id="weightProductPrice">0 ₲ / KG</p>
+            
+            <div class="bg-gray-100 rounded-2xl p-4 mb-6 text-center">
+                <span class="text-xs font-bold text-gray-400 block mb-1">CANTIDAD (KG)</span>
+                <input type="number" id="weightInput" value="0" step="0.001" 
+                       class="bg-transparent text-4xl font-black text-gray-900 w-full text-center outline-none">
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                <button onclick="appendWeight('1')" class="numpad-btn">1</button>
+                <button onclick="appendWeight('2')" class="numpad-btn">2</button>
+                <button onclick="appendWeight('3')" class="numpad-btn">3</button>
+                <button onclick="appendWeight('4')" class="numpad-btn">4</button>
+                <button onclick="appendWeight('5')" class="numpad-btn">5</button>
+                <button onclick="appendWeight('6')" class="numpad-btn">6</button>
+                <button onclick="appendWeight('7')" class="numpad-btn">7</button>
+                <button onclick="appendWeight('8')" class="numpad-btn">8</button>
+                <button onclick="appendWeight('9')" class="numpad-btn">9</button>
+                <button onclick="appendWeight('.')" class="numpad-btn">.</button>
+                <button onclick="appendWeight('0')" class="numpad-btn">0</button>
+                <button onclick="appendWeight('C')" class="numpad-btn bg-red-50 text-red-500">C</button>
+            </div>
+
+            <button onclick="confirmWeightAdd()" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-lg shadow-indigo-100">
+                Aceptar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let cart = [];
+        let html5QrCode;
+        let currentWeightProduct = null;
+
+        // --- LÓGICA DEL CARRITO ---
+
+        function handleProductClick(productData) {
+            const product = JSON.parse(productData);
+            if (product.isWeighted) {
+                openWeightModal(product);
+            } else {
+                addToCart(product, 1);
+            }
+        }
+
+        function addToCart(product, quantity) {
+            const existing = cart.find(item => item.productId === product._id);
+            if (existing) {
+                existing.quantity += quantity;
+                existing.subtotal = existing.quantity * existing.price;
+            } else {
+                cart.push({
+                    productId: product._id,
+                    name: product.name,
+                    price: product.salePrice,
+                    quantity: quantity,
+                    subtotal: product.salePrice * quantity,
+                    isWeighted: product.isWeighted
+                });
+            }
+            renderCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cartItems');
+            const totalLabel = document.getElementById('totalLabel');
+            const subtotalLabel = document.getElementById('subtotalLabel');
+            const btnCobrar = document.getElementById('btnCobrar');
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center py-20 text-gray-300 italic"><i class="fas fa-cart-plus text-5xl mb-4 block"></i>Carrito vacío</div>`;
+                totalLabel.innerText = '0 ₲';
+                subtotalLabel.innerText = '0 ₲';
+                btnCobrar.disabled = true;
+                btnCobrar.className = btnCobrar.className.replace('bg-indigo-600', 'bg-gray-300');
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map((item, index) => {
+                total += item.subtotal;
+                return `
+                <div class="bg-gray-50 p-3 rounded-2xl border border-gray-100 flex justify-between items-center animate-in slide-in-from-right-4 duration-200">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-sm">${item.name}</h4>
+                        <p class="text-[10px] text-gray-400">${item.quantity} ${item.isWeighted ? 'KG' : 'Uds'} x ${item.price.toLocaleString()} ₲</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-indigo-600 text-sm">${item.subtotal.toLocaleString()} ₲</span>
+                        <button onclick="removeFromCart(${index})" class="h-8 w-8 text-red-300 hover:text-red-500"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+
+            totalLabel.innerText = total.toLocaleString('es-PY') + ' ₲';
+            subtotalLabel.innerText = total.toLocaleString('es-PY') + ' ₲';
+            btnCobrar.disabled = false;
+            btnCobrar.className = btnCobrar.className.replace('bg-gray-300', 'bg-indigo-600');
+        }
+
+        // --- LÓGICA DE PESO ---
+
+        function openWeightModal(product) {
+            currentWeightProduct = product;
+            document.getElementById('weightProductName').innerText = product.name;
+            document.getElementById('weightProductPrice').innerText = product.salePrice.toLocaleString() + ' ₲ / KG';
+            document.getElementById('weightInput').value = '';
+            document.getElementById('weightModal').classList.remove('hidden');
+            document.getElementById('weightModal').classList.add('flex');
+        }
+
+        function appendWeight(val) {
+            const input = document.getElementById('weightInput');
+            if (val === 'C') { input.value = ''; return; }
+            if (val === '.' && input.value.includes('.')) return;
+            input.value += val;
+        }
+
+        function confirmWeightAdd() {
+            const qty = parseFloat(document.getElementById('weightInput').value);
+            if (!qty || qty <= 0) return Swal.fire('Error', 'Ingresa un peso válido', 'error');
+            
+            addToCart(currentWeightProduct, qty);
+            document.getElementById('weightModal').classList.add('hidden');
+            document.getElementById('weightModal').classList.remove('flex');
+        }
+
+        // --- ESCÁNER DE CÁMARA ---
+
+        async function startScanner() {
+            document.getElementById('scannerModal').classList.remove('hidden');
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 10, qrbox: { width: 250, height: 150 } };
+            
+            try {
+                await html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+                    handleScanSuccess(decodedText);
+                    stopScanner();
+                });
+            } catch (err) {
+                Swal.fire('Error', 'No se pudo acceder a la cámara', 'error');
+                stopScanner();
+            }
+        }
+
+        function stopScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('scannerModal').classList.add('hidden');
+                });
+            } else {
+                document.getElementById('scannerModal').classList.add('hidden');
+            }
+        }
+
+        async function handleScanSuccess(code) {
+            try {
+                const response = await fetch(`/dashboard/pos/api/scan?code=${code}`);
+                const data = await response.json();
+                if (data.success) {
+                    handleProductClick(JSON.stringify(data.product));
+                } else {
+                    Swal.fire('No encontrado', 'El producto no está en el inventario', 'warning');
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // --- PROCESAR VENTA ---
+
+        async function openCheckoutModal() {
+            const total = cart.reduce((acc, item) => acc + item.subtotal, 0);
+            
+            const { value: paymentMethod } = await Swal.fire({
+                title: 'Confirmar Venta',
+                html: `<div class="text-3xl font-black text-indigo-600 mb-4">${total.toLocaleString()} ₲</div>`,
+                input: 'select',
+                inputOptions: {
+                    'EFECTIVO': 'Efectivo',
+                    'TRANSFERENCIA': 'Transferencia / QR',
+                    'TARJETA': 'Tarjeta Débito/Crédito'
+                },
+                inputPlaceholder: 'Método de Pago',
+                showCancelButton: true,
+                confirmButtonText: 'Finalizar Venta',
+                confirmButtonColor: '#4f46e5'
+            });
+
+            if (paymentMethod) {
+                processFinalSale(paymentMethod, total);
+            }
+        }
+
+        async function processFinalSale(method, total) {
+            try {
+                const response = await fetch('/dashboard/pos/api/process-sale', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        cart: cart,
+                        paymentMethod: method,
+                        total: total
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire('¡Éxito!', `Venta registrada: ${data.receiptNumber}`, 'success');
+                    cart = [];
+                    renderCart();
+                } else {
+                    Swal.fire('Error', data.msg, 'error');
+                }
+            } catch (e) {
+                Swal.fire('Error', 'Fallo en la conexión', 'error');
+            }
+        }
+
+        function clearCart() {
+            cart = [];
+            renderCart();
+        }
+
+        // Buscador de grilla
+        document.getElementById('productSearch').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('#productsGrid > div');
+            cards.forEach(card => {
+                const name = card.querySelector('h4').innerText.toLowerCase();
+                card.style.display = name.includes(query) ? 'block' : 'none';
+            });
+        });
+
+    </script>
+</body>
+</html>

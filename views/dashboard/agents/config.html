@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de mi Agente IA | LFAF Tech</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .step-active { color: #2563eb; border-bottom: 2px solid #2563eb; }
+        .step-inactive { color: #9ca3af; border-bottom: 2px solid transparent; }
+        .step-done { color: #10b981; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="flex min-h-screen">
+        <aside class="w-64 bg-slate-900 text-white hidden md:block">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold text-blue-400">LFAF Tech</h1>
+            </div>
+            <nav class="mt-6">
+                <a href="/dashboard/agents" class="flex items-center px-6 py-3 text-gray-300 hover:bg-slate-800 transition">
+                    <i class="fas fa-arrow-left mr-3"></i> Volver al Panel
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-8 text-center">
+                    <h2 class="text-3xl font-bold text-gray-800">Configura tu Vendedor IA</h2>
+                    <p class="text-gray-500 mt-2">Sigue estos 4 pasos para poner a tu bot a trabajar.</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm mb-8 border border-gray-100">
+                    <div class="flex justify-around items-center p-4">
+                        <div id="tab-1" class="step-active flex flex-col items-center pb-2 cursor-pointer transition">
+                            <span class="text-xs font-bold uppercase tracking-wider">Paso 1</span>
+                            <span class="font-semibold text-sm">Identidad</span>
+                        </div>
+                        <div id="tab-2" class="step-inactive flex flex-col items-center pb-2 cursor-pointer transition">
+                            <span class="text-xs font-bold uppercase tracking-wider">Paso 2</span>
+                            <span class="font-semibold text-sm">Personalidad IA</span>
+                        </div>
+                        <div id="tab-3" class="step-inactive flex flex-col items-center pb-2 cursor-pointer transition">
+                            <span class="text-xs font-bold uppercase tracking-wider">Paso 3</span>
+                            <span class="font-semibold text-sm">Logística</span>
+                        </div>
+                        <div id="tab-4" class="step-inactive flex flex-col items-center pb-2 cursor-pointer transition">
+                            <span class="text-xs font-bold uppercase tracking-wider">Paso 4</span>
+                            <span class="font-semibold text-sm">Pagos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+                    
+                    <div id="step-content-1" class="space-y-6">
+                        <h3 class="text-xl font-bold border-b pb-4">¿Quién es tu vendedor?</h3>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Nombre del Bot</label>
+                            <input type="text" id="botName" placeholder="Ej: Camila, Asistente de Ventas" 
+                                class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                            <p class="text-xs text-gray-400 mt-1">Este es el nombre con el que se presentará el bot en WhatsApp.</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Descripción de la Tienda</label>
+                            <textarea id="description" rows="3" placeholder="Ej: Tienda oficial de tecnología y accesorios en Asunción."
+                                class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                        </div>
+                        <div class="flex justify-end pt-6">
+                            <button onclick="saveStep(1)" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg transition">
+                                Siguiente <i class="fas fa-chevron-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="step-content-2" class="hidden space-y-6">
+                        <h3 class="text-xl font-bold border-b pb-4">Personalidad de la IA (Gemini)</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="personality" value="amigable" checked class="hidden peer">
+                                <div class="p-4 border-2 rounded-xl peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50 transition">
+                                    <p class="font-bold">😊 Amigable</p>
+                                    <p class="text-xs text-gray-500">Cercana y usa muchos emojis.</p>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="personality" value="formal" class="hidden peer">
+                                <div class="p-4 border-2 rounded-xl peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:bg-gray-50 transition">
+                                    <p class="font-bold">👔 Profesional</p>
+                                    <p class="text-xs text-gray-500">Seria, directa y muy respetuosa.</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Tono de voz personalizado</label>
+                            <textarea id="tone" rows="3" class="w-full p-3 border rounded-xl outline-none" 
+                                placeholder="Ej: Trata a los clientes de 'Vos', sé muy entusiasta y ofrece ofertas especiales."></textarea>
+                        </div>
+                        <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-100">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="usePlatformKey" checked class="h-5 w-5 text-blue-600 rounded">
+                                <span class="ml-3 text-sm font-medium text-yellow-800">Usar API Key de LFAF Tech (Recomendado)</span>
+                            </label>
+                        </div>
+                        <div class="flex justify-between pt-6">
+                            <button onclick="changeTab(1)" class="text-gray-500 font-bold">Atrás</button>
+                            <button onclick="saveStep(2)" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg">
+                                Guardar Personalidad <i class="fas fa-chevron-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="step-content-3" class="hidden space-y-6">
+                        <h3 class="text-xl font-bold border-b pb-4">Configuración de Envíos</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Costo General Delivery (Gs.)</label>
+                                <input type="number" id="shippingCost" placeholder="Ej: 25000" class="w-full p-3 border rounded-xl outline-none">
+                                <p class="text-xs text-gray-400 mt-1">Si pones 0, la IA dirá que el envío es GRATIS.</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Zonas de Cobertura</label>
+                                <input type="text" id="regions" placeholder="Asunción, Luque, San Lorenzo..." class="w-full p-3 border rounded-xl outline-none">
+                            </div>
+                        </div>
+                        <div class="border-t pt-4">
+                            <label class="block text-sm font-bold text-gray-700 mb-4">Horario de Atención del Bot</label>
+                            <div class="flex items-center space-x-4">
+                                <input type="number" id="hourStart" placeholder="8" class="w-20 p-3 border rounded-xl text-center">
+                                <span>a</span>
+                                <input type="number" id="hourEnd" placeholder="20" class="w-20 p-3 border rounded-xl text-center">
+                                <span class="text-gray-400 text-sm">(Formato 24hs)</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between pt-6">
+                            <button onclick="changeTab(2)" class="text-gray-500 font-bold">Atrás</button>
+                            <button onclick="saveStep(3)" class="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg">
+                                Siguiente Paso <i class="fas fa-chevron-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="step-content-4" class="hidden space-y-6">
+                        <h3 class="text-xl font-bold border-b pb-4">Información de Pago</h3>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Datos Bancarios para Transferencia</label>
+                            <textarea id="bankInfo" rows="4" class="w-full p-3 border rounded-xl outline-none" 
+                                placeholder="Banco: ITAU&#10;Cuenta: 1234567&#10;Nombre: Mi Empresa S.A.&#10;RUC: 80012345-0"></textarea>
+                            <p class="text-xs text-gray-400 mt-1">La IA enviará este texto exacto cuando el cliente quiera pagar.</p>
+                        </div>
+                        <div class="p-4 bg-blue-50 rounded-xl">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox" id="requirePaymentProof" class="h-5 w-5 text-blue-600 rounded">
+                                <span class="ml-3 font-medium text-blue-800 text-sm">Exigir foto del comprobante para confirmar pedido</span>
+                            </label>
+                        </div>
+                        <div class="flex justify-between pt-6">
+                            <button onclick="changeTab(3)" class="text-gray-500 font-bold">Atrás</button>
+                            <button onclick="saveStep(4)" class="bg-green-600 text-white px-10 py-4 rounded-xl font-bold hover:bg-green-700 shadow-xl transition transform hover:scale-105">
+                                <i class="fas fa-check-circle mr-2"></i> FINALIZAR CONFIGURACIÓN
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        // Cargar datos existentes del Agente al iniciar
+        async function loadAgentConfig() {
+            const res = await fetch('/api/agents/my-agent');
+            const data = await res.json();
+            const agent = data.agent;
+
+            if(agent) {
+                // Llenar campos Paso 1
+                document.getElementById('botName').value = agent.botName || '';
+                document.getElementById('description').value = agent.description || '';
+                
+                // Paso 2
+                if(agent.aiConfig.personality) {
+                    document.querySelector(`input[name="personality"][value="${agent.aiConfig.personality}"]`).checked = true;
+                }
+                document.getElementById('tone').value = agent.aiConfig.tone || '';
+                document.getElementById('usePlatformKey').checked = agent.aiConfig.usePlatformKey;
+
+                // Paso 3
+                document.getElementById('shippingCost').value = agent.businessConfig.shippingCost || 0;
+                document.getElementById('regions').value = agent.businessConfig.shippingRegions.map(r => r.name).join(', ') || '';
+                document.getElementById('hourStart').value = agent.businessConfig.openingHours.start || 8;
+                document.getElementById('hourEnd').value = agent.businessConfig.openingHours.end || 20;
+
+                // Paso 4
+                document.getElementById('bankInfo').value = agent.paymentConfig.bankInfo || '';
+                document.getElementById('requirePaymentProof').checked = agent.paymentConfig.requirePaymentProof;
+            }
+        }
+
+        function changeTab(step) {
+            // Ocultar todos
+            for(let i=1; i<=4; i++) {
+                document.getElementById(`step-content-${i}`).classList.add('hidden');
+                document.getElementById(`tab-${i}`).className = 'step-inactive flex flex-col items-center pb-2 cursor-pointer transition';
+            }
+            // Mostrar activo
+            document.getElementById(`step-content-${step}`).classList.remove('hidden');
+            document.getElementById(`tab-${step}`).className = 'step-active flex flex-col items-center pb-2 cursor-pointer transition';
+            currentStep = step;
+        }
+
+        async function saveStep(step) {
+            let body = {};
+            
+            if(step === 1) {
+                body = {
+                    botName: document.getElementById('botName').value,
+                    description: document.getElementById('description').value
+                };
+            } else if(step === 2) {
+                body = {
+                    personality: document.querySelector('input[name="personality"]:checked').value,
+                    tone: document.getElementById('tone').value,
+                    usePlatformKey: document.getElementById('usePlatformKey').checked
+                };
+            } else if(step === 3) {
+                const regionsRaw = document.getElementById('regions').value;
+                const regionList = regionsRaw.split(',').map(r => ({ name: r.trim(), active: true }));
+                body = {
+                    shippingCost: document.getElementById('shippingCost').value,
+                    shippingRegions: regionList,
+                    openingHours: {
+                        start: document.getElementById('hourStart').value,
+                        end: document.getElementById('hourEnd').value,
+                        enabled: true
+                    }
+                };
+            } else if(step === 4) {
+                body = {
+                    bankInfo: document.getElementById('bankInfo').value,
+                    requirePaymentProof: document.getElementById('requirePaymentProof').checked
+                };
+            }
+
+            try {
+                const res = await fetch(`/api/agents/wizard/step/${step}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if(res.ok) {
+                    if(step < 4) {
+                        changeTab(step + 1);
+                    } else {
+                        alert('¡Configuración guardada con éxito! Tu bot está listo.');
+                        window.location.href = '/dashboard/agents';
+                    }
+                }
+            } catch (err) {
+                alert('Error al guardar. Revisa tu conexión.');
+            }
+        }
+
+        // Ejecutar al cargar
+        loadAgentConfig();
+    </script>
+</body>
+</html>

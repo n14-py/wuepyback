@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product.name %> | <%= site.name %></title>
+</head>
+<body class="font-sans">
+
+    <%- include('./partials/header.html') %>
+
+    <div class="max-w-6xl mx-auto px-6 py-10">
+        <nav class="text-sm font-bold text-gray-400 mb-8 flex gap-2 items-center">
+            <a href="/" class="hover:text-pink-500">Inicio</a> <i class="fas fa-chevron-right text-xs"></i>
+            <a href="/search" class="hover:text-pink-500">Tienda</a> <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-pink-500"><%= product.name %></span>
+        </nav>
+
+        <div class="bg-white rounded-[3rem] p-6 md:p-10 shadow-xl shadow-pink-100/50 border border-white">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                <div class="relative rounded-[2rem] overflow-hidden shadow-lg border-4 border-pink-50 group">
+                    <img src="<%= product.imageUrl %>" class="w-full h-full object-cover">
+                    <% if(product.stock <= 0) { %>
+                        <div class="absolute inset-0 bg-white/80 flex items-center justify-center">
+                            <span class="text-3xl font-script font-bold text-gray-400">Sin Stock :(</span>
+                        </div>
+                    <% } %>
+                </div>
+
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-xs font-bold uppercase"><%= product.category %></span>
+                        <% if(product.stock > 0) { %>
+                            <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1"><i class="fas fa-check-circle"></i> Disponible</span>
+                        <% } %>
+                    </div>
+
+                    <h1 class="text-4xl md:text-5xl font-script font-bold text-gray-800 mb-6"><%= product.name %></h1>
+                    <p class="text-4xl font-bold text-pink-500 mb-8">$<%= product.price %></p>
+
+                    <div class="bg-pink-50/50 rounded-2xl p-6 mb-8 border border-pink-100">
+                        <h3 class="font-bold text-gray-700 mb-2">Descripción:</h3>
+                        <p class="text-gray-600 leading-relaxed font-medium"><%= product.description || '¡Es tan lindo que te va a encantar!' %></p>
+                    </div>
+
+                    <a href="https://wa.me/<%= site.contact.whatsapp %>?text=Hola!%20Me%20encanta%20este%20producto:%20*<%= encodeURIComponent(product.name) %>*" 
+                       target="_blank"
+                       class="btn-glam w-full py-4 text-xl flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl">
+                        <i class="fab fa-whatsapp text-2xl"></i> ¡Lo quiero!
+                    </a>
+                    
+                    <div class="mt-6 flex justify-center gap-6 text-xs text-gray-400 font-bold uppercase tracking-wide">
+                        <span><i class="fas fa-lock text-pink-300"></i> Pago Seguro</span>
+                        <span><i class="fas fa-gift text-pink-300"></i> Envío Rápido</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <% if(related && related.length > 0) { %>
+            <div class="mt-24">
+                <h3 class="text-center text-4xl font-script font-bold text-gray-800 mb-10">También te vas a enamorar de...</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <% related.forEach(rel => { %>
+                        <a href="/p/<%= rel._id %>" class="block bg-white rounded-2xl p-3 shadow-sm hover:shadow-lg hover:-translate-y-1 transition duration-300">
+                            <div class="aspect-square rounded-xl overflow-hidden mb-3">
+                                <img src="<%= rel.imageUrl %>" class="w-full h-full object-cover">
+                            </div>
+                            <h4 class="font-bold text-gray-800 text-center truncate"><%= rel.name %></h4>
+                            <p class="text-pink-500 font-bold text-center text-sm">$<%= rel.price %></p>
+                        </a>
+                    <% }) %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+
+    <%- include('./partials/footer.html') %>
+</body>
+</html>

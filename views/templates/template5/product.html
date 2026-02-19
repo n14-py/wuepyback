@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product.name %> | DATABASE</title>
+</head>
+<body class="bg-cyber text-gray-300 font-sans min-h-screen flex flex-col">
+
+    <%- include('./partials/header.html') %>
+
+    <div class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow">
+        
+        <div class="font-mono text-xs text-gray-600 mb-8 border-b border-gray-800 pb-2">
+            <span class="text-brand">root@<%= site.name %></span>:<span class="text-blue-400">~/products</span>$ view <%= product.name.toLowerCase().replace(/ /g, '_') %>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+            
+            <div class="lg:col-span-7">
+                <div class="relative border border-gray-700 bg-panel p-1 group">
+                    <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-brand z-20"></div>
+                    <div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-brand z-20"></div>
+                    <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-brand z-20"></div>
+                    <div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-brand z-20"></div>
+                    
+                    <div class="aspect-video bg-black relative overflow-hidden">
+                        <img src="<%= product.imageUrl %>" class="w-full h-full object-contain opacity-90 group-hover:opacity-100 transition duration-300">
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')] opacity-5 pointer-events-none"></div>
+                        
+                        <% if(product.stock <= 0) { %>
+                            <div class="absolute inset-0 bg-black/80 flex items-center justify-center backdrop-blur-sm">
+                                <div class="border-2 border-red-500 text-red-500 font-mono font-bold text-2xl px-8 py-2 animate-pulse bg-red-900/20">
+                                    CRITICAL_FAILURE: OUT_OF_STOCK
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 flex flex-col justify-center">
+                <div class="border-l-4 border-brand pl-6 mb-8 bg-gradient-to-r from-brand/5 to-transparent py-2">
+                    <span class="text-brand font-mono text-xs mb-1 block">> ITEM_CATEGORY: [<%= product.category.toUpperCase() %>]</span>
+                    <h1 class="text-4xl lg:text-5xl font-bold text-white uppercase leading-none mb-2 tracking-tight"><%= product.name %></h1>
+                </div>
+
+                <div class="flex items-center gap-6 mb-8 bg-panel border border-gray-800 p-4">
+                    <span class="text-4xl font-mono font-bold text-brand">$<%= product.price %></span>
+                    <div class="text-[10px] text-gray-500 font-mono text-right flex-1 leading-tight">
+                        UNIT_PRICE: CONFIRMED<br>
+                        TAX_PROTOCOL: INCLUDED<br>
+                        AVAILABILITY: <% if(product.stock > 0) { %><span class="text-green-500">TRUE</span><% } else { %><span class="text-red-500">FALSE</span><% } %>
+                    </div>
+                </div>
+
+                <div class="font-mono text-sm text-gray-400 mb-8 leading-relaxed border-t border-b border-gray-800 py-6">
+                    <p class="mb-2 text-brand text-xs">> DESCRIPTION_LOG:</p>
+                    <p><%= product.description || 'DATA_CORRUPTED: No description found in sector 7G.' %></p>
+                </div>
+
+                <a href="https://wa.me/<%= site.contact.whatsapp %>?text=INITIALIZE_TRANSACTION:%20<%= encodeURIComponent(product.name) %>" 
+                   target="_blank"
+                   class="btn-cyber w-full py-4 text-center font-bold text-lg block mb-4 bg-black hover:bg-brand hover:text-black transition-all group">
+                    <span class="group-hover:hidden">[ INITIALIZE PURCHASE ]</span>
+                    <span class="hidden group-hover:inline">>> EXECUTE NOW_</span>
+                </a>
+                
+                <div class="grid grid-cols-2 gap-4 text-[10px] font-mono text-gray-600 uppercase">
+                    <div class="border border-gray-800 p-2 text-center bg-panel">
+                        <i class="fas fa-lock mb-1 block text-lg"></i> Secure_Link: <span class="text-brand">Active</span>
+                    </div>
+                    <div class="border border-gray-800 p-2 text-center bg-panel">
+                        <i class="fas fa-truck mb-1 block text-lg"></i> Transport: <span class="text-brand">Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <% if(related && related.length > 0) { %>
+            <div class="mt-20 border-t border-gray-800 pt-10">
+                <div class="flex items-center gap-2 mb-8">
+                    <span class="w-2 h-2 bg-brand animate-ping"></span>
+                    <h3 class="text-xl font-bold text-white font-mono uppercase">Related_Data_Stream</h3>
+                </div>
+                
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <% related.forEach(rel => { %>
+                        <a href="/p/<%= rel._id %>" class="block bg-panel border border-gray-800 hover:border-brand hover:shadow-neon transition group relative overflow-hidden">
+                            <div class="aspect-square bg-black relative">
+                                <img src="<%= rel.imageUrl %>" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition grayscale group-hover:grayscale-0">
+                            </div>
+                            <div class="p-3 border-t border-gray-800 bg-panel/90 backdrop-blur">
+                                <h4 class="text-brand font-mono text-xs truncate mb-1"><%= rel.name %></h4>
+                                <p class="text-white font-bold text-sm">$<%= rel.price %></p>
+                            </div>
+                        </a>
+                    <% }) %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+
+    <%- include('./partials/footer.html') %>
+</body>
+</html>
