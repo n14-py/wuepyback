@@ -1,38 +1,34 @@
-// UBICACIÓN: lfaftech.com/routes/pos.js
+// ==========================================================================
+// WUEPY.COM - RUTAS DEL PUNTO DE VENTA (API REST)
+// ==========================================================================
 
 const express = require('express');
-const router = express.Router();
-const { ensureAuthenticated } = require('../middleware/auth');
+const router = express.Router({ mergeParams: true }); // mergeParams permite heredar el siteId si viene desde el dashboard
+const { ensureAuthenticated, ensureSiteAccess } = require('../middleware/auth');
 const posController = require('../controllers/posController');
 
-// --- VISTAS PRINCIPALES ---
+// --- ENDPOINTS DE DATOS (Sustituyen a las antiguas Vistas) ---
 
-// 1. Terminal de Venta (La pantalla principal del POS)
-// URL: /dashboard/pos/terminal
-router.get('/terminal', ensureAuthenticated, posController.renderPosScreen);
+// 1. Obtener los datos iniciales para cargar la Terminal de Venta (Productos, Deliverys, etc.)
+// URL API: GET /api/dashboard/site/:siteId/pos/terminal
+router.get('/terminal', ensureSiteAccess, posController.renderPosScreen);
 
-// 2. Gestión de Inventario Independiente
-// URL: /dashboard/pos/inventory
-router.get('/inventory', ensureAuthenticated, posController.getInventory);
+// 2. Historial de Ventas (Para la tabla del frontend)
+// URL API: GET /api/dashboard/site/:siteId/pos/history
+router.get('/history', ensureSiteAccess, posController.getSalesHistory);
 
-// 3. Historial de Ventas
-// URL: /dashboard/pos/history
-router.get('/history', ensureAuthenticated, posController.getSalesHistory);
+// --- ENDPOINTS DE OPERACIONES (El núcleo interactivo) ---
 
+// 3. Escanear código de barras (El frontend o la app Flutter llama aquí)
+// URL API: GET /api/dashboard/site/:siteId/pos/api/scan?code=123456
+router.get('/api/scan', ensureSiteAccess, posController.scanBarcode);
 
-// --- PROCESOS Y FORMULARIOS ---
+// 4. Procesar la venta final (Cobrar, descontar stock y despachar)
+// URL API: POST /api/dashboard/site/:siteId/pos/api/process-sale
+router.post('/api/process-sale', ensureSiteAccess, posController.processSale);
 
-// Guardar un nuevo producto (Desde el formulario de inventario)
-router.post('/inventory/add', ensureAuthenticated, posController.saveProduct);
-
-
-// --- API ENDPOINTS (Para la interactividad sin recargar) ---
-
-// Escanear código de barras (El celular llama aquí)
-// Uso: /dashboard/pos/api/scan?code=123456
-router.get('/api/scan', ensureAuthenticated, posController.scanBarcode);
-
-// Procesar la venta final (Cobrar)
-router.post('/api/process-sale', ensureAuthenticated, posController.processSale);
+// (Opcional) Si en el futuro separas el inventario aquí, puedes habilitar esta ruta:
+// router.get('/inventory', ensureSiteAccess, posController.getInventory);
+// router.post('/inventory/add', ensureSiteAccess, posController.saveProduct);
 
 module.exports = router;

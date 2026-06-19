@@ -1,123 +1,119 @@
-const Inventory = require('../models/Inventory');
+// ==========================================================================
+// WUEPY.COM - CONTROLADOR DE INVENTARIO (API REST)
+// ==========================================================================
+const Product = require('../models/Product');
 const Site = require('../models/Site');
 
 module.exports = {
-    // 1. LISTAR
+    // ==========================================
+    // 1. OBTENER TODO EL INVENTARIO
+    // ==========================================
     getInventory: async (req, res) => {
         try {
-            const siteId = req.params.siteId;
-            const site = await Site.findOne({ _id: siteId, owner: req.user._id });
+            const siteId = req.params.siteId || req.user.siteId;
+            const site = await Site.findOne({ _id: siteId });
             
             if (!site) {
-                req.flash('error_msg', 'Sitio no encontrado.');
-                return res.redirect('/dashboard');
+                return res.status(404).json({ success: false, message: 'Sitio no encontrado o no tienes permisos.' });
             }
 
-            const products = await Inventory.find({ site: siteId }).sort({ createdAt: -1 });
+            const products = await Product.find({ site: siteId }).sort({ createdAt: -1 }).lean();
+            let maxProducts = site.plan === 'basico' ? 30 : (site.plan === 'medio' ? 80 : 'Ilimitados');
 
-            res.render('dashboard/inventory/list', {
+            return res.status(200).json({
+                success: true,
                 title: `Inventario - ${site.name}`,
-                site,
+                site: { id: site._id, name: site.name, plan: site.plan },
+                maxProducts,
                 products
             });
         } catch (error) {
-            console.error(error);
-            res.redirect('/dashboard');
+            console.error('Error listando inventario:', error);
+            return res.status(500).json({ success: false, message: 'Error interno del servidor.' });
         }
     },
 
-    // 2. FORMULARIO
-    getForm: async (req, res) => {
+    // ==========================================
+    // 2. OBTENER UN SOLO PRODUCTO (Para editar)
+    // ==========================================
+    getProduct: async (req, res) => {
         try {
             const { siteId, productId } = req.params;
-            const site = await Site.findOne({ _id: siteId, owner: req.user._id });
-            
-            if (!site) return res.redirect('/dashboard');
+            const product = await Product.findOne({ _id: productId, site: siteId }).lean();
 
-            let product = null;
-            if (productId) {
-                product = await Inventory.findOne({ _id: productId, site: siteId });
-            }
+            if (!product) return res.status(404).json({ success: false, message: 'Producto no encontrado.' });
 
-            res.render('dashboard/inventory/form', {
-                title: product ? 'Editar Producto' : 'Nuevo Producto',
-                site,
-                product
-            });
+            return res.status(200).json({ success: true, product });
         } catch (error) {
-            console.error(error);
-            res.redirect(`/dashboard/inventory/${req.params.siteId}`);
+            return res.status(500).json({ success: false, message: 'Error interno obteniendo el producto.' });
         }
     },
 
-    // 3. GUARDAR (CREATE/UPDATE)
+    // ==========================================
+    // 3. GUARDAR (CREAR O ACTUALIZAR)
+    // ==========================================
     saveProduct: async (req, res) => {
-        const { siteId, productId } = req.params;
+        const siteId = req.params.siteId || req.user.siteId;
+        const productId = req.params.productId;
 
         try {
-            // DEBUG: Ver en consola qué llega
-            console.log('--- SAVE PRODUCT ---');
-            console.log('Body:', req.body);
-            console.log('File:', req.file ? 'SI (Recibido)' : 'NO (Vacio)');
+            const { 
+                name, price, priceUSD, stock, description, shortDescription, 
+                category, globalCategory, showInGlobalMarketplace, sku, lowStockThreshold 
+            } = req.body;
 
-            const { name, price, stock, description, category } = req.body;
-
-            const site = await Site.findOne({ _id: siteId, owner: req.user._id });
-            if (!site) {
-                req.flash('error_msg', 'Permiso denegado');
-                return res.redirect('/dashboard');
-            }
+            const isGlobal = showInGlobalMarketplace === 'on' || showInGlobalMarketplace === true || showInGlobalMarketplace === 'true';
 
             const productData = {
                 name,
-                price,
-                stock,
+                price: parseFloat(price) || 0,
+                priceUSD: parseFloat(priceUSD) || 0,
+                stock: parseInt(stock) || 0,
+                lowStockThreshold: parseInt(lowStockThreshold) || 5,
                 description,
-                category,
+                shortDescription: shortDescription || '',
+                category: category || 'General',
+                globalCategory: globalCategory || 'Otros',
+                showInGlobalMarketplace: isGlobal,
+                sku: sku || '',
                 site: siteId,
-                owner: req.user._id
+                lastModifiedBy: req.user.role || 'owner'
             };
 
-            // Lógica de Imagen
             if (req.file) {
-                // Si subió archivo nuevo, usamos la URL segura que nos dio BunnyStorage
-                productData.images = [req.file.path]; 
                 productData.imageUrl = req.file.path;
             } else if (!productId) {
-                // Si es nuevo y NO subió nada, ponemos placeholder
                 productData.imageUrl = 'https://placehold.co/400?text=Sin+Imagen';
-                productData.images = [productData.imageUrl];
             }
-            // Si es edición y no subió nada, no tocamos la imagen (se mantiene la anterior)
 
             if (productId) {
-                await Inventory.findOneAndUpdate({ _id: productId }, productData);
-                req.flash('success_msg', 'Producto actualizado.');
+                // EDITAR PRODUCTO EXISTENTE
+                const updatedProduct = await Product.findOneAndUpdate({ _id: productId, site: siteId }, productData, { new: true });
+                return res.status(200).json({ success: true, message: 'Producto actualizado correctamente.', product: updatedProduct });
             } else {
-                const newProduct = new Inventory(productData);
+                // CREAR NUEVO PRODUCTO
+                productData.createdBy = req.user.role || 'owner';
+                const newProduct = new Product(productData);
                 await newProduct.save();
-                req.flash('success_msg', 'Producto creado.');
+                return res.status(201).json({ success: true, message: '¡Producto añadido al inventario!', product: newProduct });
             }
 
-            res.redirect(`/dashboard/inventory/${siteId}`);
-
         } catch (error) {
-            console.error('ERROR GUARDANDO:', error);
-            req.flash('error_msg', 'Error al guardar: ' + error.message);
-            res.redirect(`/dashboard/inventory/${siteId}`);
+            console.error('ERROR GUARDANDO PRODUCTO:', error);
+            return res.status(500).json({ success: false, message: 'Error al guardar el producto: ' + error.message });
         }
     },
 
+    // ==========================================
     // 4. ELIMINAR
+    // ==========================================
     deleteProduct: async (req, res) => {
         try {
             const { siteId, productId } = req.params;
-            await Inventory.findOneAndDelete({ _id: productId, owner: req.user._id });
-            req.flash('success_msg', 'Producto eliminado');
-            res.redirect(`/dashboard/inventory/${siteId}`);
+            await Product.findOneAndDelete({ _id: productId, site: siteId });
+            return res.status(200).json({ success: true, message: 'Producto eliminado del catálogo.' });
         } catch (error) {
-            console.error(error);
-            res.redirect('/dashboard');
+            return res.status(500).json({ success: false, message: 'Error al eliminar el producto.' });
         }
     }
 };

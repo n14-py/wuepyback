@@ -1,204 +1,112 @@
-// services/agentAiService.js
-const OpenAI = require("openai"); // Usamos la librería estándar compatible con DeepSeek
-const Agent = require('../models/Agent');
-const AgentProduct = require('../models/AgentProduct');
+// ==========================================================================
+// WUEPY AI - ORQUESTADOR DE DISEÑO Y GENERACIÓN DE CONTENIDO
+// ==========================================================================
 
-/**
- * --- SERVICIO DE INTELIGENCIA ARTIFICIAL (NÚCLEO DE VENTAS - DEEPSEEK EDITION) ---
- * * Este módulo es el cerebro de la tienda.
- * * Ahora potenciado por DeepSeek V3 para mayor razonamiento y obediencia.
- */
+const Site = require('../models/Site');
+const Product = require('../models/Product');
+// const { GoogleGenerativeAI } = require("@google/genai"); // Descomenta cuando uses el SDK oficial
 
-// Función auxiliar para formatear precios en Guaraníes
-const formatoGs = (precio) => new Intl.NumberFormat('es-PY').format(precio);
+module.exports = {
+    /**
+     * orquestarDisenoWeb
+     * Toma el ID de una tienda recién creada y un prompt del usuario.
+     * Utiliza IA para generar textos persuasivos, elegir una paleta de colores
+     * y poblar el inventario inicial con productos relevantes al nicho.
+     */
+    orquestarDisenoWeb: async (siteId, prompt) => {
+        try {
+            console.log(`[Wuepy AI] Iniciando orquestación para la tienda ID: ${siteId}`);
+            console.log(`[Wuepy AI] Prompt del usuario: "${prompt}"`);
 
-const generarRespuestaIA = async (mensajeUsuario, historial, order, agentId) => {
-    try {
-        // ==================================================================
-        // 1. CARGA DE DATOS VITALES
-        // ==================================================================
-        
-        const agent = await Agent.findById(agentId);
-        if (!agent) throw new Error("CRITICAL: Agente no encontrado.");
+            const site = await Site.findById(siteId);
+            if (!site) {
+                throw new Error('La tienda no existe en la base de datos.');
+            }
 
-        const productos = await AgentProduct.find({ agent: agentId, isActive: true }).sort({ name: 1 });
+            // ==========================================================
+            // 1. LLAMADA A LA INTELIGENCIA ARTIFICIAL (GEMINI / OPENAI)
+            // ==========================================================
+            // Aquí iría tu llamada real a la API. 
+            // Para evitar que tu server crashee mientras configuras tus API Keys,
+            // usaremos una estructura de datos simulada y robusta que imita la respuesta de la IA.
+            
+            /* EJEMPLO DE LLAMADA REAL A GEMINI:
+            const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", response_format: { type: "json_object" } });
+            const aiPrompt = `Actúa como un experto en e-commerce. Crea los datos para una tienda basada en esto: "${prompt}". Devuelve un JSON con heroTitle, heroSubtitle, aboutText, primaryColor (hex), secondaryColor (hex), y un array de 4 'products' (con name, category, price, description).`;
+            const result = await model.generateContent(aiPrompt);
+            const aiData = JSON.parse(result.response.text());
+            */
 
-        // LOGICA DE API KEY:
-        // Si usas la del sistema (.env), busca DEEPSEEK_API_KEY.
-        // Si el agente tiene su propia key, usa esa (asumiendo que pegaste la de DeepSeek en el campo de Gemini en el dashboard).
-        const apiKey = agent.aiConfig.usePlatformKey 
-            ? process.env.DEEPSEEK_API_KEY 
-            : agent.aiConfig.geminiApiKey; // Reutilizamos el campo de la BD por ahora
-
-        if (!apiKey) return "Disculpa, estoy en mantenimiento técnico (Falta API Key).";
-
-        // ==================================================================
-        // 2. CONSTRUCCIÓN DEL CATÁLOGO
-        // ==================================================================
-        
-        let catalogoTexto = "";
-        if (productos.length > 0) {
-            catalogoTexto = productos.map((p, index) => 
-                `OPCIÓN ${index + 1}: ${p.name.toUpperCase()} 
-                - Precio: Gs. ${formatoGs(p.price)}
-                - Info Clave: ${p.aiDescription || 'Excelente calidad.'}`
-            ).join('\n\n');
-        } else {
-            catalogoTexto = "ACTUALMENTE NO HAY STOCK DISPONIBLE.";
-        }
-
-        // ==================================================================
-        // 3. REGLAS DE NEGOCIO Y LOGÍSTICA
-        // ==================================================================
-        
-        const costoEnvio = agent.businessConfig.shippingCost;
-        let textoEnvio = costoEnvio === 0 
-            ? "🔥 ¡EL ENVÍO ES TOTALMENTE GRATIS! (La casa invita) 🎁"
-            : `🚚 El costo de envío es de Gs. ${formatoGs(costoEnvio)} adicionales.`;
-
-        const zonasActivas = agent.businessConfig.shippingRegions
-            .filter(z => z.active)
-            .map(z => z.name)
-            .join(', ');
-
-        const infoBancaria = agent.paymentConfig.bankInfo || "No hay datos bancarios registrados.";
-
-        // ==================================================================
-        // 4. PLANTILLAS DE VENTA (BALAS DE PLATA)
-        // ==================================================================
-
-        const PLANTILLA_DATOS_DELIVERY = `
-📦 *DATOS PARA EL DELIVERY* 🛵
-¡Perfecto! Para agendar tu pedido, por favor completame:
-
-📝 Nombre Completo:
-📍 Ciudad y Barrio:
-🏠 Referencia de la casa (Color, portón, etc):
-📍 Ubicación GPS (Opcional, ayuda mucho):
-
-¡Aguardamos tus datos para enviarlo ya! 🚀`;
-
-        const PLANTILLA_DATOS_ENCOMIENDA = `
-📦 *DATOS PARA ENCOMIENDA* 🚛
-Para despachar tu paquete por transportadora, necesitamos:
-
-👤 Nombre Completo:
-🪪 Número de Cédula (Para la guía):
-🏙️ Ciudad de Destino:
-📞 Teléfono de quien retira:
-
-⚠️ *IMPORTANTE:* El envío por encomienda requiere pago previo del producto.`;
-
-        const PLANTILLA_PAGO = `
-💳 *DATOS PARA EL PAGO*
-Aquí tienes los datos para asegurar tu pedido:
-
-${infoBancaria}
-
-📸 *Por favor, envíanos la foto del comprobante una vez realizado.*`;
-
-        // ==================================================================
-        // 5. SYSTEM PROMPT (EL CEREBRO MAESTRO)
-        // ==================================================================
-        
-        const systemPrompt = `
-        ROL: Eres ${agent.botName}, la mejor vendedora de la tienda.
-        PERSONALIDAD: ${agent.aiConfig.personality.toUpperCase()}. ${agent.aiConfig.tone}
-        
-        --- 🎯 TU ÚNICO OBJETIVO ---
-        Atender al cliente, resolver dudas sobre los productos y CERRAR LA VENTA consiguiendo los datos de entrega.
-        
-        --- 🛒 CATÁLOGO OFICIAL (SOLO VENDES ESTO) ---
-        ${catalogoTexto}
-
-        --- 🚚 POLÍTICA DE ENVÍOS ---
-        ${textoEnvio}
-        Zonas de cobertura directa: ${zonasActivas}.
-        Para otras ciudades lejanas, usamos ENCOMIENDAS (Transportadora).
-
-        --- 🧠 REGLAS DE COMPORTAMIENTO (STRICT MODE) ---
-        1. **Interpretación:** Si el cliente dice "quiero el 1", mira tu catálogo y asume que es la OPCIÓN 1.
-        2. **Precios:** NUNCA inventes precios. Usa estrictamente los del catálogo.
-        3. **Cierre de Venta:**
-           - Si es DELIVERY (Zona cercana): Pide los datos usando la PLANTILLA DE DELIVERY.
-           - Si es ENCOMIENDA (Interior/Lejos): Pide los datos usando la PLANTILLA DE ENCOMIENDA y pasa los DATOS DE PAGO.
-           
-        4. **Plantillas:**
-           - Cuando pidas datos para moto, USA ESTO: """${PLANTILLA_DATOS_DELIVERY}"""
-           - Cuando pidas datos para encomienda, USA ESTO: """${PLANTILLA_DATOS_ENCOMIENDA}"""
-           - Cuando te pidan cuenta bancaria, USA ESTO: """${PLANTILLA_PAGO}"""
-
-        5. **Imágenes:** Si recibes el texto "[SISTEMA: FOTO RECIBIDA]":
-           - Si estabas esperando un pago -> Es el comprobante. Agradece y confirma.
-           - Si es al inicio -> Es una consulta visual.
-
-        --- 💾 EXTRACCIÓN DE DATOS (CRÍTICO) ---
-        CUANDO (Y SOLO CUANDO) EL CLIENTE TE HAYA DADO SUS DATOS COMPLETOS (Nombre y Dirección/Ciudad),
-        debes confirmar el pedido generando una ETIQUETA OCULTA al final de tu mensaje.
-        
-        FORMATO OBLIGATORIO DE LA ETIQUETA:
-        [GUARDAR_DATOS | Nombre Cliente | Ciudad | Dirección_y_Ref | Producto_Elegido | Monto_Total_Numerico | Telefono_Contacto]
-
-        * Monto_Total_Numerico: Solo el número (Ej: 150000). Suma precio + envío si aplica.
-        * Telefono_Contacto: Si el cliente escribió otro número en el chat, ponlo. Si no, deja vacío.
-        
-        SI GENERAS LA ETIQUETA, TU MENSAJE FINAL AL CLIENTE DEBE SER:
-        "¡Excelente! 🎉 Tu pedido ha sido registrado correctamente. En breve nos comunicaremos contigo para coordinar la entrega. ¡Gracias por tu compra!"
-        (No agregues más preguntas después de esto).
-        `;
-
-        // ==================================================================
-        // 6. GESTIÓN DE HISTORIAL (FORMATO OPENAI/DEEPSEEK)
-        // ==================================================================
-        
-        // Transformamos el historial de DB al formato estándar { role: 'user'|'assistant', content: '' }
-        const chatHistory = historial.map(msg => {
-            return {
-                role: msg.role === 'user' ? 'user' : 'assistant',
-                content: msg.content
+            // SIMULACIÓN DE RESPUESTA DE LA IA BASADA EN EL PROMPT
+            // (La IA detecta automáticamente el nicho del usuario)
+            let isTech = prompt.toLowerCase().includes('tecnologia') || prompt.toLowerCase().includes('celulares');
+            let isClothing = prompt.toLowerCase().includes('ropa') || prompt.toLowerCase().includes('moda');
+            
+            const aiData = {
+                heroTitle: isTech ? 'La mejor tecnología a tu alcance' : (isClothing ? 'Viste con estilo y actitud' : 'Los mejores productos, a un clic'),
+                heroSubtitle: isTech ? 'Equipos de última generación con garantía.' : (isClothing ? 'Colección exclusiva para la temporada.' : 'Descubre nuestra selección exclusiva.'),
+                aboutText: `Nuestra misión es ofrecerte calidad y confianza. Nacimos de la idea de transformar el mercado basándonos en: ${prompt}.`,
+                primaryColor: isTech ? '#2563eb' : (isClothing ? '#db2777' : '#4f46e5'),
+                secondaryColor: '#0f172a',
+                products: [
+                    {
+                        name: isTech ? 'Auriculares Inalámbricos Pro' : (isClothing ? 'Remera Oversize Premium' : 'Producto Estrella 1'),
+                        category: isTech ? 'Accesorios' : (isClothing ? 'Remeras' : 'General'),
+                        price: 150000,
+                        description: 'Calidad superior, diseño moderno y durabilidad garantizada. Ideal para el uso diario.'
+                    },
+                    {
+                        name: isTech ? 'Smartwatch Serie 8' : (isClothing ? 'Pantalón Cargo Urbano' : 'Producto Estrella 2'),
+                        category: isTech ? 'Relojes' : (isClothing ? 'Pantalones' : 'General'),
+                        price: 250000,
+                        description: 'El complemento perfecto que no puede faltar. Materiales premium.'
+                    },
+                    {
+                        name: isTech ? 'Cargador Carga Rápida 20W' : (isClothing ? 'Hoodie Minimalista' : 'Producto Estrella 3'),
+                        category: isTech ? 'Accesorios' : (isClothing ? 'Abrigos' : 'General'),
+                        price: 85000,
+                        description: 'Eficiencia y diseño en un solo paquete. Compra segura.'
+                    }
+                ]
             };
-        });
 
-        // Agregamos el mensaje actual del usuario al final
-        chatHistory.push({ role: "user", content: mensajeUsuario });
+            // ==========================================================
+            // 2. ACTUALIZAR LA TIENDA CON EL DISEÑO DE LA IA
+            // ==========================================================
+            site.content.heroTitle = aiData.heroTitle;
+            site.content.heroSubtitle = aiData.heroSubtitle;
+            site.content.aboutText = aiData.aboutText;
+            site.primaryColor = aiData.primaryColor;
+            site.secondaryColor = aiData.secondaryColor;
+            
+            await site.save();
+            console.log(`[Wuepy AI] Textos y colores guardados con éxito en la tienda.`);
 
-        // Preparamos el array final de mensajes incluyendo el Sistema al principio
-        const messagesPayload = [
-            { role: "system", content: systemPrompt },
-            ...chatHistory
-        ];
+            // ==========================================================
+            // 3. POBLAR EL INVENTARIO CON LOS PRODUCTOS GENERADOS
+            // ==========================================================
+            if (aiData.products && aiData.products.length > 0) {
+                const initialProducts = aiData.products.map(p => ({
+                    site: site._id,
+                    name: p.name,
+                    description: p.description,
+                    price: p.price,
+                    stock: 10, // Stock base para que puedan empezar a vender o usar el POS
+                    category: p.category,
+                    isActive: true,
+                    showInGlobalMarketplace: true
+                }));
 
-        // ==================================================================
-        // 7. CONEXIÓN CON DEEPSEEK (VIA OPENAI LIB)
-        // ==================================================================
+                await Product.insertMany(initialProducts);
+                console.log(`[Wuepy AI] Inventario inicial poblado con ${initialProducts.length} productos.`);
+            }
 
-        const openai = new OpenAI({
-            baseURL: 'https://api.deepseek.com', // Endpoint oficial de DeepSeek
-            apiKey: apiKey
-        });
+            return { success: true, message: 'Orquestación completada' };
 
-        const completion = await openai.chat.completions.create({
-            messages: messagesPayload,
-            model: "deepseek-chat", // DeepSeek V3 (Rápido y muy inteligente)
-            temperature: 0.3,       // Frio y calculador para no inventar precios
-            max_tokens: 1000
-        });
-
-        let respuestaTexto = completion.choices[0].message.content;
-
-        // ==================================================================
-        // 8. LIMPIEZA Y POST-PROCESAMIENTO
-        // ==================================================================
-
-        // WhatsApp usa un solo asterisco para negrita, DeepSeek usa MD estándar (**).
-        respuestaTexto = respuestaTexto.replace(/\*\*/g, '*');
-
-        return respuestaTexto;
-
-    } catch (error) {
-        console.error("❌ ERROR CRÍTICO EN IA SERVICE (DEEPSEEK):", error);
-        return "⚠️ Tuve un pequeño parpadeo en mi sistema. ¿Podrías repetirme eso último por favor? 🙏";
+        } catch (error) {
+            console.error('[Wuepy AI] Error crítico durante la orquestación:', error);
+            return { success: false, error: error.message };
+        }
     }
 };
-
-module.exports = { generarRespuestaIA };

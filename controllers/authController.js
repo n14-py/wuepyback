@@ -1,56 +1,142 @@
+// ==========================================================================
+// WUEPY.COM - CONTROLADOR DE AUTENTICACIÓN (API REST)
+// ==========================================================================
 const passport = require('passport');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
 module.exports = {
-    // Renderizar formularios
-    getLogin: (req, res) => res.render('auth/login', { title: 'Iniciar Sesión' }),
-    getRegister: (req, res) => res.render('auth/register', { title: 'Crear Cuenta' }),
-
-    // Procesar Registro
+    // ==========================================
+    // 1. REGISTRO (API)
+    // ==========================================
     postRegister: async (req, res) => {
         try {
-            const { username, email, password, confirmPassword } = req.body;
+            const { name, email, password, confirmPassword } = req.body;
+
+            // Validaciones básicas
+            if (!name || !email || !password) {
+                return res.status(400).json({ success: false, message: 'Por favor completa todos los campos.' });
+            }
 
             if (password !== confirmPassword) {
-                req.flash('error_msg', 'Las contraseñas no coinciden');
-                return res.redirect('/register');
+                return res.status(400).json({ success: false, message: 'Las contraseñas no coinciden.' });
             }
 
-            // Verificar si existe
-            let user = await User.findOne({ email: email.toLowerCase() });
-            if (user) {
-                req.flash('error_msg', 'El correo ya está registrado');
-                return res.redirect('/register');
+            if (password.length < 6) {
+                return res.status(400).json({ success: false, message: 'La contraseña debe tener al menos 6 caracteres.' });
             }
 
-            // Crear usuario
-            const newUser = new User({ username, email, password });
+            const emailClean = email.toLowerCase().trim();
+            let userExists = await User.findOne({ email: emailClean });
+            
+            if (userExists) {
+                return res.status(400).json({ success: false, message: 'Este correo ya está registrado en la plataforma.' });
+            }
+
+            // Encriptar la contraseña
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+
+            // Crear el nuevo usuario
+            const newUser = new User({ 
+                name: name.trim(), 
+                email: emailClean, 
+                password: hashedPassword,
+                role: 'dueño', // Rol por defecto
+                plan: 'free',
+                status: 'active'
+            });
+
             await newUser.save();
 
-            req.flash('success_msg', 'Cuenta creada. Ahora inicia sesión.');
-            res.redirect('/login');
+            return res.status(201).json({ 
+                success: true, 
+                message: '¡Cuenta creada con éxito! Ahora puedes iniciar sesión.' 
+            });
+
         } catch (error) {
-            console.error(error);
-            req.flash('error_msg', 'Error en el registro');
-            res.redirect('/register');
+            console.error('Error en el registro API:', error);
+            return res.status(500).json({ success: false, message: 'Ocurrió un error interno durante el registro.' });
         }
     },
 
-    // Procesar Login
+    // ==========================================
+    // 2. LOGIN TRADICIONAL (API)
+    // ==========================================
     postLogin: (req, res, next) => {
-        passport.authenticate('local', {
-            successRedirect: '/dashboard',
-            failureRedirect: '/login',
-            failureFlash: true
+        passport.authenticate('local', (err, user, info) => {
+            if (err) {
+                console.error("Error en login:", err);
+                return res.status(500).json({ success: false, message: 'Error interno del servidor.' });
+            }
+            if (!user) {
+                // info.message viene directamente de passport.js que configuramos antes
+                return res.status(401).json({ success: false, message: info ? info.message : 'Credenciales inválidas.' });
+            }
+            
+            // Establecer la sesión
+            req.logIn(user, (err) => {
+                if (err) {
+                    console.error("Error al iniciar sesión:", err);
+                    return res.status(500).json({ success: false, message: 'Error al establecer la sesión.' });
+                }
+                
+                // Login exitoso, enviamos los datos básicos del usuario (jamás la contraseña)
+                const userData = {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    avatar: user.avatar
+                };
+                
+                return res.status(200).json({ 
+                    success: true, 
+                    message: 'Inicio de sesión exitoso.', 
+                    user: userData 
+                });
+            });
         })(req, res, next);
     },
 
-    // Cerrar Sesión
+    // ==========================================
+    // 3. CERRAR SESIÓN (API)
+    // ==========================================
     logout: (req, res, next) => {
         req.logout((err) => {
-            if (err) return next(err);
-            req.flash('success_msg', 'Sesión cerrada exitosamente');
-            res.redirect('/login');
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Error al cerrar sesión.' });
+            }
+            // Limpiar la cookie del navegador o dispositivo
+            res.clearCookie('connect.sid'); 
+            return res.status(200).json({ success: true, message: 'Has cerrado sesión correctamente.' });
         });
+    },
+
+    // ==========================================
+    // 4. VERIFICAR SESIÓN ACTIVA (Vital para Flutter y Cloudflare)
+    // ==========================================
+    checkSession: (req, res) => {
+        if (req.isAuthenticated()) {
+            const userData = {
+                id: req.user._id,
+                name: req.user.name,
+                email: req.user.email,
+                role: req.user.role,
+                avatar: req.user.avatar,
+                plan: req.user.plan
+            };
+            return res.status(200).json({ 
+                success: true, 
+                isAuthenticated: true, 
+                user: userData 
+            });
+        } else {
+            return res.status(401).json({ 
+                success: false, 
+                isAuthenticated: false, 
+                message: 'No hay sesión activa.' 
+            });
+        }
     }
 };

@@ -1,166 +1,142 @@
-// server.js COMPLETO LFAF TECH
+// ==========================================================================
+// WUEPY.COM - NÚCLEO DEL SERVIDOR API (Backend Separado)
+// ==========================================================================
 const express = require('express');
 const mongoose = require('mongoose');
-const path = require('path');
 const dotenv = require('dotenv');
 const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const flash = require('connect-flash'); // Corrige: req.flash is not a function
+const cors = require('cors'); 
 
-// 1. CARGAR CONFIGURACIÓN
+// 1. CARGAR CONFIGURACIÓN DE ENTORNO
 dotenv.config();
-
-// 2. IMPORTAR SERVICIOS DE AGENTE (IA)
-const { iniciarBotAgente } = require('./services/agentWhatsappService');
-const Agent = require('./models/Agent');
 
 const app = express();
 
+// NUEVO Y VITAL PARA RENDER/CONTABO: Confiar en el proxy (Load Balancer) 
+// Esto es obligatorio para que las cookies seguras (https) viajen correctamente
+app.set('trust proxy', 1);
+
 // ==========================================
-// 3. CONFIGURACIONES Y MIDDLEWARES
+// 2. CONFIGURACIONES Y MIDDLEWARES BASE
 // ==========================================
 
-// Parseo de datos
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Archivos Estáticos (CSS, JS, IMGs públicos)
-app.use(express.static(path.join(__dirname, 'public')));
-
-// --- MOTOR DE VISTAS (Corrige: No default engine specified) ---
-// Usamos EJS para renderizar archivos .html
-app.set('views', path.join(__dirname, 'views'));
-app.engine('html', require('ejs').renderFile); 
-app.set('view engine', 'html');
-
-// Configuración de Sesión (Persistente en Mongo)
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'lfaftech_secret_key',
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
-    cookie: { maxAge: 1000 * 60 * 60 * 24 } // 24 horas
+// Configuración de CORS ultra-permisiva adaptada para infinitos subdominios
+app.use(cors({
+    origin: function (origin, callback) {
+        // Permitimos cualquier origen dinámicamente para que soporte tiendadenando.wuepy.com y el main
+        callback(null, true);
+    },
+    credentials: true, // Obligatorio para que las cookies de sesión viajen
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
-// Autenticación y Mensajes Flash
+app.use(express.json({ limit: '50mb' })); 
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// --- SISTEMA DE SESIONES DE ALTO RENDIMIENTO ---
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'wuepy_super_secret_master_key_2026',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ 
+        mongoUrl: process.env.MONGODB_URI,
+        collectionName: 'sessions',
+        ttl: 14 * 24 * 60 * 60 
+    }),
+    cookie: { 
+        maxAge: 1000 * 60 * 60 * 24 * 14,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // VITAL: true en producción (Render/Contabo)
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // 'none' permite cross-domain (Cloudflare -> Render)
+    }
+}));
+
+// --- AUTENTICACIÓN ---
 require('./config/passport')(passport);
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash()); 
-
-// Variables Globales (Para usar en cualquier HTML)
-app.use((req, res, next) => {
-    res.locals.success_msg = req.flash('success_msg');
-    res.locals.error_msg = req.flash('error_msg');
-    res.locals.error = req.flash('error');
-    res.locals.user = req.user || null;
-    next();
-});
-
-
-// ... (después de app.use(flash()); y el middleware de variables globales)
 
 // ==========================================
-// MIDDLEWARE DE SUBDOMINIOS (CORREGIDO PARA LOCALHOST)
+// 3. ENRUTADOR INTELIGENTE DE SUBDOMINIOS (Adaptado para API pura)
 // ==========================================
 app.use((req, res, next) => {
-    const host = req.get('host'); // Ej: "alinishop.localhost:3000"
-    const mainDomain = 'lfaftech.com';
+    // En una arquitectura separada, debemos leer OBLIGATORIAMENTE el 'origin'
+    // porque el 'host' siempre será la URL de Render (api-wuepy.onrender.com)
+    const origin = req.get('origin'); 
+    const mainDomain = process.env.MAIN_DOMAIN || 'wuepy.com';
+
+    // Si la petición no tiene origen, asumimos que es el dominio principal
+    if (!origin) {
+        req.isMainDomain = true;
+        req.subdomainName = null;
+        return next();
+    }
+
+    const isLocal = origin.includes('localhost') || origin.includes('127.0.0.1');
     
-    // Detectamos si estamos en entorno local
-    const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
-
     if (isLocal) {
-        // --- LÓGICA PARA LOCALHOST ---
-        // Dividimos por puntos. 
-        // "localhost:3000" -> ["localhost:3000"] (Length 1) -> Es Principal
-        // "alinishop.localhost:3000" -> ["alinishop", "localhost:3000"] (Length 2) -> Es Tienda
-        const parts = host.split('.');
-
-        if (parts.length > 1 && !parts[0].includes('localhost')) {
-            req.isMainDomain = false;
-            req.subdomainName = parts[0]; // "alinishop"
-        } else {
-            req.isMainDomain = true;
-            req.subdomainName = null;
-        }
-
+        req.isMainDomain = true;
+        req.subdomainName = null;
     } else {
-        // --- LÓGICA PARA PRODUCCIÓN (lfaftech.com) ---
-        if (host === mainDomain || host === `www.${mainDomain}`) {
+        try {
+            // Parseamos la URL de donde viene la petición (Ej: https://tiendadenando.wuepy.com)
+            const urlObj = new URL(origin);
+            const hostname = urlObj.hostname;
+            
+            if (hostname === mainDomain || hostname === `www.${mainDomain}`) {
+                req.isMainDomain = true;
+                req.subdomainName = null;
+            } else {
+                req.isMainDomain = false;
+                // Extraemos el subdominio con precisión ("tiendadenando")
+                req.subdomainName = hostname.split('.')[0].toLowerCase(); 
+            }
+        } catch(e) {
             req.isMainDomain = true;
             req.subdomainName = null;
-        } else {
-            req.isMainDomain = false;
-            // "tienda.lfaftech.com" -> ["tienda", "lfaftech", "com"] -> tomamos el [0]
-            req.subdomainName = host.split('.')[0]; 
         }
     }
-    
-    // Descomenta esto si quieres ver en la consola qué está detectando:
-    // console.log(`Host: ${host} | Es Principal: ${req.isMainDomain} | Subdominio: ${req.subdomainName}`);
-    
     next();
 });
 
 // ==========================================
-// 4. REGISTRO DE RUTAS (ORDEN CRÍTICO)
+// 4. REGISTRO DE RUTAS MAESTRAS (API JSON)
 // ==========================================
+// Todas las rutas llevan el prefijo /api
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/superadmin', require('./routes/superadmin'));
+app.use('/api', require('./routes/index'));
 
-// A) RUTAS DE API (BACKEND AGENTES)
-app.use('/api/agents', require('./routes/agents'));
-app.use('/api/agent-products', require('./routes/agentProducts'));
-app.use('/api/agent-orders', require('./routes/agentOrders'));
-app.use('/api/agent-deliveries', require('./routes/agentDeliveries'));
+// Manejador global 404 para rutas inexistentes de la API
+app.use((req, res) => {
+    res.status(404).json({ success: false, message: 'Ruta de la API no encontrada' });
+});
 
-// B) RUTAS DE AUTENTICACIÓN
-app.use('/auth', require('./routes/auth'));
-
-// C) RUTAS DEL DASHBOARD (Aquí vive el POS, Agentes e Inventario)
-app.use('/dashboard', require('./routes/dashboard'));
-
-// D) RUTA PRINCIPAL Y SUBDOMINIOS (SIEMPRE AL FINAL)
-// Esta ruta maneja "tutienda.lfaftech.com" y la landing page.
-// Si la pones antes, bloqueará todo lo demás.
-app.use('/', require('./routes/index'));
+// Manejador global de errores
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ success: false, message: 'Error interno del servidor API' });
+});
 
 // ==========================================
-// 5. ARRANQUE DEL SERVIDOR
+// 5. INICIALIZACIÓN DE LA MÁQUINA
 // ==========================================
 const PORT = process.env.PORT || 3000;
 
-mongoose.connect(process.env.MONGODB_URI)
-    .then(async () => {
-        console.log('✅ Conectado a MongoDB (LFAF Tech Cloud)');
-
-        app.listen(PORT, () => {
-            console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-            // Auto-reconexión de Bots de WhatsApp
-            inicializarBotsActivos();
-        });
-    })
-    .catch(err => console.error('❌ Error de conexión BD:', err));
-
-/**
- * Función para levantar los bots de WhatsApp que estaban encendidos
- */
-async function inicializarBotsActivos() {
-    try {
-        console.log('🔄 Verificando bots para reconexión...');
-        const agentesActivos = await Agent.find({ isActive: true });
-        
-        if (agentesActivos.length > 0) {
-            console.log(`⚡ Reconectando ${agentesActivos.length} bots...`);
-            for (const agente of agentesActivos) {
-                // Pequeña pausa para no saturar el arranque
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                iniciarBotAgente(agente._id).catch(e => console.error(`Error bot ${agente._id}:`, e.message));
-            }
-        } else {
-            console.log('ℹ️ Ningún bot activo pendiente.');
-        }
-    } catch (error) {
-        console.error('❌ Error en inicializarBotsActivos:', error);
-    }
-}
+mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('✅ Conectado al Clúster de MongoDB (Wuepy Core - API)');
+    app.listen(PORT, () => {
+        console.log(`🚀 Servidor API Wuepy ejecutándose en el puerto: ${PORT}`);
+        console.log(`🌐 Esperando peticiones del Frontend Wuepy...`);
+    });
+}).catch(err => {
+    console.error('❌ Error fatal de conexión a la Base de Datos:', err);
+    process.exit(1); 
+});

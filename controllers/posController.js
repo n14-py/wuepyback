@@ -1,183 +1,232 @@
-// UBICACIÓN: lfaftech.com/controllers/posController.js
-
-const PosProduct = require('../models/PosProduct');
-const PosSale = require('../models/PosSale');
+// ==========================================================================
+// WUEPY.COM - CONTROLADOR DEL PUNTO DE VENTA (API REST)
+// ==========================================================================
+const Product = require('../models/Product');
+const Sale = require('../models/Sale');
+const Site = require('../models/Site');
 
 module.exports = {
 
-    // --- GESTIÓN DE INVENTARIO ---
-
-    // 1. Obtener todos los productos del usuario (Para la lista de administración)
-    getInventory: async (req, res) => {
-        try {
-            const products = await PosProduct.find({ user: req.user._id })
-                                           .sort({ name: 1 });
-            // Si es una petición API (JSON), devolvemos datos, si no, renderizamos vista
-            if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-                return res.json({ success: true, products });
-            }
-            res.render('dashboard/pos/inventory', { products });
-        } catch (err) {
-            console.error(err);
-            if (req.xhr) return res.status(500).json({ error: 'Error al cargar inventario' });
-            req.flash('error_msg', 'Error al cargar inventario');
-            res.redirect('/dashboard');
-        }
-    },
-
-    // 2. Guardar nuevo producto (Manual o con Escáner)
-    saveProduct: async (req, res) => {
-        const { 
-            name, barcode, salePrice, costPrice, 
-            stock, minStock, unitType, isWeighted 
-        } = req.body;
-
-        try {
-            // Verificar si el código de barras ya existe para este usuario
-            if (barcode) {
-                const existing = await PosProduct.findOne({ user: req.user._id, barcode });
-                if (existing) {
-                    return res.status(400).json({ 
-                        success: false, 
-                        msg: '¡Este código de barras ya está registrado en tu inventario!' 
-                    });
-                }
-            }
-
-            const newProduct = new PosProduct({
-                user: req.user._id,
-                name,
-                barcode,
-                salePrice: parseFloat(salePrice),
-                costPrice: parseFloat(costPrice) || 0,
-                stock: parseFloat(stock) || 0,
-                minStock: parseInt(minStock) || 5,
-                unitType: unitType || 'UNIDAD',
-                isWeighted: isWeighted === 'on' || isWeighted === true // Checkbox HTML
-            });
-
-            await newProduct.save();
-
-            if (req.xhr) {
-                return res.json({ success: true, msg: 'Producto guardado correctamente' });
-            }
-            req.flash('success_msg', 'Producto agregado');
-            res.redirect('/dashboard/pos/inventory');
-
-        } catch (err) {
-            console.error(err);
-            res.status(500).json({ success: false, msg: 'Error al guardar producto' });
-        }
-    },
-
-    // --- PUNTO DE VENTA (POS) ---
-
-    // 3. Renderizar la pantalla de Ventas (La interfaz principal)
+    // ==========================================
+    // 1. ENVIAR DATOS INICIALES DE LA TERMINAL OMNICANAL
+    // ==========================================
     renderPosScreen: async (req, res) => {
         try {
-            // Enviamos solo productos activos para el buscador rápido
-            const products = await PosProduct.find({ user: req.user._id, isActive: true })
-                                           .select('name barcode salePrice image isWeighted stock');
-            res.render('dashboard/pos/terminal', { products });
+            // El siteId puede venir de params o del usuario logueado según la estructura final de rutas
+            const siteId = req.params.siteId || req.user.siteId;
+            const site = await Site.findOne({ _id: siteId });
+            
+            if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada o acceso denegado.' });
+
+            // Enviamos los productos activos al frontend/Flutter para el buscador rápido / grilla
+            const products = await Product.find({ site: siteId, isActive: true })
+                                          .select('name sku price compareAtPrice imageUrl stock')
+                                          .sort({ name: 1 })
+                                          .lean();
+
+            // Enviamos la lista de empleados que son 'delivery' para el select del formulario de envíos
+            const deliveryBoys = (site.employees || []).filter(emp => emp.role === 'delivery' && emp.isActive);
+
+            return res.status(200).json({ 
+                success: true,
+                title: `Punto de Venta - ${site.name}`,
+                site: {
+                    id: site._id,
+                    name: site.name,
+                    currency: site.currency || 'PYG'
+                },
+                products,
+                deliveryBoys 
+            });
         } catch (err) {
-            console.error(err);
-            res.redirect('/dashboard');
+            console.error('Error cargando los datos del POS:', err);
+            return res.status(500).json({ success: false, message: 'Error interno del servidor al cargar la terminal.' });
         }
     },
 
-    // 4. API: Buscar producto por Código de Barras (Para el escáner del celular)
+    // ==========================================
+    // 2. API: ESCANEAR CÓDIGO DE BARRAS (Buscador ultrarrápido)
+    // ==========================================
     scanBarcode: async (req, res) => {
         const { code } = req.query;
+        const siteId = req.params.siteId || req.user.siteId;
+
+        if (!code) return res.status(400).json({ success: false, message: 'Código de barras no proporcionado.' });
+
         try {
-            const product = await PosProduct.findOne({ 
-                user: req.user._id, 
-                barcode: code 
-            });
+            const product = await Product.findOne({ 
+                site: siteId, 
+                sku: code,
+                isActive: true
+            }).lean();
 
             if (!product) {
-                return res.json({ success: false, msg: 'Producto no encontrado' });
+                return res.status(404).json({ success: false, message: 'Producto no encontrado o inactivo.' });
             }
-            res.json({ success: true, product });
+            
+            return res.status(200).json({ success: true, product });
         } catch (err) {
-            res.status(500).json({ success: false, msg: 'Error de servidor' });
+            console.error('Error escaneando código de barras:', err);
+            return res.status(500).json({ success: false, message: 'Error interno de búsqueda.' });
         }
     },
 
-    // 5. PROCESAR VENTA (El núcleo transaccional)
+    // ==========================================
+    // 3. PROCESAR VENTA (El núcleo transaccional y logístico)
+    // ==========================================
     processSale: async (req, res) => {
-        const { cart, paymentMethod, clientName, discount, total } = req.body;
-        // 'cart' es un array que viene del frontend: [{ productId, quantity, price... }]
+        const siteId = req.params.siteId || req.user.siteId;
+        const { 
+            cart, paymentMethod, discount, deliveryFee, 
+            customerName, customerPhone, customerDocument,
+            saleChannel, requiresDelivery, deliveryAddress, 
+            deliveryRef, deliveryLat, deliveryLng, assignedDeliveryId,
+            amountToCollect, changeFor
+        } = req.body;
 
-        if (!cart || cart.length === 0) {
-            return res.status(400).json({ success: false, msg: 'El carrito está vacío' });
+        // Validaciones básicas: Soporte por si Flutter o React envían string o array puro
+        let cartData = typeof cart === 'string' ? JSON.parse(cart) : cart;
+
+        if (!cartData || cartData.length === 0) {
+            return res.status(400).json({ success: false, message: 'El carrito de compras está vacío.' });
         }
 
         try {
+            const site = await Site.findById(siteId);
+            if (!site) return res.status(403).json({ success: false, message: 'Tienda no válida o sin permisos.' });
+
             const saleItems = [];
+            let calculatedSubtotal = 0;
             
-            // Iterar sobre el carrito para verificar stock y preparar datos
-            for (let item of cart) {
-                const product = await PosProduct.findById(item.productId);
-                
-                if (!product) continue; // Si se borró mientras vendían, lo saltamos
-                
-                // Verificar Stock (si el producto requiere control)
-                if (product.trackStock) {
-                    if (product.stock < item.quantity) {
-                        return res.status(400).json({ 
-                            success: false, 
-                            msg: `Stock insuficiente para: ${product.name}. Disponible: ${product.stock}` 
-                        });
-                    }
-                    // Descontar Stock
-                    product.stock -= item.quantity;
-                    await product.save();
+            // Iterar sobre el carrito para verificar stock real en la BD y armar la orden
+            for (let item of cartData) {
+                // Si es un producto libre agregado a mano en el POS (Ej: "Servicio Extra")
+                if (item.isCustom) {
+                    saleItems.push({
+                        productId: null,
+                        name: item.name,
+                        price: parseFloat(item.price),
+                        quantity: parseInt(item.quantity),
+                        isCustom: true
+                    });
+                    calculatedSubtotal += (item.price * item.quantity);
+                    continue;
                 }
 
+                // Si es un producto del inventario real
+                const product = await Product.findById(item.productId || item._id);
+                if (!product) continue; 
+                
+                // Verificar Stock estricto
+                if (product.stock < item.quantity) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: `Stock insuficiente para: ${product.name}. Solo quedan ${product.stock} unidades.` 
+                    });
+                }
+
+                // Descontar Stock de la base de datos
+                product.stock -= item.quantity;
+                await product.save();
+
                 saleItems.push({
-                    product: product._id,
-                    productName: product.name,
+                    productId: product._id,
+                    name: product.name,
+                    sku: product.sku || '',
+                    price: product.price, // Obligamos a usar el precio de la BD por seguridad antifraude
                     quantity: item.quantity,
-                    unitPrice: item.price,
-                    subtotal: item.quantity * item.price
+                    isCustom: false
                 });
+
+                calculatedSubtotal += (product.price * item.quantity);
             }
 
-            // Crear el registro de venta
-            const newSale = new PosSale({
-                user: req.user._id,
-                clientName: clientName || 'Cliente General',
+            const finalTotal = (calculatedSubtotal + parseFloat(deliveryFee || 0)) - parseFloat(discount || 0);
+            const isDelivery = requiresDelivery === 'on' || requiresDelivery === true || requiresDelivery === 'true';
+
+            // Crear el registro maestro de la venta
+            const newSale = new Sale({
+                site: siteId,
+                registeredBy: req.user._id,
+                saleChannel: saleChannel || 'pos', // Puede ser 'whatsapp' o 'web' si se integra luego
+                
+                customer: {
+                    name: customerName || 'Cliente Ocasional',
+                    phone: customerPhone || '',
+                    documentId: customerDocument || ''
+                },
+                
                 items: saleItems,
-                totalAmount: total,
-                discount: discount || 0,
-                paymentMethod: paymentMethod || 'EFECTIVO'
+                
+                subtotal: calculatedSubtotal,
+                discount: parseFloat(discount || 0),
+                deliveryFee: parseFloat(deliveryFee || 0),
+                totalAmount: finalTotal,
+                
+                paymentMethod: paymentMethod || 'efectivo',
+                paymentStatus: paymentMethod === 'efectivo' && !isDelivery ? 'paid' : 'pending',
+                
+                amountToCollect: parseFloat(amountToCollect || 0),
+                changeFor: parseFloat(changeFor || 0),
+
+                requiresDelivery: isDelivery,
+                status: isDelivery ? 'in_transit' : 'completed' // in_transit va directo a la app del repartidor
             });
+
+            // Si requiere delivery, agregamos los datos logísticos precisos
+            if (isDelivery) {
+                newSale.delivery = {
+                    address: deliveryAddress || '',
+                    reference: deliveryRef || '',
+                    assignedTo: assignedDeliveryId || null,
+                    coordinates: {
+                        lat: deliveryLat || null,
+                        lng: deliveryLng || null
+                    }
+                };
+            }
 
             await newSale.save();
 
-            res.json({ 
+            return res.status(201).json({ 
                 success: true, 
                 saleId: newSale._id, 
-                receiptNumber: newSale.receiptNumber,
-                msg: '¡Venta registrada con éxito!' 
+                totalCharged: finalTotal,
+                message: isDelivery ? '¡Pedido guardado y enviado a logística!' : '¡Venta completada y stock descontado con éxito!' 
             });
 
         } catch (err) {
-            console.error('Error en venta:', err);
-            res.status(500).json({ success: false, msg: 'Error al procesar la venta' });
+            console.error('Error crítico procesando la venta:', err);
+            return res.status(500).json({ success: false, message: 'Error interno en los servidores al procesar la venta.' });
         }
     },
 
-    // 6. Historial de Ventas (Reporte rápido)
+    // ==========================================
+    // 4. HISTORIAL Y REPORTES DEL POS (API)
+    // ==========================================
     getSalesHistory: async (req, res) => {
         try {
-            const sales = await PosSale.find({ user: req.user._id })
-                                     .sort({ date: -1 })
-                                     .limit(50); // Últimas 50 ventas
-            res.render('dashboard/pos/history', { sales });
+            const siteId = req.params.siteId || req.user.siteId;
+            const site = await Site.findOne({ _id: siteId });
+            
+            if (!site) return res.status(404).json({ success: false, message: 'Tienda no válida.' });
+
+            // Traemos las últimas 100 ventas, incluyendo el nombre del empleado que registró y el delivery asignado
+            const sales = await Sale.find({ site: siteId })
+                                    .populate('registeredBy', 'name')
+                                    .populate('delivery.assignedTo', 'name')
+                                    .sort({ createdAt: -1 })
+                                    .limit(100)
+                                    .lean();
+
+            return res.status(200).json({ 
+                success: true,
+                title: `Historial de Ventas - ${site.name}`,
+                sales 
+            });
         } catch (err) {
-            console.error(err);
-            res.redirect('/dashboard/pos/terminal');
+            console.error('Error cargando historial de la API:', err);
+            return res.status(500).json({ success: false, message: 'Fallo al extraer el historial de ventas.' });
         }
     }
 };

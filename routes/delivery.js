@@ -1,42 +1,26 @@
-// UBICACIÓN: lfaftech.com/routes/delivery.js
-
+// ==========================================================================
+// WUEPY.COM - RUTAS DE LOGÍSTICA / DELIVERY (API REST)
+// ==========================================================================
 const express = require('express');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const deliveryController = require('../controllers/deliveryController');
-const { ensureAuthenticated } = require('../middleware/auth');
+const { ensureSiteAccess } = require('../middleware/auth');
 
-// 🔒 SEGURIDAD: Todas las rutas de logística requieren login
-router.use(ensureAuthenticated);
+// 🔒 SEGURIDAD: Solo usuarios de la tienda (Dueño o empleados)
+router.use(ensureSiteAccess);
 
-// --- 1. RUTA DE VISTA (IMPORTANTE) ---
-// Esta es la que carga el archivo HTML visual cuando haces clic en el menú.
-// URL: /api/delivery/panel
-router.get('/panel', (req, res) => {
-    try {
-        // Renderiza el archivo que está en views/dashboard/delivery.html
-        res.render('dashboard/delivery.html', { 
-            user: req.user,
-            pageTitle: 'Gestión de Delivery'
-        });
-    } catch (error) {
-        console.error("Error cargando vista de delivery:", error);
-        res.status(500).send('Error cargando el panel de logística.');
-    }
-});
+// --- ENDPOINTS DE API ---
 
-// --- 2. RUTAS DE API (DATOS JSON) ---
-
-// GET /api/delivery/ -> Obtiene la lista de repartidores (para llenar la tabla)
+// GET: Obtiene la lista de repartidores de la tienda actual
 router.get('/', deliveryController.getMyDeliveries);
 
-// POST /api/delivery/create -> Crea un nuevo chofer en la base de datos
+// POST: Crea un nuevo chofer en la base de datos
 router.post('/create', deliveryController.createDelivery);
 
-// POST /api/delivery/assign -> Asigna un pedido, calcula costos y envía WhatsApps
-// Esta es la función maestra que conecta KingsStore con LFAF
+// POST: Asigna un pedido, calcula costos y genera plantilla de WhatsApp
 router.post('/assign', deliveryController.assignOrderToDelivery);
 
-// POST /api/delivery/update-status -> Para cambiar estado manualmente (ej: Entregado)
+// POST: Cambiar estado manualmente (ej: in_transit -> completed)
 router.post('/update-status', deliveryController.updateDeliveryStatus);
 
 module.exports = router;
