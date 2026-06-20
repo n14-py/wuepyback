@@ -7,6 +7,12 @@ const siteController = require('../controllers/siteController');
 const Product = require('../models/Product');
 
 // ==========================================================================
+// NUEVO: ENDPOINT PÚBLICO PARA FRONTEND ESTÁTICO (MÓVILES Y SUBDOMINIOS)
+// ==========================================================================
+// Permite que las plantillas y el index principal consulten los datos de cualquier tienda de forma directa
+router.get('/store/public/:subdomain', siteController.renderStoreHome);
+
+// ==========================================================================
 // 1. RUTA PRINCIPAL (MARKETPLACE WUEPY O INICIO DE TIENDA)
 // ==========================================================================
 router.get('/', async (req, res) => {
