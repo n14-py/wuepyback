@@ -22,7 +22,10 @@ module.exports = {
     // 3. NIVEL DUEÑO DE TIENDA
     // ==========================================
     ensureStoreOwner: function(req, res, next) {
-        if (req.isAuthenticated() && req.user.isOwner) return next();
+        // CORRECCIÓN: Revisar el rol correcto (store_owner o superadmin)
+        if (req.isAuthenticated() && (req.user.role === 'store_owner' || req.user.role === 'superadmin')) {
+            return next();
+        }
         return res.status(403).json({ success: false, message: 'Acceso denegado. Función exclusiva para dueños de tienda.', errorCode: 'OWNER_REQUIRED' });
     },
 
@@ -30,7 +33,9 @@ module.exports = {
     // 4. NIVEL SÚPER ADMIN
     // ==========================================
     ensureSuperAdmin: function(req, res, next) {
-        if (req.isAuthenticated() && req.user.isOwner && req.user.role === 'superadmin') return next();
+        if (req.isAuthenticated() && req.user.role === 'superadmin') {
+            return next();
+        }
         return res.status(403).json({ success: false, message: 'Acceso restringido. Solo Super Administradores.', errorCode: 'SUPERADMIN_REQUIRED' });
     },
 
@@ -49,10 +54,12 @@ module.exports = {
             return res.status(400).json({ success: false, message: 'ID de tienda no proporcionado en la petición.', errorCode: 'MISSING_SITE_ID' });
         }
 
-        if (req.user.isOwner) {
+        // Si es el dueño de la tienda o un súper administrador, pasa directo
+        if (req.user.role === 'store_owner' || req.user.role === 'superadmin') {
             return next();
         }
 
+        // Si es un empleado, verificamos si pertenece a la sucursal exacta a la que intenta entrar
         if (req.user.isEmployee) {
             if (req.user.siteId && req.user.siteId.toString() === requestedSiteId.toString()) {
                 return next();
