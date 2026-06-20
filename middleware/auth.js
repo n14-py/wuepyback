@@ -1,29 +1,61 @@
 // ==========================================================================
 // WUEPY.COM - MIDDLEWARE DE SEGURIDAD (API REST)
 // ==========================================================================
+const jwt = require('jsonwebtoken');
+const User = require('../models/User'); // Aseguramos traer el modelo para cargar el usuario
+
+// Función auxiliar HÍBRIDA: Revisa primero la Cookie (PC) y luego el Token (Móvil)
+const checkAuth = async (req) => {
+    // 1. Verificación tradicional por Cookie (Escritorio)
+    if (req.isAuthenticated()) {
+        return req.user;
+    }
+    
+    // 2. Verificación por JWT Token (Celulares / Cross-Domain)
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+        const token = req.headers.authorization.split(' ')[1];
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'wuepy_super_secret_key_2026');
+            // Buscamos al usuario en la base de datos para que actúe igual que req.user tradicional
+            const user = await User.findById(decoded.id);
+            return user;
+        } catch (err) {
+            console.warn("[Auth Middleware] Token inválido o expirado.");
+            return null;
+        }
+    }
+    return null;
+};
+
 module.exports = {
     // ==========================================
     // 1. NIVEL BASE (Solo logueados)
     // ==========================================
-    ensureAuthenticated: function(req, res, next) {
-        if (req.isAuthenticated()) return next();
+    ensureAuthenticated: async function(req, res, next) {
+        const user = await checkAuth(req);
+        if (user) {
+            req.user = user; // Inyectamos el usuario en la request para que el backend lo reconozca
+            return next();
+        }
         return res.status(401).json({ success: false, message: 'Por favor inicia sesión para acceder.', errorCode: 'AUTH_REQUIRED' });
     },
 
     // ==========================================
     // 2. NIVEL INVITADO
     // ==========================================
-    ensureGuest: function(req, res, next) {
-        if (!req.isAuthenticated()) return next();
+    ensureGuest: async function(req, res, next) {
+        const user = await checkAuth(req);
+        if (!user) return next();
         return res.status(403).json({ success: false, message: 'Ya tienes una sesión activa.', errorCode: 'ALREADY_LOGGED_IN' });
     },
 
     // ==========================================
     // 3. NIVEL DUEÑO DE TIENDA
     // ==========================================
-    ensureStoreOwner: function(req, res, next) {
-        // CORRECCIÓN: Revisar el rol correcto (store_owner o superadmin)
-        if (req.isAuthenticated() && (req.user.role === 'store_owner' || req.user.role === 'superadmin')) {
+    ensureStoreOwner: async function(req, res, next) {
+        const user = await checkAuth(req);
+        if (user && (user.role === 'store_owner' || user.role === 'superadmin')) {
+            req.user = user;
             return next();
         }
         return res.status(403).json({ success: false, message: 'Acceso denegado. Función exclusiva para dueños de tienda.', errorCode: 'OWNER_REQUIRED' });
@@ -32,8 +64,10 @@ module.exports = {
     // ==========================================
     // 4. NIVEL SÚPER ADMIN
     // ==========================================
-    ensureSuperAdmin: function(req, res, next) {
-        if (req.isAuthenticated() && req.user.role === 'superadmin') {
+    ensureSuperAdmin: async function(req, res, next) {
+        const user = await checkAuth(req);
+        if (user && user.role === 'superadmin') {
+            req.user = user;
             return next();
         }
         return res.status(403).json({ success: false, message: 'Acceso restringido. Solo Super Administradores.', errorCode: 'SUPERADMIN_REQUIRED' });
@@ -42,10 +76,13 @@ module.exports = {
     // ==========================================
     // 5. CANDADO POR SUCURSAL (BLINDADO ANTI-CRASH)
     // ==========================================
-    ensureSiteAccess: function(req, res, next) {
-        if (!req.isAuthenticated()) {
+    ensureSiteAccess: async function(req, res, next) {
+        const user = await checkAuth(req);
+        if (!user) {
             return res.status(401).json({ success: false, message: 'Por favor inicia sesión.', errorCode: 'AUTH_REQUIRED' });
         }
+        
+        req.user = user; // Inyectamos el usuario seguro
 
         const requestedSiteId = req.params.siteId || req.params.id || req.body.siteId || req.query.siteId;
 
@@ -55,13 +92,13 @@ module.exports = {
         }
 
         // Si es el dueño de la tienda o un súper administrador, pasa directo
-        if (req.user.role === 'store_owner' || req.user.role === 'superadmin') {
+        if (user.role === 'store_owner' || user.role === 'superadmin') {
             return next();
         }
 
         // Si es un empleado, verificamos si pertenece a la sucursal exacta a la que intenta entrar
-        if (req.user.isEmployee) {
-            if (req.user.siteId && req.user.siteId.toString() === requestedSiteId.toString()) {
+        if (user.isEmployee) {
+            if (user.siteId && user.siteId.toString() === requestedSiteId.toString()) {
                 return next();
             } else {
                 return res.status(403).json({ success: false, message: 'Alerta de Seguridad: No tienes permisos en esta sucursal.', errorCode: 'WRONG_BRANCH' });
