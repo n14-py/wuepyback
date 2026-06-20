@@ -10,7 +10,8 @@ module.exports = {
     // ==========================================
     getInventory: async (req, res) => {
         try {
-            const siteId = req.params.siteId || req.user.siteId;
+            // CORRECCIÓN: Leer el siteId de params, query o body
+            const siteId = req.params.siteId || req.query.siteId || req.body.siteId || req.user.siteId;
             const site = await Site.findOne({ _id: siteId });
             
             if (!site) {
@@ -38,7 +39,8 @@ module.exports = {
     // ==========================================
     getProduct: async (req, res) => {
         try {
-            const { siteId, productId } = req.params;
+            const siteId = req.params.siteId || req.query.siteId || req.body.siteId || req.user.siteId;
+            const productId = req.params.productId;
             const product = await Product.findOne({ _id: productId, site: siteId }).lean();
 
             if (!product) return res.status(404).json({ success: false, message: 'Producto no encontrado.' });
@@ -53,7 +55,8 @@ module.exports = {
     // 3. GUARDAR (CREAR O ACTUALIZAR)
     // ==========================================
     saveProduct: async (req, res) => {
-        const siteId = req.params.siteId || req.user.siteId;
+        // CORRECCIÓN: Leemos el siteId desde el req.query de forma prioritaria
+        const siteId = req.params.siteId || req.query.siteId || req.body.siteId || req.user.siteId;
         const productId = req.params.productId;
 
         try {
@@ -109,7 +112,8 @@ module.exports = {
     // ==========================================
     deleteProduct: async (req, res) => {
         try {
-            const { siteId, productId } = req.params;
+            const siteId = req.params.siteId || req.query.siteId || req.body.siteId || req.user.siteId;
+            const productId = req.params.productId;
             await Product.findOneAndDelete({ _id: productId, site: siteId });
             return res.status(200).json({ success: true, message: 'Producto eliminado del catálogo.' });
         } catch (error) {
