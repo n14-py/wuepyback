@@ -25,7 +25,6 @@ app.set('trust proxy', 1);
 // Configuración de CORS ultra-permisiva adaptada para infinitos subdominios
 app.use(cors({
     origin: function (origin, callback) {
-        // Permitimos cualquier origen dinámicamente para que soporte tiendadenando.wuepy.com y el main
         callback(null, true);
     },
     credentials: true, // Obligatorio para que las cookies de sesión viajen
@@ -49,8 +48,10 @@ app.use(session({
     cookie: { 
         maxAge: 1000 * 60 * 60 * 24 * 14,
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // VITAL: true en producción (Render/Contabo)
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // 'none' permite cross-domain (Cloudflare -> Render)
+        // CORRECCIÓN CRÍTICA: Forzamos la seguridad Cross-Domain para siempre.
+        // Esto obliga a Chrome/Safari a enviar tu sesión desde Cloudflare hacia Render.
+        secure: true, 
+        sameSite: 'none' 
     }
 }));
 
@@ -63,12 +64,9 @@ app.use(passport.session());
 // 3. ENRUTADOR INTELIGENTE DE SUBDOMINIOS (Adaptado para API pura)
 // ==========================================
 app.use((req, res, next) => {
-    // En una arquitectura separada, debemos leer OBLIGATORIAMENTE el 'origin'
-    // porque el 'host' siempre será la URL de Render (api-wuepy.onrender.com)
     const origin = req.get('origin'); 
     const mainDomain = process.env.MAIN_DOMAIN || 'wuepy.com';
 
-    // Si la petición no tiene origen, asumimos que es el dominio principal
     if (!origin) {
         req.isMainDomain = true;
         req.subdomainName = null;
@@ -82,7 +80,6 @@ app.use((req, res, next) => {
         req.subdomainName = null;
     } else {
         try {
-            // Parseamos la URL de donde viene la petición (Ej: https://tiendadenando.wuepy.com)
             const urlObj = new URL(origin);
             const hostname = urlObj.hostname;
             
@@ -91,7 +88,6 @@ app.use((req, res, next) => {
                 req.subdomainName = null;
             } else {
                 req.isMainDomain = false;
-                // Extraemos el subdominio con precisión ("tiendadenando")
                 req.subdomainName = hostname.split('.')[0].toLowerCase(); 
             }
         } catch(e) {
@@ -105,7 +101,6 @@ app.use((req, res, next) => {
 // ==========================================
 // 4. REGISTRO DE RUTAS MAESTRAS (API JSON)
 // ==========================================
-// Todas las rutas llevan el prefijo /api
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/superadmin', require('./routes/superadmin'));
