@@ -78,7 +78,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
 
 // GET para validar acceso a creación (Opcional en API, pero útil para chequeos)
 router.get('/create-site', ensureStoreOwner, (req, res) => {
-    return res.status(200).json({ success: true, message: 'Acceso autorizado para crear tienda', user: req.user });
+    return res.status(200).json({ success: true, message: 'Acceso authorized para crear tienda', user: req.user });
 });
 
 router.post('/create-site', ensureStoreOwner, upload.single('logo'), async (req, res) => {
@@ -348,9 +348,12 @@ router.get('/site/:siteId/inventory', ensureSiteAccess, async (req, res) => {
 });
 
 router.post('/inventory/add', ensureSiteAccess, upload.single('image'), async (req, res) => {
-    const { siteId } = req.body;
+    // CORRECCIÓN INTERNA: Leemos el siteId con soporte robusto para query param (?siteId=...) o body
+    const siteId = req.body.siteId || req.query.siteId;
     try {
         const site = await Site.findOne({ _id: siteId });
+        if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada para asociar el producto.' });
+
         const { name, category, sku, price, compareAtPrice, stock, lowStockThreshold, description, isActive } = req.body;
         let imageUrl = req.file ? req.file.path : '';
         const isProductActive = isActive === 'true' || isActive === true;
@@ -370,9 +373,12 @@ router.post('/inventory/add', ensureSiteAccess, upload.single('image'), async (r
 });
 
 router.post('/inventory/edit/:productId', ensureSiteAccess, upload.single('image'), async (req, res) => {
-    const { siteId } = req.body;
+    // CORRECCIÓN INTERNA: Leemos el siteId de forma híbrida
+    const siteId = req.body.siteId || req.query.siteId;
     try {
         const site = await Site.findOne({ _id: siteId });
+        if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada.' });
+
         const { name, category, sku, price, compareAtPrice, stock, lowStockThreshold, description, isActive } = req.body;
         const isProductActive = isActive === 'true' || isActive === true;
 
@@ -392,7 +398,8 @@ router.post('/inventory/edit/:productId', ensureSiteAccess, upload.single('image
 });
 
 router.post('/inventory/delete/:productId', ensureSiteAccess, async (req, res) => {
-    const { siteId } = req.body;
+    // CORRECCIÓN INTERNA: Leemos el siteId de forma híbrida
+    const siteId = req.body.siteId || req.query.siteId;
     try {
         await Product.findOneAndDelete({ _id: req.params.productId, site: siteId });
         return res.status(200).json({ success: true, message: 'Producto purgado de la base de datos.' });
@@ -530,6 +537,7 @@ router.get('/site/:siteId/finances', ensureStoreOwner, async (req, res) => {
     }
 });
 
+// Registrar egreso / gasto
 router.post('/site/:siteId/expenses/add', ensureStoreOwner, async (req, res) => {
     try {
         const { description, amount, category } = req.body;
@@ -541,7 +549,7 @@ router.post('/site/:siteId/expenses/add', ensureStoreOwner, async (req, res) => 
     }
 });
 
-// MOTOR DE EXPORTACIÓN A PDF (Este lo mantenemos con `res.setHeader` para que la app pueda descargar el archivo binario)
+// MOTOR DE EXPORTACIÓN A PDF
 router.get('/site/:siteId/finances/export', ensureStoreOwner, async (req, res) => {
     try {
         const site = await Site.findOne({ _id: req.params.siteId, owner: req.user._id }).lean();
@@ -582,8 +590,7 @@ router.get('/site/:siteId/finances/export', ensureStoreOwner, async (req, res) =
     }
 });
 
-// Ruta para procesar el formulario del programa Wuepy Apoya (UGC)
-// (siteController.enviarPostulacionApoya debe retornar JSON también, lo haremos en el próximo paso)
+// Postulaciones
 router.post('/programs/apoya', siteController.enviarPostulacionApoya);
 
 module.exports = router;
