@@ -18,6 +18,7 @@ module.exports = {
                 return res.status(400).json({ success: false, message: 'Por favor completa todos los campos.' });
             }
 
+            // Ya lo validamos en el front, pero por seguridad lo re-validamos en el back
             if (password !== confirmPassword) {
                 return res.status(400).json({ success: false, message: 'Las contraseñas no coinciden.' });
             }
@@ -37,14 +38,13 @@ module.exports = {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
 
-            // Crear el nuevo usuario
+            // Crear el nuevo usuario (CORREGIDO PARA QUE COINCIDA CON TU MODELO USER.JS)
             const newUser = new User({ 
                 name: name.trim(), 
                 email: emailClean, 
                 password: hashedPassword,
-                role: 'dueño', // Rol por defecto
-                plan: 'free',
-                status: 'active'
+                role: 'store_owner', // CORRECCIÓN CRÍTICA: En lugar de 'dueño'
+                accountStatus: 'active' // Coincide con el modelo
             });
 
             await newUser.save();
@@ -70,7 +70,6 @@ module.exports = {
                 return res.status(500).json({ success: false, message: 'Error interno del servidor.' });
             }
             if (!user) {
-                // info.message viene directamente de passport.js que configuramos antes
                 return res.status(401).json({ success: false, message: info ? info.message : 'Credenciales inválidas.' });
             }
             
@@ -81,13 +80,12 @@ module.exports = {
                     return res.status(500).json({ success: false, message: 'Error al establecer la sesión.' });
                 }
                 
-                // Login exitoso, enviamos los datos básicos del usuario (jamás la contraseña)
+                // Login exitoso, enviamos los datos básicos del usuario
                 const userData = {
                     id: user._id,
                     name: user.name,
                     email: user.email,
-                    role: user.role,
-                    avatar: user.avatar
+                    role: user.role
                 };
                 
                 return res.status(200).json({ 
@@ -107,14 +105,14 @@ module.exports = {
             if (err) {
                 return res.status(500).json({ success: false, message: 'Error al cerrar sesión.' });
             }
-            // Limpiar la cookie del navegador o dispositivo
+            // Limpiar la cookie
             res.clearCookie('connect.sid'); 
             return res.status(200).json({ success: true, message: 'Has cerrado sesión correctamente.' });
         });
     },
 
     // ==========================================
-    // 4. VERIFICAR SESIÓN ACTIVA (Vital para Flutter y Cloudflare)
+    // 4. VERIFICAR SESIÓN ACTIVA
     // ==========================================
     checkSession: (req, res) => {
         if (req.isAuthenticated()) {
@@ -122,9 +120,7 @@ module.exports = {
                 id: req.user._id,
                 name: req.user.name,
                 email: req.user.email,
-                role: req.user.role,
-                avatar: req.user.avatar,
-                plan: req.user.plan
+                role: req.user.role
             };
             return res.status(200).json({ 
                 success: true, 
