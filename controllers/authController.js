@@ -4,6 +4,7 @@
 const passport = require('passport');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const jwt = require('jsonwebtoken'); // <-- AGREGADO PARA SOPORTE MÓVIL (TOKEN)
 
 module.exports = {
     // ==========================================
@@ -80,12 +81,20 @@ module.exports = {
                     return res.status(500).json({ success: false, message: 'Error al establecer la sesión.' });
                 }
                 
-                // Login exitoso, enviamos los datos básicos del usuario
+                // GENERAR TOKEN JWT PARA MÓVILES (Bypass de bloqueo de cookies cross-site)
+                const token = jwt.sign(
+                    { id: user._id, role: user.role, isEmployee: user.isEmployee, siteId: user.siteId }, 
+                    process.env.JWT_SECRET || 'wuepy_super_secret_key_2026', 
+                    { expiresIn: '30d' }
+                );
+
+                // Login exitoso, enviamos los datos básicos del usuario y el token
                 const userData = {
                     id: user._id,
                     name: user.name,
                     email: user.email,
-                    role: user.role
+                    role: user.role,
+                    token: token // <-- INYECTAMOS EL TOKEN AQUÍ
                 };
                 
                 return res.status(200).json({ 
@@ -114,13 +123,30 @@ module.exports = {
     // ==========================================
     // 4. VERIFICAR SESIÓN ACTIVA
     // ==========================================
-    checkSession: (req, res) => {
+    checkSession: async (req, res) => {
+        let currentUser = null;
+
+        // 1. Verificamos si hay sesión tradicional por Cookie (Escritorio)
         if (req.isAuthenticated()) {
+            currentUser = req.user;
+        } 
+        // 2. Si no hay cookie (caso celular), verificamos el Token
+        else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+            const token = req.headers.authorization.split(' ')[1];
+            try {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET || 'wuepy_super_secret_key_2026');
+                currentUser = await User.findById(decoded.id);
+            } catch (err) {
+                // Token inválido o expirado
+            }
+        }
+
+        if (currentUser) {
             const userData = {
-                id: req.user._id,
-                name: req.user.name,
-                email: req.user.email,
-                role: req.user.role
+                id: currentUser._id,
+                name: currentUser.name,
+                email: currentUser.email,
+                role: currentUser.role
             };
             return res.status(200).json({ 
                 success: true, 
