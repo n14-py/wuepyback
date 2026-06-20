@@ -12,7 +12,6 @@ module.exports = {
     // ==========================================
 
     getBuilder: (req, res) => {
-        // En la API, solo confirmamos que tiene permiso. El Frontend/App se encarga de mostrar la UI.
         return res.status(200).json({ 
             success: true, 
             user: req.user, 
@@ -29,7 +28,6 @@ module.exports = {
                 whatsapp, contactEmail, address
             } = req.body;
             
-            // Limpieza estricta de subdominio (Antihack, anti-espacios y en minúsculas)
             const cleanSubdomain = subdomain.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
 
             const existingSite = await Site.findOne({ subdomain: cleanSubdomain });
@@ -40,10 +38,8 @@ module.exports = {
                 });
             }
 
-            // Limpieza de WhatsApp (Solo números)
             const cleanWhatsapp = whatsapp ? whatsapp.replace(/[^0-9]/g, '') : '';
 
-            // LÓGICA DE SUSCRIPCIÓN FREEMIUM (1 Mes Gratis Garantizado)
             const trialEndDate = new Date();
             trialEndDate.setDate(trialEndDate.getDate() + 30);
 
@@ -80,14 +76,10 @@ module.exports = {
                 social: { facebook: '', instagram: '', tiktok: '' }
             });
 
-            // Si subió un logo por multer (R2/BunnyCDN o Local)
             if (req.file) newSite.logoUrl = req.file.path; 
 
             await newSite.save();
 
-            // ==========================================
-            // MAGIA IA: DISPARAR EL ORQUESTADOR GEMINI
-            // ==========================================
             if (newSite.designMode === 'ai_generated' && newSite.aiPrompt && newSite.plan !== 'basico') {
                 const aiResult = await agentAiService.orquestarDisenoWeb(newSite._id, newSite.aiPrompt);
                 if (!aiResult.success) {
@@ -100,7 +92,6 @@ module.exports = {
                 }
             }
 
-            // Generar la URL pública para enviarla al frontend
             const frontendDomain = process.env.FRONTEND_DOMAIN || 'wuepy.com';
             const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
             const storeUrl = `${protocol}://${newSite.subdomain}.${frontendDomain}`;
@@ -234,21 +225,17 @@ module.exports = {
 
     renderStoreHome: async (req, res) => {
         try {
-            // Extraído por nuestro enrutador inteligente en server.js
             const subdomain = req.subdomainName || req.params.subdomain;
             const site = await Site.findOne({ subdomain });
             
             if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada', errorCode: 'NOT_FOUND' });
             
-            // Lógica de Prevención y Bloqueos
             if (!site.isActive || site.subscriptionStatus === 'suspended') {
                 return res.status(403).json({ success: false, message: 'Tienda suspendida por falta de pago o inactividad', errorCode: 'SUSPENDED' });
             }
 
-            // Registrar visita (Útil para métricas)
             await Site.updateOne({ _id: site._id }, { $inc: { views: 1 } });
 
-            // ENRUTAMIENTO IA: Si fue generada por IA, el frontend buscará en la carpeta estática.
             if (site.designMode === 'ai_generated' && site.customHtmlFolder) {
                 return res.status(200).json({
                     success: true,
@@ -259,12 +246,12 @@ module.exports = {
                 });
             }
 
-            // ENRUTAMIENTO TRADICIONAL
-            const products = await Product.find({ site: site._id, isActive: true })
+            // CORRECCIÓN CRÍTICA: Buscar productos que NO sean false (evita el bug de esquemas viejos)
+            const products = await Product.find({ site: site._id, isActive: { $ne: false } })
                                           .sort({ createdAt: -1 })
                                           .limit(12).lean();
 
-            const categories = await Product.distinct('category', { site: site._id, isActive: true });
+            const categories = await Product.distinct('category', { site: site._id, isActive: { $ne: false } });
 
             return res.status(200).json({
                 success: true,
@@ -283,9 +270,6 @@ module.exports = {
     renderStoreProduct: async (req, res) => {
         try {
             const subdomain = req.subdomainName || req.params.subdomain;
-            
-            // CORRECCIÓN CRÍTICA: En routes/index.js tu parámetro es :id, no :productId
-            // Por lo tanto extraemos req.params.id directamente
             const productId = req.params.id; 
 
             if (!productId) {
@@ -298,14 +282,14 @@ module.exports = {
             const product = await Product.findOne({ _id: productId, site: site._id }).lean();
             if (!product) return res.status(404).json({ success: false, message: 'Producto no encontrado' });
 
-            // Actualizar vistas del producto para el "Social Proof" 
             await Product.updateOne({ _id: productId }, { $inc: { views: 1 } });
 
+            // CORRECCIÓN CRÍTICA: Buscar relacionados que NO sean false
             const related = await Product.find({ 
                 site: site._id, 
                 category: product.category, 
                 _id: { $ne: product._id }, 
-                isActive: true
+                isActive: { $ne: false }
             }).limit(4).lean();
 
             return res.status(200).json({
@@ -317,7 +301,6 @@ module.exports = {
 
         } catch (error) {
             console.error('Error Producto API:', error);
-            // Capturar error si el ID no tiene formato válido de MongoDB (CastError)
             if (error.name === 'CastError') {
                 return res.status(404).json({ success: false, message: 'Producto no encontrado o ID inválido' });
             }
@@ -334,9 +317,9 @@ module.exports = {
             const site = await Site.findOne({ subdomain });
             if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada' });
 
-            let filter = { site: site._id, isActive: true };
+            // CORRECCIÓN CRÍTICA: Buscar en buscador que NO sean false
+            let filter = { site: site._id, isActive: { $ne: false } };
             
-            // Aprovechamos los índices "text" para búsquedas rápidas
             if (query) {
                 filter.$text = { $search: query };
             }
@@ -344,7 +327,7 @@ module.exports = {
             if (category) filter.category = category;
 
             const products = await Product.find(filter).sort({ createdAt: -1 }).lean();
-            const categories = await Product.distinct('category', { site: site._id, isActive: true });
+            const categories = await Product.distinct('category', { site: site._id, isActive: { $ne: false } });
 
             return res.status(200).json({
                 success: true,
