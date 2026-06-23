@@ -10,7 +10,6 @@ module.exports = {
     // ==========================================
     getInventory: async (req, res) => {
         try {
-            // CORRECCIÓN: Leer el siteId de params, query o body
             const siteId = req.params.siteId || req.query.siteId || req.body.siteId || req.user.siteId;
             const site = await Site.findOne({ _id: siteId });
             
@@ -55,7 +54,6 @@ module.exports = {
     // 3. GUARDAR (CREAR O ACTUALIZAR)
     // ==========================================
     saveProduct: async (req, res) => {
-        // CORRECCIÓN: Leemos el siteId desde el req.query de forma prioritaria
         const siteId = req.params.siteId || req.query.siteId || req.body.siteId || req.user.siteId;
         const productId = req.params.productId;
 
@@ -66,15 +64,21 @@ module.exports = {
                 isActive 
             } = req.body;
 
-            const isGlobal = showInGlobalMarketplace === 'on' || showInGlobalMarketplace === true || showInGlobalMarketplace === 'true';
+            // BLINDAJE ABSOLUTO: Parseo de checkbox para el marketplace global
+            let isGlobal = true;
+            if (showInGlobalMarketplace !== undefined) {
+                const globalStr = String(showInGlobalMarketplace).toLowerCase();
+                isGlobal = globalStr.includes('true') || globalStr.includes('on') || globalStr.includes('1');
+            }
             
-            // SOLUCIÓN AL BUG "SIEMPRE OCULTO": 
-            // Si el frontend envía variables duplicadas en el FormData, Node las vuelve un Array.
-            // Extraemos la versión limpia y plana para que la lectura lógica nunca falle.
-            const rawActive = Array.isArray(isActive) ? isActive[0] : isActive;
-            
-            // Ahora sí hacemos la comprobación blindada
-            const isProductActive = rawActive === undefined ? true : (rawActive === 'true' || rawActive === true || rawActive === 'on');
+            // BLINDAJE ABSOLUTO DEL ESTADO PUBLICADO/OCULTO
+            // Evitamos el bug "true,true" revisando si la palabra clave existe en lo que mandó el HTML
+            let isProductActive = true; 
+            if (isActive !== undefined) {
+                const activeStr = String(isActive).toLowerCase();
+                // Si incluye la palabra true, on o 1, se publica. Si no, se oculta.
+                isProductActive = activeStr.includes('true') || activeStr.includes('on') || activeStr.includes('1');
+            }
 
             const productData = {
                 name,
@@ -87,7 +91,7 @@ module.exports = {
                 category: category || 'General',
                 globalCategory: globalCategory || 'Otros',
                 showInGlobalMarketplace: isGlobal,
-                isActive: isProductActive, // Se guarda el estado correcto en la BD
+                isActive: isProductActive, // Ahora sí se guarda perfectamente
                 sku: sku || '',
                 site: siteId,
                 lastModifiedBy: req.user.role || 'owner'
