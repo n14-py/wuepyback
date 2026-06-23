@@ -33,7 +33,9 @@ class AgentAiService {
     injectVariables(template, variables) {
         if (!template) return '';
         let compiled = template;
-        for (const [key, value] || Object.entries(variables)) {
+        
+        // CORRECCIÓN APLICADA: 'of' en lugar de '||' para iterar el objeto
+        for (const [key, value] of Object.entries(variables)) {
             // Reemplaza globalmente todas las coincidencias de {{VARIABLE}}
             const regex = new RegExp(`{{${key}}}`, 'g');
             compiled = compiled.replace(regex, value);
