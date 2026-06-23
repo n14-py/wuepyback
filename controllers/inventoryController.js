@@ -60,12 +60,17 @@ module.exports = {
         const productId = req.params.productId;
 
         try {
+            // SOLUCIÓN AL BUG: Se agregó 'isActive' para poder recibirlo del frontend
             const { 
                 name, price, priceUSD, stock, description, shortDescription, 
-                category, globalCategory, showInGlobalMarketplace, sku, lowStockThreshold 
+                category, globalCategory, showInGlobalMarketplace, sku, lowStockThreshold,
+                isActive 
             } = req.body;
 
             const isGlobal = showInGlobalMarketplace === 'on' || showInGlobalMarketplace === true || showInGlobalMarketplace === 'true';
+            
+            // Convertimos el valor string del FormData ("true" / "false") a un booleano real
+            const isProductActive = isActive === undefined ? true : (isActive === 'true' || isActive === true || isActive === 'on');
 
             const productData = {
                 name,
@@ -78,6 +83,7 @@ module.exports = {
                 category: category || 'General',
                 globalCategory: globalCategory || 'Otros',
                 showInGlobalMarketplace: isGlobal,
+                isActive: isProductActive, // SOLUCIÓN: Guardamos el estado en el producto
                 sku: sku || '',
                 site: siteId,
                 lastModifiedBy: req.user.role || 'owner'
