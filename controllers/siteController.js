@@ -28,8 +28,10 @@ module.exports = {
                 whatsapp, contactEmail, address
             } = req.body;
             
+            // Limpieza absoluta del subdominio para evitar caracteres raros
             const cleanSubdomain = subdomain.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
 
+            // Verificamos si alguien más ya tomó este nombre
             const existingSite = await Site.findOne({ subdomain: cleanSubdomain });
             if (existingSite) {
                 return res.status(400).json({ 
@@ -40,9 +42,11 @@ module.exports = {
 
             const cleanWhatsapp = whatsapp ? whatsapp.replace(/[^0-9]/g, '') : '';
 
+            // 1 mes de prueba gratis automático
             const trialEndDate = new Date();
             trialEndDate.setDate(trialEndDate.getDate() + 30);
 
+            // Creamos el registro en la base de datos
             const newSite = new Site({
                 owner: req.user._id,
                 name,
@@ -76,18 +80,27 @@ module.exports = {
                 social: { facebook: '', instagram: '', tiktok: '' }
             });
 
+            // Si subieron un logo, Multer y Cloudflare R2 ya lo guardaron y nos dan la URL
             if (req.file) newSite.logoUrl = req.file.path; 
 
             await newSite.save();
 
-            if (newSite.designMode === 'ai_generated' && newSite.aiPrompt && newSite.plan !== 'basico') {
+            // =========================================================
+            // 🔥 ACTIVACIÓN DEL ORQUESTADOR IA (DEEPSEEK) 🔥
+            // =========================================================
+            // Quitamos la restricción del plan básico para que puedas hacer pruebas tranquilo
+            if (newSite.designMode === 'ai_generated' && newSite.aiPrompt) {
+                console.log(`[API Wuepy] 🧠 Despertando a DeepSeek para la tienda: ${newSite.subdomain}`);
+                
+                // El servidor se queda "congelado" aquí esperando a que la IA termine de crear los HTMLs
                 const aiResult = await agentAiService.orquestarDisenoWeb(newSite._id, newSite.aiPrompt);
+                
                 if (!aiResult.success) {
                     console.error("Error orquestando IA:", aiResult.error);
                     return res.status(201).json({ 
                         success: true, 
                         siteId: newSite._id,
-                        warning: 'Tu negocio fue creado, pero el motor de Inteligencia Artificial tuvo un problema. Contacta a soporte.' 
+                        message: 'Tu negocio fue creado, pero la Inteligencia Artificial falló al armar el diseño. Se aplicará el diseño clásico.' 
                     });
                 }
             }
@@ -236,17 +249,18 @@ module.exports = {
 
             await Site.updateOne({ _id: site._id }, { $inc: { views: 1 } });
 
+            // 🔥 MAGIA DE LA IA: Si el sitio tiene diseño generado, le decimos al frontend que cargue esa carpeta
             if (site.designMode === 'ai_generated' && site.customHtmlFolder) {
                 return res.status(200).json({
                     success: true,
                     isAiGenerated: true,
                     aiFolder: site.customHtmlFolder,
                     site,
-                    message: 'Esta tienda es servida por IA estática'
+                    message: 'Esta tienda es servida por la Bóveda IA de Wuepy'
                 });
             }
 
-            // CORRECCIÓN CRÍTICA: Buscar productos que NO sean false (evita el bug de esquemas viejos)
+            // Si es una tienda normal, cargamos sus productos
             const products = await Product.find({ site: site._id, isActive: { $ne: false } })
                                           .sort({ createdAt: -1 })
                                           .limit(12).lean();
@@ -284,7 +298,6 @@ module.exports = {
 
             await Product.updateOne({ _id: productId }, { $inc: { views: 1 } });
 
-            // CORRECCIÓN CRÍTICA: Buscar relacionados que NO sean false
             const related = await Product.find({ 
                 site: site._id, 
                 category: product.category, 
@@ -317,7 +330,6 @@ module.exports = {
             const site = await Site.findOne({ subdomain });
             if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada' });
 
-            // CORRECCIÓN CRÍTICA: Buscar en buscador que NO sean false
             let filter = { site: site._id, isActive: { $ne: false } };
             
             if (query) {
