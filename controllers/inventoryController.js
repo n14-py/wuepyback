@@ -60,7 +60,6 @@ module.exports = {
         const productId = req.params.productId;
 
         try {
-            // SOLUCIÓN AL BUG: Se agregó 'isActive' para poder recibirlo del frontend
             const { 
                 name, price, priceUSD, stock, description, shortDescription, 
                 category, globalCategory, showInGlobalMarketplace, sku, lowStockThreshold,
@@ -69,8 +68,13 @@ module.exports = {
 
             const isGlobal = showInGlobalMarketplace === 'on' || showInGlobalMarketplace === true || showInGlobalMarketplace === 'true';
             
-            // Convertimos el valor string del FormData ("true" / "false") a un booleano real
-            const isProductActive = isActive === undefined ? true : (isActive === 'true' || isActive === true || isActive === 'on');
+            // SOLUCIÓN AL BUG "SIEMPRE OCULTO": 
+            // Si el frontend envía variables duplicadas en el FormData, Node las vuelve un Array.
+            // Extraemos la versión limpia y plana para que la lectura lógica nunca falle.
+            const rawActive = Array.isArray(isActive) ? isActive[0] : isActive;
+            
+            // Ahora sí hacemos la comprobación blindada
+            const isProductActive = rawActive === undefined ? true : (rawActive === 'true' || rawActive === true || rawActive === 'on');
 
             const productData = {
                 name,
@@ -83,7 +87,7 @@ module.exports = {
                 category: category || 'General',
                 globalCategory: globalCategory || 'Otros',
                 showInGlobalMarketplace: isGlobal,
-                isActive: isProductActive, // SOLUCIÓN: Guardamos el estado en el producto
+                isActive: isProductActive, // Se guarda el estado correcto en la BD
                 sku: sku || '',
                 site: siteId,
                 lastModifiedBy: req.user.role || 'owner'
