@@ -81,6 +81,9 @@ router.get('/create-site', ensureStoreOwner, (req, res) => {
     return res.status(200).json({ success: true, message: 'Acceso authorized para crear tienda', user: req.user });
 });
 
+// NUEVA RUTA PARA EL ASISTENTE CON ORQUESTADOR IA
+router.post('/site/create', ensureStoreOwner, upload.single('logo'), siteController.createSite);
+
 router.post('/create-site', ensureStoreOwner, upload.single('logo'), async (req, res) => {
     try {
         const { 
