@@ -54,16 +54,16 @@ class AgentAiService {
             // 1. EXTRAER INVENTARIO DE BLOQUES PARA LA IA
             // =========================================================
             // Le pasamos a la IA la lista de piezas que tenemos en la bóveda
-            // para que ella sepa qué puede elegir.
-            const availableNavs = Object.keys(aiBlocks.navs).join(', ');
-            const availableHeros = Object.keys(aiBlocks.heros).join(', ');
-            const availableProducts = Object.keys(aiBlocks.products).join(', ');
-            const availableFeatures = Object.keys(aiBlocks.features).join(', ');
-            const availableAbout = Object.keys(aiBlocks.about).join(', ');
-            const availableTestimonials = Object.keys(aiBlocks.testimonials).join(', ');
-            const availableFaq = Object.keys(aiBlocks.faq).join(', ');
-            const availableCta = Object.keys(aiBlocks.cta).join(', ');
-            const availableFooters = Object.keys(aiBlocks.footers).join(', ');
+            // para que ella sepa qué puede elegir. BLINDADO contra undefined.
+            const availableNavs = Object.keys(aiBlocks?.navs || {}).join(', ');
+            const availableHeros = Object.keys(aiBlocks?.heros || {}).join(', ');
+            const availableProducts = Object.keys(aiBlocks?.products || {}).join(', ');
+            const availableFeatures = Object.keys(aiBlocks?.features || {}).join(', ');
+            const availableAbout = Object.keys(aiBlocks?.about || {}).join(', ');
+            const availableTestimonials = Object.keys(aiBlocks?.testimonials || {}).join(', ');
+            const availableFaq = Object.keys(aiBlocks?.faq || {}).join(', ');
+            const availableCta = Object.keys(aiBlocks?.cta || {}).join(', ');
+            const availableFooters = Object.keys(aiBlocks?.footers || {}).join(', ');
 
             // =========================================================
             // 2. EL PROMPT MAESTRO (EL CEREBRO ARQUITECTO)
@@ -197,14 +197,14 @@ Crea la estructura JSON completa, con colores que encajen con este rubro, crea e
             // 5. EL COMPILADOR (El Constructor Node.js)
             // =========================================================
             for (const page of blueprint.pages) {
-                let pageHtml = aiBlocks.base.layout; // Toma el esqueleto base
+                let pageHtml = aiBlocks?.base?.layout || '<html><body>{{NAV_BLOCK}}{{BODY_BLOCKS}}{{FOOTER_BLOCK}}</body></html>'; // Toma el esqueleto base con fallback
                 
                 // 5.1. Construir el Nav
-                const navTemplate = aiBlocks.navs[page.nav] || aiBlocks.navs['modern_glass'];
+                const navTemplate = (aiBlocks?.navs && aiBlocks.navs[page.nav]) ? aiBlocks.navs[page.nav] : (aiBlocks?.navs?.['modern_glass'] || '');
                 pageHtml = pageHtml.replace('{{NAV_BLOCK}}', navTemplate);
 
                 // 5.2. Construir el Footer
-                const footerTemplate = aiBlocks.footers[page.footer] || aiBlocks.footers['modern_dark'];
+                const footerTemplate = (aiBlocks?.footers && aiBlocks.footers[page.footer]) ? aiBlocks.footers[page.footer] : (aiBlocks?.footers?.['modern_dark'] || '');
                 const footerCompiled = this.injectVariables(footerTemplate, page.footer_content || {});
                 pageHtml = pageHtml.replace('{{FOOTER_BLOCK}}', footerCompiled);
 
@@ -213,7 +213,7 @@ Crea la estructura JSON completa, con colores que encajen con este rubro, crea e
                 if (page.blocks && page.blocks.length > 0) {
                     for (const block of page.blocks) {
                         // Verifica si el bloque existe en nuestra bóveda
-                        if (aiBlocks[block.type] && aiBlocks[block.type][block.name]) {
+                        if (aiBlocks?.[block.type] && aiBlocks[block.type][block.name]) {
                             const rawBlockHtml = aiBlocks[block.type][block.name];
                             // Inyecta los textos persuasivos redactados por DeepSeek
                             const compiledBlock = this.injectVariables(rawBlockHtml, block.content || {});

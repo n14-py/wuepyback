@@ -1,41 +1,60 @@
 // ==========================================================================
-// WUEPY.COM - BÓVEDA DE COMPONENTES IA (EL ARSENAL DEFINITIVO)
+// WUEPY.COM - LA BÓVEDA DE COMPONENTES IA (AI BLOCKS)
+// Aquí residen todos los bloques HTML que la IA puede elegir para construir.
+// Tecnologías embebidas: Tailwind CSS, Alpine.js (Interactividad), FontAwesome.
 // ==========================================================================
-// Cientos de piezas de alta conversión. DeepSeek elegirá las mejores
-// y reemplazará las variables {{VARIABLES}} para crear webs únicas.
 
 module.exports = {
-    // ==========================================
-    // 1. ESTRUCTURAS BASE MAESTRAS
-    // ==========================================
+    // ----------------------------------------------------------------------
+    // 1. BASE LAYOUT (El esqueleto principal de todas las páginas)
+    // ----------------------------------------------------------------------
     base: {
-        // Layout para la página principal (con carga de catálogo)
-        layout: `<!DOCTYPE html>
+        layout: `
+<!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{SITE_NAME}} | {{PAGE_TITLE}}</title>
+    <title>{{PAGE_TITLE}} - {{SITE_NAME}}</title>
     <meta name="description" content="{{SITE_DESCRIPTION}}">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family={{FONT_FAMILY}}:wght@300;400;600;800;900&display=swap" rel="stylesheet">
-    <script src="/js/api.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family={{FONT_FAMILY}}:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '{{PRIMARY_COLOR}}',
+                        secondary: '{{SECONDARY_COLOR}}',
+                        dark: '{{BG_COLOR}}',
+                        light: '{{TEXT_COLOR}}'
+                    },
+                    fontFamily: {
+                        sans: ['"{{FONT_FAMILY}}"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        :root { --brand-color: {{PRIMARY_COLOR}}; --brand-dark: {{SECONDARY_COLOR}}; }
         body { font-family: '{{FONT_FAMILY}}', sans-serif; background-color: {{BG_COLOR}}; color: {{TEXT_COLOR}}; }
-        .text-brand { color: var(--brand-color); }
-        .bg-brand { background-color: var(--brand-color); }
-        .border-brand { border-color: var(--brand-color); }
-        .hover-bg-brand:hover { background-color: var(--brand-color); filter: brightness(1.1); }
-        [x-cloak] { display: none !important; }
+        /* Scrollbar personalizada */
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: var(--brand-color); border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: {{PRIMARY_COLOR}}; border-radius: 4px; }
+        .glass-effect { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
-<body x-data="storefrontApp()" x-cloak class="antialiased flex flex-col min-h-screen">
-    
+<body class="antialiased flex flex-col min-h-screen">
+
     {{NAV_BLOCK}}
 
     <main class="flex-grow">
@@ -44,343 +63,501 @@ module.exports = {
 
     {{FOOTER_BLOCK}}
 
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('storefrontApp', () => ({
-                site: null, products: [], isLoading: true,
-                async init() {
-                    try {
-                        const hostname = window.location.hostname;
-                        const subdomain = (hostname === 'localhost' || hostname === '127.0.0.1') ? 'demo' : hostname.split('.')[0];
-                        const res = await fetch((window.API_URL || 'https://wuepyback.onrender.com/api') + '/store/public/' + subdomain + '?_t=' + Date.now());
-                        const data = await res.json();
-                        if (data.success) { this.site = data.site; this.products = data.products || []; }
-                    } catch (e) { console.error(e); }
-                    this.isLoading = false;
-                },
-                formatMoney(amount) { return (this.site?.currency === 'PYG' ? 'Gs. ' : '$ ') + parseInt(amount || 0).toLocaleString('es-PY'); }
-            }));
-        });
-    </script>
 </body>
-</html>`
+</html>
+        `
     },
 
-    // ==========================================
-    // 2. NAVEGADORES (HEADERS)
-    // ==========================================
+    // ----------------------------------------------------------------------
+    // 2. NAVEGACIONES (Headers)
+    // ----------------------------------------------------------------------
     navs: {
         modern_glass: `
-        <nav class="fixed w-full z-50 top-0 transition-all duration-300 backdrop-blur-xl bg-[{{BG_COLOR}}]/80 border-b border-gray-200/10 shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ mobileMenuOpen: false }">
-                <div class="flex justify-between items-center h-20">
-                    <a href="index.html" class="flex items-center gap-3 group">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg transform group-hover:rotate-12 transition" style="background-color: {{PRIMARY_COLOR}};">{{SITE_INITIAL}}</div>
-                        <span class="text-2xl font-black tracking-tight" style="color: {{TEXT_COLOR}}">{{SITE_NAME}}</span>
-                    </a>
-                    <div class="hidden md:flex gap-8 items-center font-bold text-sm">
-                        <a href="index.html" class="opacity-70 hover:opacity-100 hover:text-brand transition">Inicio</a>
-                        <a href="index.html#catalogo" class="opacity-70 hover:opacity-100 hover:text-brand transition">Catálogo</a>
-                        <a href="nosotros.html" class="opacity-70 hover:opacity-100 hover:text-brand transition">Nuestra Historia</a>
-                        <a href="contacto.html" class="opacity-70 hover:opacity-100 hover:text-brand transition">Contacto</a>
-                    </div>
-                    <a :href="'https://wa.me/' + (site?.whatsappNumber || '').replace(/[^0-9]/g, '')" target="_blank" class="hidden sm:flex bg-brand text-white px-6 py-2.5 rounded-full font-black shadow-lg hover:scale-105 transition items-center gap-2">
-                        <i class="fab fa-whatsapp text-xl"></i> Chat
-                    </a>
-                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
+<nav x-data="{ mobileMenuOpen: false, scrolled: false }" 
+     @scroll.window="scrolled = (window.pageYOffset > 20)"
+     :class="{ 'glass-effect shadow-lg': scrolled, 'bg-transparent': !scrolled }"
+     class="fixed w-full z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+            <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-primary/30">
+                    {{SITE_INITIAL}}
                 </div>
-                <div x-show="mobileMenuOpen" class="md:hidden absolute top-20 left-0 w-full bg-[{{BG_COLOR}}] border-b shadow-2xl pb-6 px-4 flex flex-col gap-4 font-bold text-lg z-50">
-                    <a href="index.html" class="pt-4 border-t border-gray-200/10">Inicio</a>
-                    <a href="index.html#catalogo">Catálogo</a>
-                    <a href="nosotros.html">Historia</a>
-                    <a href="contacto.html">Contacto</a>
-                </div>
+                <span class="font-bold text-2xl tracking-tight">{{SITE_NAME}}</span>
             </div>
-        </nav>
-        <div class="h-20"></div>`,
+            
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="hover:text-primary transition-colors font-medium">Inicio</a>
+                <a href="nosotros.html" class="hover:text-primary transition-colors font-medium">Nosotros</a>
+                <a href="faq.html" class="hover:text-primary transition-colors font-medium">FAQ</a>
+                <a href="contacto.html" class="bg-primary text-white px-6 py-2.5 rounded-full font-medium hover:opacity-90 transition-all shadow-md shadow-primary/20">Contacto</a>
+            </div>
+
+            <div class="md:hidden flex items-center">
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-2xl focus:outline-none">
+                    <i class="fas" :class="mobileMenuOpen ? 'fa-times' : 'fa-bars'"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="mobileMenuOpen" 
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         class="md:hidden glass-effect border-t border-gray-200/20 absolute w-full">
+        <div class="px-4 pt-2 pb-6 space-y-2 flex flex-col">
+            <a href="index.html" class="block px-3 py-3 rounded-lg hover:bg-primary/10 font-medium">Inicio</a>
+            <a href="nosotros.html" class="block px-3 py-3 rounded-lg hover:bg-primary/10 font-medium">Nosotros</a>
+            <a href="faq.html" class="block px-3 py-3 rounded-lg hover:bg-primary/10 font-medium">FAQ</a>
+            <a href="contacto.html" class="block px-3 py-3 mt-2 text-center rounded-lg bg-primary text-white font-medium">Contacto</a>
+        </div>
+    </div>
+</nav>
+        `
     },
 
-    // ==========================================
-    // 3. HEROS (PORTADAS PRINCIPALES)
-    // ==========================================
+    // ----------------------------------------------------------------------
+    // 3. HEROS (Bloques de inicio impactantes)
+    // ----------------------------------------------------------------------
     heros: {
-        bold_centered: `
-        <section class="relative py-32 overflow-hidden flex items-center justify-center min-h-[70vh]">
-            <div class="absolute inset-0 z-0">
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-10 blur-[120px] pointer-events-none" style="background-color: {{PRIMARY_COLOR}};"></div>
-            </div>
-            <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
-                <span class="inline-block py-1.5 px-4 rounded-full text-xs font-black uppercase tracking-widest mb-6 border bg-opacity-10" style="color: {{PRIMARY_COLOR}}; border-color: {{PRIMARY_COLOR}}; background-color: {{PRIMARY_COLOR}}20;">{{HERO_BADGE}}</span>
-                <h1 class="text-6xl md:text-8xl font-black mb-8 leading-tight tracking-tighter">{{HERO_TITLE}}</h1>
-                <p class="text-xl md:text-2xl mb-12 opacity-80 max-w-2xl mx-auto">{{HERO_SUBTITLE}}</p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="index.html#catalogo" class="px-8 py-4 rounded-xl font-black text-lg transition transform hover:-translate-y-1 text-white shadow-xl shadow-brand/30" style="background-color: {{PRIMARY_COLOR}};">{{HERO_CTA1}} <i class="fas fa-arrow-right ml-2"></i></a>
-                    <a href="nosotros.html" class="px-8 py-4 rounded-xl font-black text-lg transition border-2 hover:bg-opacity-10" style="border-color: {{SECONDARY_COLOR}}40; color: {{TEXT_COLOR}};">{{HERO_CTA2}}</a>
-                </div>
-            </div>
-        </section>`,
-
         split_image: `
-        <section class="relative pt-20 pb-32 lg:pt-32 overflow-hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <div class="relative z-10">
-                    <div class="w-16 h-2 mb-8 rounded-full" style="background-color: {{PRIMARY_COLOR}};"></div>
-                    <h1 class="text-5xl md:text-7xl font-black mb-6 leading-none tracking-tight">{{HERO_TITLE}}</h1>
-                    <p class="text-xl opacity-80 mb-10 leading-relaxed max-w-lg">{{HERO_SUBTITLE}}</p>
-                    <a href="index.html#catalogo" class="inline-flex items-center gap-3 px-8 py-4 rounded-full font-black text-white shadow-xl transition hover:scale-105" style="background-color: {{PRIMARY_COLOR}};">
-                        {{HERO_CTA1}} <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center"><i class="fas fa-shopping-bag"></i></div>
-                    </a>
+<section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div class="text-center lg:text-left">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-semibold text-sm mb-6 border border-primary/20">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
+                    {{HERO_BADGE}}
                 </div>
-                <div class="relative">
-                    <div class="absolute inset-0 transform translate-x-6 translate-y-6 rounded-3xl" style="background-color: {{PRIMARY_COLOR}}; opacity: 0.2;"></div>
-                    <img src="https://source.unsplash.com/800x1000/?{{IMAGE_KEYWORD}}" alt="Hero" class="relative rounded-3xl shadow-2xl object-cover h-[600px] w-full transform hover:-translate-y-2 transition duration-500">
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-tight">
+                    {{HERO_TITLE}}
+                </h1>
+                <p class="text-lg md:text-xl opacity-80 mb-8 max-w-2xl mx-auto lg:mx-0">
+                    {{HERO_SUBTITLE}}
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <button class="bg-primary text-white px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-primary/30">
+                        {{HERO_CTA1}}
+                    </button>
+                    <button class="glass-effect px-8 py-4 rounded-full font-bold text-lg hover:bg-primary/5 transition-colors border-2">
+                        {{HERO_CTA2}}
+                    </button>
                 </div>
             </div>
-        </section>`
+            
+            <div class="relative hidden lg:block">
+                <div class="absolute inset-0 bg-gradient-to-tr from-primary to-secondary rounded-[3rem] blur-3xl opacity-30 animate-pulse"></div>
+                <img src="https://loremflickr.com/800/1000/{{IMAGE_KEYWORD}}" alt="Hero Image" class="relative z-10 w-full h-[600px] object-cover rounded-[3rem] shadow-2xl border-4 border-white/10">
+                
+                <div class="absolute -bottom-10 -left-10 glass-effect p-6 rounded-2xl shadow-xl z-20 flex items-center gap-4 animate-bounce" style="animation-duration: 3s;">
+                    <div class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white text-xl">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold">Calidad Premium</p>
+                        <p class="text-sm opacity-80">Garantizada</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+        `,
+        centered_gradient: `
+<section class="relative pt-40 pb-32 overflow-hidden flex items-center justify-center min-h-[90vh] text-center">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-primary/30 rounded-full blur-[120px] -z-10"></div>
+    
+    <div class="max-w-4xl mx-auto px-4 relative z-10">
+        <h1 class="text-6xl md:text-8xl font-extrabold mb-8 tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-white to-secondary">
+            {{HERO_TITLE}}
+        </h1>
+        <p class="text-xl md:text-2xl mb-10 opacity-80 max-w-2xl mx-auto font-light">
+            {{HERO_SUBTITLE}}
+        </p>
+        <div class="flex flex-col sm:flex-row gap-6 justify-center">
+            <a href="#catalogo" class="bg-primary text-white px-10 py-4 rounded-full font-bold text-lg hover:shadow-[0_0_40px_rgba(var(--primary),0.5)] transition-all">
+                {{HERO_CTA1}} <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+        `
     },
 
-    // ==========================================
-    // 4. GRILLAS DE PRODUCTOS (MOTOR WUEPY)
-    // ==========================================
+    // ----------------------------------------------------------------------
+    // 4. PRODUCTOS / CATÁLOGO (Para E-commerce o Servicios)
+    // ----------------------------------------------------------------------
     products: {
         modern_grid: `
-        <section id="catalogo" class="py-24" style="background-color: {{SECONDARY_COLOR}}03;">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-                    <div>
-                        <h2 class="text-4xl md:text-5xl font-black mb-4">{{CATALOG_TITLE}}</h2>
-                        <p class="text-lg opacity-70 max-w-xl">{{CATALOG_SUBTITLE}}</p>
+<section id="catalogo" class="py-24 relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">{{CATALOG_TITLE}}</h2>
+            <p class="text-xl opacity-70">{{CATALOG_SUBTITLE}}</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="group rounded-3xl overflow-hidden glass-effect border hover:-translate-y-2 transition-all duration-300">
+                <div class="relative h-64 overflow-hidden">
+                    <img src="https://loremflickr.com/600/400/{{IMAGE_KEYWORD}},1" alt="Product" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-black px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                        Destacado
                     </div>
                 </div>
-                
-                <template x-if="products.length === 0 && !isLoading">
-                    <div class="text-center py-20 border-2 border-dashed border-gray-300 rounded-3xl opacity-50">
-                        <i class="fas fa-box-open text-6xl mb-4"></i>
-                        <p class="text-xl font-bold">Catálogo en preparación...</p>
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold mb-2">{{PRODUCT_1_NAME}}</h3>
+                    <p class="opacity-70 mb-4">{{PRODUCT_1_DESC}}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-2xl font-extrabold text-primary">{{PRODUCT_1_PRICE}}</span>
+                        <button class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-primary/30">
+                            <i class="fas fa-shopping-cart"></i>
+                        </button>
                     </div>
-                </template>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <template x-for="product in products" :key="product._id">
-                        <div class="group relative rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition duration-500 bg-white" style="border: 1px solid {{SECONDARY_COLOR}}15;">
-                            <div class="aspect-[4/5] overflow-hidden relative bg-gray-50">
-                                <img :src="product.imageUrl || 'https://placehold.co/600x800?text=Sin+Imagen'" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
-                                
-                                <template x-if="product.compareAtPrice > product.price">
-                                    <div class="absolute top-4 left-4 bg-red-500 text-white text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-lg">Oferta</div>
-                                </template>
-                                <template x-if="product.stock <= 0">
-                                    <div class="absolute top-4 right-4 bg-black text-white text-xs font-black px-3 py-1.5 rounded-full uppercase shadow-lg">Agotado</div>
-                                </template>
-                            </div>
-                            <div class="p-6">
-                                <p class="text-[10px] font-black uppercase tracking-widest mb-2 opacity-50" x-text="product.category || 'Destacado'"></p>
-                                <h3 class="text-lg font-bold mb-3 line-clamp-2 text-gray-900 group-hover:text-brand transition" x-text="product.name"></h3>
-                                
-                                <div class="flex items-center gap-3 mb-6">
-                                    <p class="text-2xl font-black" style="color: {{PRIMARY_COLOR}}" x-text="formatMoney(product.price)"></p>
-                                    <template x-if="product.compareAtPrice > product.price">
-                                        <p class="text-sm font-bold text-gray-400 line-through" x-text="formatMoney(product.compareAtPrice)"></p>
-                                    </template>
-                                </div>
-                                
-                                <a :href="'https://wa.me/' + (site?.whatsappNumber || '').replace(/[^0-9]/g, '') + '?text=Hola! Quiero comprar: ' + product.name" target="_blank" class="w-full block text-center py-3.5 rounded-xl font-black text-white transition transform active:scale-95 shadow-md hover:shadow-xl" style="background-color: {{PRIMARY_COLOR}};">
-                                    <i class="fab fa-whatsapp mr-1"></i> Pedir Ahora
-                                </a>
-                            </div>
-                        </div>
-                    </template>
                 </div>
             </div>
-        </section>`
+            
+            <div class="group rounded-3xl overflow-hidden glass-effect border hover:-translate-y-2 transition-all duration-300">
+                <div class="relative h-64 overflow-hidden">
+                    <img src="https://loremflickr.com/600/400/{{IMAGE_KEYWORD}},2" alt="Product" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                </div>
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold mb-2">{{PRODUCT_2_NAME}}</h3>
+                    <p class="opacity-70 mb-4">{{PRODUCT_2_DESC}}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-2xl font-extrabold text-primary">{{PRODUCT_2_PRICE}}</span>
+                        <button class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-primary/30">
+                            <i class="fas fa-shopping-cart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group rounded-3xl overflow-hidden glass-effect border hover:-translate-y-2 transition-all duration-300">
+                <div class="relative h-64 overflow-hidden">
+                    <img src="https://loremflickr.com/600/400/{{IMAGE_KEYWORD}},3" alt="Product" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute top-4 right-4 bg-primary/90 backdrop-blur text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                        Oferta
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold mb-2">{{PRODUCT_3_NAME}}</h3>
+                    <p class="opacity-70 mb-4">{{PRODUCT_3_DESC}}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-2xl font-extrabold text-primary">{{PRODUCT_3_PRICE}}</span>
+                        <button class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-primary/30">
+                            <i class="fas fa-shopping-cart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-16 text-center">
+            <button class="px-8 py-4 border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-full font-bold transition-colors">
+                Ver todo el catálogo <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </div>
+</section>
+        `
     },
 
-    // ==========================================
-    // 5. SOBRE NOSOTROS / HISTORIA (NUEVO)
-    // ==========================================
+    // ----------------------------------------------------------------------
+    // 5. SOBRE NOSOTROS (Para página nosotros.html)
+    // ----------------------------------------------------------------------
     about: {
         story_split: `
-        <section class="py-24 overflow-hidden relative">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                    <div class="relative order-2 lg:order-1">
-                        <div class="grid grid-cols-2 gap-4">
-                            <img src="https://source.unsplash.com/600x800/?{{ABOUT_IMAGE1}}" class="rounded-3xl shadow-xl transform translate-y-8">
-                            <img src="https://source.unsplash.com/600x800/?{{ABOUT_IMAGE2}}" class="rounded-3xl shadow-xl">
-                        </div>
-                        <div class="absolute -bottom-10 -left-10 w-40 h-40 rounded-full border-8 opacity-20 pointer-events-none" style="border-color: {{PRIMARY_COLOR}};"></div>
+<section class="py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div class="relative">
+                <div class="absolute -inset-4 bg-primary/20 rounded-[3rem] transform rotate-3 -z-10"></div>
+                <img src="https://loremflickr.com/800/800/team,business" alt="Nuestro Equipo" class="rounded-[2rem] shadow-2xl w-full object-cover h-[500px]">
+                <div class="absolute -bottom-8 -right-8 glass-effect p-8 rounded-2xl shadow-xl max-w-xs hidden md:block">
+                    <p class="text-4xl font-extrabold text-primary mb-2">{{YEARS_EXPERIENCE}}+</p>
+                    <p class="font-medium opacity-80">Años de experiencia transformando ideas en realidad.</p>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="text-primary font-bold tracking-wider uppercase mb-2">Nuestra Historia</h4>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">{{ABOUT_TITLE}}</h2>
+                <div class="space-y-6 opacity-80 text-lg leading-relaxed">
+                    <p>{{ABOUT_PARAGRAPH_1}}</p>
+                    <p>{{ABOUT_PARAGRAPH_2}}</p>
+                </div>
+                
+                <div class="mt-10 grid grid-cols-2 gap-6">
+                    <div class="glass-effect p-6 rounded-xl border-t-4 border-primary">
+                        <i class="fas fa-bullseye text-3xl text-primary mb-4"></i>
+                        <h3 class="font-bold text-xl mb-2">Misión</h3>
+                        <p class="opacity-70 text-sm">{{MISSION_TEXT}}</p>
                     </div>
-                    <div class="order-1 lg:order-2">
-                        <span class="text-brand font-black tracking-widest uppercase text-sm mb-4 block">{{ABOUT_EYEBROW}}</span>
-                        <h2 class="text-4xl md:text-6xl font-black mb-8 leading-tight">{{ABOUT_TITLE}}</h2>
-                        <div class="space-y-6 text-lg opacity-80 leading-relaxed">
-                            <p>{{ABOUT_PARAGRAPH_1}}</p>
-                            <p>{{ABOUT_PARAGRAPH_2}}</p>
-                        </div>
-                        <div class="mt-12 grid grid-cols-2 gap-8 pt-10 border-t border-gray-200/20">
-                            <div>
-                                <h4 class="text-4xl font-black mb-2" style="color: {{PRIMARY_COLOR}}">{{ABOUT_STAT1_NUM}}</h4>
-                                <p class="font-bold opacity-70 uppercase tracking-widest text-xs">{{ABOUT_STAT1_TEXT}}</p>
-                            </div>
-                            <div>
-                                <h4 class="text-4xl font-black mb-2" style="color: {{PRIMARY_COLOR}}">{{ABOUT_STAT2_NUM}}</h4>
-                                <p class="font-bold opacity-70 uppercase tracking-widest text-xs">{{ABOUT_STAT2_TEXT}}</p>
-                            </div>
-                        </div>
+                    <div class="glass-effect p-6 rounded-xl border-t-4 border-secondary">
+                        <i class="fas fa-eye text-3xl text-secondary mb-4"></i>
+                        <h3 class="font-bold text-xl mb-2">Visión</h3>
+                        <p class="opacity-70 text-sm">{{VISION_TEXT}}</p>
                     </div>
                 </div>
             </div>
-        </section>`
+        </div>
+    </div>
+</section>
+        `
     },
 
-    // ==========================================
-    // 6. TESTIMONIOS (SOCIAL PROOF) (NUEVO)
-    // ==========================================
-    testimonials: {
-        grid: `
-        <section class="py-24" style="background-color: {{SECONDARY_COLOR}};">
-            <div class="max-w-7xl mx-auto px-4 text-white">
-                <div class="text-center mb-16">
-                    <h2 class="text-4xl font-black mb-4">{{TESTIMONIAL_TITLE}}</h2>
-                    <p class="opacity-70 text-lg">{{TESTIMONIAL_SUBTITLE}}</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-sm hover:bg-white/10 transition">
-                        <div class="flex text-yellow-400 mb-6 text-xl"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                        <p class="text-lg mb-8 opacity-90 leading-relaxed">"{{REVIEW1_TEXT}}"</p>
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center font-bold text-xl">{{REVIEW1_INITIAL}}</div>
-                            <div>
-                                <h4 class="font-bold">{{REVIEW1_NAME}}</h4>
-                                <span class="text-xs opacity-50 uppercase tracking-widest">Cliente Verificado</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-sm hover:bg-white/10 transition transform md:-translate-y-4">
-                        <div class="flex text-yellow-400 mb-6 text-xl"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
-                        <p class="text-lg mb-8 opacity-90 leading-relaxed">"{{REVIEW2_TEXT}}"</p>
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-brand flex items-center justify-center font-bold text-xl">{{REVIEW2_INITIAL}}</div>
-                            <div>
-                                <h4 class="font-bold">{{REVIEW2_NAME}}</h4>
-                                <span class="text-xs opacity-50 uppercase tracking-widest">Cliente Fiel</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white/5 p-8 rounded-3xl border border-white/10 backdrop-blur-sm hover:bg-white/10 transition">
-                        <div class="flex text-yellow-400 mb-6 text-xl"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div>
-                        <p class="text-lg mb-8 opacity-90 leading-relaxed">"{{REVIEW3_TEXT}}"</p>
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center font-bold text-xl">{{REVIEW3_INITIAL}}</div>
-                            <div>
-                                <h4 class="font-bold">{{REVIEW3_NAME}}</h4>
-                                <span class="text-xs opacity-50 uppercase tracking-widest">Cliente Verificado</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    // ----------------------------------------------------------------------
+    // 6. CARACTERÍSTICAS / VENTAJAS (Features)
+    // ----------------------------------------------------------------------
+    features: {
+        bento_box: `
+<section class="py-24 bg-black/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-4xl font-bold mb-4">{{FEATURES_TITLE}}</h2>
+            <p class="text-xl opacity-70">{{FEATURES_SUBTITLE}}</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-2 glass-effect p-10 rounded-3xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10 group-hover:bg-primary/20 transition-all"></div>
+                <i class="{{FEATURE_1_ICON}} text-5xl text-primary mb-6"></i>
+                <h3 class="text-3xl font-bold mb-4">{{FEATURE_1_TITLE}}</h3>
+                <p class="opacity-80 text-lg max-w-md">{{FEATURE_1_DESC}}</p>
             </div>
-        </section>`
+            
+            <div class="glass-effect p-8 rounded-3xl group hover:bg-primary hover:text-white transition-colors duration-300">
+                <i class="{{FEATURE_2_ICON}} text-4xl text-primary group-hover:text-white mb-6"></i>
+                <h3 class="text-2xl font-bold mb-3">{{FEATURE_2_TITLE}}</h3>
+                <p class="opacity-80">{{FEATURE_2_DESC}}</p>
+            </div>
+
+            <div class="glass-effect p-8 rounded-3xl group hover:bg-primary hover:text-white transition-colors duration-300">
+                <i class="{{FEATURE_3_ICON}} text-4xl text-primary group-hover:text-white mb-6"></i>
+                <h3 class="text-2xl font-bold mb-3">{{FEATURE_3_TITLE}}</h3>
+                <p class="opacity-80">{{FEATURE_3_DESC}}</p>
+            </div>
+
+            <div class="md:col-span-2 glass-effect p-10 rounded-3xl flex flex-col justify-center items-center text-center bg-gradient-to-br from-primary/10 to-transparent">
+                <h3 class="text-3xl font-bold mb-4">{{FEATURE_4_TITLE}}</h3>
+                <p class="opacity-80 text-lg mb-6">{{FEATURE_4_DESC}}</p>
+                <button class="bg-primary text-white px-6 py-2 rounded-full font-bold">Saber más</button>
+            </div>
+        </div>
+    </div>
+</section>
+        `
     },
 
-    // ==========================================
-    // 7. PREGUNTAS FRECUENTES (FAQ) (NUEVO)
-    // ==========================================
+    // ----------------------------------------------------------------------
+    // 7. PREGUNTAS FRECUENTES (Para faq.html)
+    // ----------------------------------------------------------------------
     faq: {
         accordion: `
-        <section class="py-24">
-            <div class="max-w-4xl mx-auto px-4">
-                <div class="text-center mb-16">
-                    <h2 class="text-4xl font-black mb-4">{{FAQ_TITLE}}</h2>
-                    <p class="opacity-70 text-lg">{{FAQ_SUBTITLE}}</p>
+<section class="py-24">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold mb-4">{{FAQ_TITLE}}</h2>
+            <p class="text-lg opacity-70">{{FAQ_SUBTITLE}}</p>
+        </div>
+
+        <div class="space-y-4">
+            <div x-data="{ open: false }" class="glass-effect rounded-2xl overflow-hidden">
+                <button @click="open = !open" class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none">
+                    <span class="font-bold text-lg">{{QUESTION_1}}</span>
+                    <i class="fas" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </button>
+                <div x-show="open" x-collapse class="px-6 pb-5 opacity-80">
+                    {{ANSWER_1}}
                 </div>
-                
-                <div class="space-y-4" x-data="{ active: null }">
-                    <div class="border border-gray-200/50 rounded-2xl overflow-hidden bg-white shadow-sm">
-                        <button @click="active !== 1 ? active = 1 : active = null" class="w-full px-6 py-5 text-left font-bold text-lg flex justify-between items-center hover:bg-gray-50 transition text-gray-900">
-                            {{FAQ1_QUESTION}}
-                            <i class="fas fa-chevron-down transition-transform duration-300" :class="active === 1 ? 'rotate-180 text-brand' : ''"></i>
-                        </button>
-                        <div x-show="active === 1" x-collapse class="px-6 pb-6 text-gray-600 leading-relaxed">{{FAQ1_ANSWER}}</div>
-                    </div>
-                    <div class="border border-gray-200/50 rounded-2xl overflow-hidden bg-white shadow-sm">
-                        <button @click="active !== 2 ? active = 2 : active = null" class="w-full px-6 py-5 text-left font-bold text-lg flex justify-between items-center hover:bg-gray-50 transition text-gray-900">
-                            {{FAQ2_QUESTION}}
-                            <i class="fas fa-chevron-down transition-transform duration-300" :class="active === 2 ? 'rotate-180 text-brand' : ''"></i>
-                        </button>
-                        <div x-show="active === 2" x-collapse class="px-6 pb-6 text-gray-600 leading-relaxed">{{FAQ2_ANSWER}}</div>
-                    </div>
-                    <div class="border border-gray-200/50 rounded-2xl overflow-hidden bg-white shadow-sm">
-                        <button @click="active !== 3 ? active = 3 : active = null" class="w-full px-6 py-5 text-left font-bold text-lg flex justify-between items-center hover:bg-gray-50 transition text-gray-900">
-                            {{FAQ3_QUESTION}}
-                            <i class="fas fa-chevron-down transition-transform duration-300" :class="active === 3 ? 'rotate-180 text-brand' : ''"></i>
-                        </button>
-                        <div x-show="active === 3" x-collapse class="px-6 pb-6 text-gray-600 leading-relaxed">{{FAQ3_ANSWER}}</div>
+            </div>
+
+            <div x-data="{ open: false }" class="glass-effect rounded-2xl overflow-hidden">
+                <button @click="open = !open" class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none">
+                    <span class="font-bold text-lg">{{QUESTION_2}}</span>
+                    <i class="fas" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </button>
+                <div x-show="open" x-collapse class="px-6 pb-5 opacity-80">
+                    {{ANSWER_2}}
+                </div>
+            </div>
+
+            <div x-data="{ open: false }" class="glass-effect rounded-2xl overflow-hidden">
+                <button @click="open = !open" class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none">
+                    <span class="font-bold text-lg">{{QUESTION_3}}</span>
+                    <i class="fas" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </button>
+                <div x-show="open" x-collapse class="px-6 pb-5 opacity-80">
+                    {{ANSWER_3}}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+        `
+    },
+
+    // ----------------------------------------------------------------------
+    // 8. TESTIMONIOS (Social Proof)
+    // ----------------------------------------------------------------------
+    testimonials: {
+        cards_row: `
+<section class="py-24 bg-black/5 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold mb-4">{{TESTIMONIALS_TITLE}}</h2>
+            <div class="flex justify-center gap-1 text-yellow-400 text-xl mb-4">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+            </div>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="glass-effect p-8 rounded-3xl relative">
+                <i class="fas fa-quote-right absolute top-8 right-8 text-4xl opacity-10 text-primary"></i>
+                <p class="italic opacity-80 mb-6 relative z-10">"{{TESTIMONIAL_1_TEXT}}"</p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">{{TESTIMONIAL_1_INITIAL}}</div>
+                    <div>
+                        <p class="font-bold">{{TESTIMONIAL_1_NAME}}</p>
+                        <p class="text-sm opacity-60">{{TESTIMONIAL_1_ROLE}}</p>
                     </div>
                 </div>
             </div>
-        </section>`
+            
+            <div class="glass-effect p-8 rounded-3xl relative bg-primary text-white transform md:-translate-y-4 shadow-xl shadow-primary/30">
+                <i class="fas fa-quote-right absolute top-8 right-8 text-4xl opacity-20"></i>
+                <p class="italic mb-6 relative z-10">"{{TESTIMONIAL_2_TEXT}}"</p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-bold">{{TESTIMONIAL_2_INITIAL}}</div>
+                    <div>
+                        <p class="font-bold">{{TESTIMONIAL_2_NAME}}</p>
+                        <p class="text-sm opacity-80">{{TESTIMONIAL_2_ROLE}}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-effect p-8 rounded-3xl relative">
+                <i class="fas fa-quote-right absolute top-8 right-8 text-4xl opacity-10 text-primary"></i>
+                <p class="italic opacity-80 mb-6 relative z-10">"{{TESTIMONIAL_3_TEXT}}"</p>
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">{{TESTIMONIAL_3_INITIAL}}</div>
+                    <div>
+                        <p class="font-bold">{{TESTIMONIAL_3_NAME}}</p>
+                        <p class="text-sm opacity-60">{{TESTIMONIAL_3_ROLE}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+        `
     },
 
-    // ==========================================
-    // 8. BANNER CTA (LLAMADO A LA ACCIÓN) (NUEVO)
-    // ==========================================
+    // ----------------------------------------------------------------------
+    // 9. CALL TO ACTION (CTA)
+    // ----------------------------------------------------------------------
     cta: {
-        banner: `
-        <section class="py-12 px-4">
-            <div class="max-w-7xl mx-auto rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl" style="background-color: {{PRIMARY_COLOR}};">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -mr-20 -mt-20"></div>
-                <div class="absolute bottom-0 left-0 w-64 h-64 bg-black opacity-10 rounded-full blur-3xl -ml-20 -mb-20"></div>
-                
-                <div class="relative z-10">
-                    <h2 class="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">{{CTA_TITLE}}</h2>
-                    <p class="text-xl text-white/80 mb-10 max-w-2xl mx-auto">{{CTA_SUBTITLE}}</p>
-                    <a href="index.html#catalogo" class="inline-block bg-white text-gray-900 px-10 py-5 rounded-full font-black text-lg shadow-xl hover:scale-105 transition transform">{{CTA_BUTTON}}</a>
+        split_cta: `
+<section class="py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-gradient-to-r from-primary to-secondary rounded-[3rem] p-12 md:p-20 text-white relative overflow-hidden shadow-2xl">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/3"></div>
+            
+            <div class="relative z-10 grid md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-extrabold mb-4">{{CTA_TITLE}}</h2>
+                    <p class="text-lg opacity-90">{{CTA_SUBTITLE}}</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4 md:justify-end">
+                    <button class="bg-white text-primary px-8 py-4 rounded-full font-bold text-lg hover:shadow-lg transition-all">
+                        {{CTA_BUTTON_1}}
+                    </button>
+                    <button class="border-2 border-white/30 hover:bg-white/10 px-8 py-4 rounded-full font-bold text-lg transition-all">
+                        {{CTA_BUTTON_2}}
+                    </button>
                 </div>
             </div>
-        </section>`
+        </div>
+    </div>
+</section>
+        `
     },
 
-    // ==========================================
-    // 9. FOOTERS (PIE DE PÁGINA)
-    // ==========================================
+    // ----------------------------------------------------------------------
+    // 10. FOOTERS
+    // ----------------------------------------------------------------------
     footers: {
         modern_dark: `
-        <footer class="pt-20 pb-10 text-white mt-auto" style="background-color: {{SECONDARY_COLOR}};">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-                    <div class="lg:col-span-2">
-                        <h2 class="text-4xl font-black mb-6">{{SITE_NAME}}</h2>
-                        <p class="opacity-60 max-w-sm text-lg leading-relaxed mb-8">{{FOOTER_ABOUT}}</p>
-                        <div class="flex gap-4">
-                            <a href="#" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition text-xl"><i class="fab fa-instagram"></i></a>
-                            <a href="#" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition text-xl"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-brand transition text-xl"><i class="fab fa-tiktok"></i></a>
-                        </div>
+<footer class="bg-gray-900 text-white pt-20 pb-10 border-t border-white/10 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+            
+            <div class="col-span-1 md:col-span-2 lg:col-span-1">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center font-bold text-xl">
+                        {{SITE_INITIAL}}
                     </div>
-                    <div>
-                        <h4 class="font-bold uppercase tracking-widest mb-6" style="color: {{PRIMARY_COLOR}};">Navegación</h4>
-                        <ul class="space-y-4 font-semibold opacity-80">
-                            <li><a href="index.html" class="hover:text-brand transition">Inicio</a></li>
-                            <li><a href="index.html#catalogo" class="hover:text-brand transition">Tienda Online</a></li>
-                            <li><a href="nosotros.html" class="hover:text-brand transition">Nuestra Historia</a></li>
-                            <li><a href="faq.html" class="hover:text-brand transition">Ayuda / FAQ</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-bold uppercase tracking-widest mb-6" style="color: {{PRIMARY_COLOR}};">Atención al Cliente</h4>
-                        <ul class="space-y-4 font-semibold opacity-80">
-                            <li class="flex items-center gap-3"><i class="fas fa-map-marker-alt text-brand"></i> {{FOOTER_ADDRESS}}</li>
-                            <li class="flex items-center gap-3"><i class="fab fa-whatsapp text-brand text-lg"></i> <span x-text="site?.whatsappNumber || 'Consulte vía web'"></span></li>
-                            <li class="flex items-center gap-3"><i class="far fa-clock text-brand"></i> {{FOOTER_HOURS}}</li>
-                        </ul>
-                    </div>
+                    <span class="font-bold text-2xl tracking-tight">{{SITE_NAME}}</span>
                 </div>
-                <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm opacity-50 font-bold">
-                    <p>&copy; <span x-text="new Date().getFullYear()"></span> {{SITE_NAME}}. Todos los derechos reservados.</p>
-                    <p>Creado con <i class="fas fa-bolt text-brand mx-1"></i> Inteligencia Artificial de Wuepy</p>
+                <p class="opacity-70 mb-6 leading-relaxed">{{FOOTER_ABOUT}}</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>
-        </footer>`
+
+            <div>
+                <h4 class="font-bold text-lg mb-6">Enlaces Rápidos</h4>
+                <ul class="space-y-3 opacity-70">
+                    <li><a href="index.html" class="hover:text-primary transition-colors">Inicio</a></li>
+                    <li><a href="nosotros.html" class="hover:text-primary transition-colors">Sobre Nosotros</a></li>
+                    <li><a href="faq.html" class="hover:text-primary transition-colors">Preguntas Frecuentes</a></li>
+                    <li><a href="contacto.html" class="hover:text-primary transition-colors">Contacto</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-lg mb-6">Contacto</h4>
+                <ul class="space-y-4 opacity-70">
+                    <li class="flex items-start gap-3">
+                        <i class="fas fa-map-marker-alt mt-1 text-primary"></i>
+                        <span>{{FOOTER_ADDRESS}}</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fas fa-clock text-primary"></i>
+                        <span>{{FOOTER_HOURS}}</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fas fa-envelope text-primary"></i>
+                        <span>hola@{{SITE_NAME}}.com</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-lg mb-6">Boletín</h4>
+                <p class="opacity-70 mb-4">Suscríbete para recibir nuestras últimas ofertas y noticias.</p>
+                <form class="flex">
+                    <input type="email" placeholder="Tu email" class="w-full bg-white/10 px-4 py-3 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary text-white">
+                    <button type="submit" class="bg-primary px-4 py-3 rounded-r-lg hover:opacity-90 transition-opacity">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="border-t border-white/10 pt-8 text-center opacity-50 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p>&copy; 2026 {{SITE_NAME}}. Todos los derechos reservados.</p>
+            <p class="text-sm">Creado con Wuepy IA 🧠</p>
+        </div>
+    </div>
+</footer>
+        `
     }
 };
