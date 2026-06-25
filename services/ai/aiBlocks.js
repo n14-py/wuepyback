@@ -1,563 +1,164 @@
 // ==========================================================================
-// WUEPY.COM - LA BÓVEDA DE COMPONENTES IA (AI BLOCKS)
-// Aquí residen todos los bloques HTML que la IA puede elegir para construir.
-// Tecnologías embebidas: Tailwind CSS, Alpine.js (Interactividad), FontAwesome.
+// WUEPY.COM - BÓVEDA DE BLOQUES IA (LEGO ARCHITECTURE V2 - INFINITY)
+// 170 MILLONES DE COMBINACIONES - 100% RESPONSIVE - CERO ERRORES
 // ==========================================================================
 
 module.exports = {
-    // ----------------------------------------------------------------------
-    // 1. BASE LAYOUT (El esqueleto principal de todas las páginas)
-    // ----------------------------------------------------------------------
-    base: {
-        layout: `
-<!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{PAGE_TITLE}} - {{SITE_NAME}}</title>
-    <meta name="description" content="{{SITE_DESCRIPTION}}">
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    // ==========================================
+    // 1. HEADERS (15 Variaciones)
+    // ==========================================
+    headers: [
+        // 1. Minimalista Clasico
+        `<header x-data="{ open: false }" class="w-full bg-white shadow-sm sticky top-0 z-50"><div class="max-w-7xl mx-auto px-4"><div class="flex justify-between items-center h-20"><div class="text-2xl font-bold cursor-pointer" onclick="window.location.href='/index.html'">{{LOGO_URL}}</div><nav class="hidden md:flex space-x-8"><a href="/index.html" class="text-slate-600 hover:text-{{PRIMARY_COLOR}} font-medium">Inicio</a><a href="/catalogo.html" class="text-slate-600 hover:text-{{PRIMARY_COLOR}} font-medium">Catálogo</a><a href="/nosotros.html" class="text-slate-600 hover:text-{{PRIMARY_COLOR}} font-medium">Nosotros</a><a href="/contacto.html" class="text-slate-600 hover:text-{{PRIMARY_COLOR}} font-medium">Contacto</a></nav><button @click="open = !open" class="md:hidden text-slate-600"><i class="fas fa-bars text-2xl"></i></button></div></div><div x-show="open" class="md:hidden bg-slate-50 border-b p-4 flex flex-col space-y-4 font-bold" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/nosotros.html">Nosotros</a><a href="/contacto.html">Contacto</a></div></header>`,
+        // 2. Brutalista Dark
+        `<header x-data="{ open: false }" class="w-full bg-slate-950 text-white border-b-4 border-{{PRIMARY_COLOR}} sticky top-0 z-50"><div class="max-w-7xl mx-auto px-4"><div class="flex justify-between items-center h-24"><div class="text-3xl font-black uppercase tracking-tighter">{{LOGO_URL}}</div><nav class="hidden md:flex space-x-6 uppercase font-bold text-sm tracking-widest"><a href="/index.html" class="hover:text-{{PRIMARY_COLOR}}">Inicio</a><a href="/catalogo.html" class="hover:text-{{PRIMARY_COLOR}}">Catálogo</a><a href="/nosotros.html" class="hover:text-{{PRIMARY_COLOR}}">Nosotros</a><a href="/contacto.html" class="hover:text-{{PRIMARY_COLOR}}">Contacto</a></nav><button @click="open = !open" class="md:hidden text-white"><i class="fas fa-bars text-3xl"></i></button></div></div><div x-show="open" class="md:hidden bg-slate-900 p-4 flex flex-col space-y-4 uppercase font-bold" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/contacto.html">Contacto</a></div></header>`,
+        // 3. Flotante Pill
+        `<div class="w-full pt-4 px-4 absolute top-0 z-50" x-data="{ open: false }"><header class="max-w-5xl mx-auto bg-white/90 backdrop-blur shadow-xl rounded-full px-8 py-4 flex justify-between items-center"><div class="font-extrabold text-xl">{{LOGO_URL}}</div><nav class="hidden lg:flex space-x-6 text-sm font-bold text-slate-700"><a href="/index.html" class="hover:text-black">Inicio</a><a href="/catalogo.html" class="hover:text-black">Catálogo</a><a href="/nosotros.html" class="hover:text-black">Nosotros</a><a href="/contacto.html" class="hover:text-black">Contacto</a></nav><button @click="open = !open" class="lg:hidden"><i class="fas fa-bars text-xl"></i></button></header><div x-show="open" class="lg:hidden absolute top-20 left-4 right-4 bg-white shadow-2xl rounded-3xl p-6 flex flex-col space-y-4 font-bold z-50" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/contacto.html">Contacto</a></div></div>`,
+        // 4. Centered Logo
+        `<header x-data="{ open: false }" class="w-full bg-white border-b border-slate-200 sticky top-0 z-50"><div class="flex flex-col"><div class="flex justify-between items-center p-4 md:hidden"><div class="font-bold text-xl">{{LOGO_URL}}</div><button @click="open = !open"><i class="fas fa-bars text-2xl"></i></button></div><div class="hidden md:flex flex-col items-center py-6"><div class="text-4xl font-black mb-6">{{LOGO_URL}}</div><nav class="flex space-x-10 font-medium text-slate-600 tracking-wide uppercase text-sm"><a href="/index.html" class="hover:text-{{PRIMARY_COLOR}}">Inicio</a><a href="/catalogo.html" class="hover:text-{{PRIMARY_COLOR}}">Catálogo</a><a href="/nosotros.html" class="hover:text-{{PRIMARY_COLOR}}">Nosotros</a><a href="/contacto.html" class="hover:text-{{PRIMARY_COLOR}}">Contacto</a></nav></div><div x-show="open" class="md:hidden bg-slate-50 p-4 flex flex-col space-y-4 font-bold border-t" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/nosotros.html">Nosotros</a><a href="/contacto.html">Contacto</a></div></div></header>`,
+        // 5. Split Nav Left/Right
+        `<header x-data="{ open: false }" class="w-full bg-slate-50 sticky top-0 z-50 border-b border-slate-200"><div class="max-w-screen-2xl mx-auto px-6 h-20 flex justify-between items-center"><nav class="hidden lg:flex space-x-8 font-semibold w-1/3"><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a></nav><div class="w-1/3 flex justify-center text-2xl font-black">{{LOGO_URL}}</div><nav class="hidden lg:flex space-x-8 font-semibold w-1/3 justify-end"><a href="/nosotros.html">Nosotros</a><a href="/contacto.html">Contacto</a></nav><button @click="open = !open" class="lg:hidden"><i class="fas fa-bars text-2xl"></i></button></div><div x-show="open" class="lg:hidden bg-white p-4 flex flex-col space-y-4 font-bold" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/contacto.html">Contacto</a></div></header>`,
+        // 6. E-commerce Style (Icons on right)
+        `<header x-data="{ open: false }" class="w-full bg-white shadow-md sticky top-0 z-50"><div class="max-w-7xl mx-auto px-4 flex justify-between items-center h-20"><div class="flex items-center gap-8"><div class="text-2xl font-bold">{{LOGO_URL}}</div><nav class="hidden md:flex space-x-6 text-slate-600 font-medium"><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/nosotros.html">Nosotros</a></nav></div><div class="flex items-center gap-6"><a href="/contacto.html" class="hidden md:block text-slate-600 hover:text-{{PRIMARY_COLOR}} font-medium">Ayuda</a><a href="/catalogo.html" class="text-{{PRIMARY_COLOR}}"><i class="fas fa-shopping-bag text-xl"></i></a><button @click="open = !open" class="md:hidden"><i class="fas fa-bars text-xl"></i></button></div></div><div x-show="open" class="md:hidden bg-slate-50 p-4 flex flex-col space-y-4 font-bold" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/contacto.html">Contacto</a></div></header>`,
+        // 7. Dark Minimal Sticky
+        `<header x-data="{ open: false }" class="w-full bg-slate-900 text-slate-300 sticky top-0 z-50 shadow-lg"><div class="max-w-7xl mx-auto px-4 flex justify-between items-center h-16"><div class="text-xl font-bold text-white tracking-widest">{{LOGO_URL}}</div><nav class="hidden md:flex space-x-8 text-sm"><a href="/index.html" class="hover:text-white">Inicio</a><a href="/catalogo.html" class="hover:text-white">Catálogo</a><a href="/nosotros.html" class="hover:text-white">Nosotros</a><a href="/contacto.html" class="hover:text-white">Contacto</a></nav><button @click="open = !open" class="md:hidden"><i class="fas fa-bars"></i></button></div><div x-show="open" class="md:hidden bg-slate-800 p-4 flex flex-col space-y-4" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/contacto.html">Contacto</a></div></header>`,
+        // 8. Neumorphic
+        `<header x-data="{ open: false }" class="w-full bg-slate-100 sticky top-0 z-50"><div class="max-w-7xl mx-auto px-4 py-4"><div class="flex justify-between items-center bg-slate-100 rounded-2xl shadow-[8px_8px_16px_#bebebe,-8px_-8px_16px_#ffffff] px-6 py-4"><div class="text-xl font-bold text-slate-700">{{LOGO_URL}}</div><nav class="hidden md:flex space-x-6 font-bold text-slate-500"><a href="/index.html" class="hover:text-{{PRIMARY_COLOR}}">Inicio</a><a href="/catalogo.html" class="hover:text-{{PRIMARY_COLOR}}">Catálogo</a><a href="/contacto.html" class="hover:text-{{PRIMARY_COLOR}}">Contacto</a></nav><button @click="open = !open" class="md:hidden text-slate-600"><i class="fas fa-bars text-xl"></i></button></div></div><div x-show="open" class="md:hidden bg-slate-100 p-6 flex flex-col space-y-4 font-bold rounded-b-3xl shadow-inner" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/contacto.html">Contacto</a></div></header>`,
+        // 9. Line Bottom Hover
+        `<header x-data="{ open: false }" class="w-full bg-white sticky top-0 z-50 border-b-2 border-slate-100"><div class="max-w-7xl mx-auto px-6 flex justify-between items-center h-24"><div class="text-2xl font-black">{{LOGO_URL}}</div><nav class="hidden md:flex space-x-10 h-full"><a href="/index.html" class="flex items-center h-full border-b-4 border-transparent hover:border-{{PRIMARY_COLOR}} font-bold text-slate-700 transition">Inicio</a><a href="/catalogo.html" class="flex items-center h-full border-b-4 border-transparent hover:border-{{PRIMARY_COLOR}} font-bold text-slate-700 transition">Catálogo</a><a href="/nosotros.html" class="flex items-center h-full border-b-4 border-transparent hover:border-{{PRIMARY_COLOR}} font-bold text-slate-700 transition">Nosotros</a><a href="/contacto.html" class="flex items-center h-full border-b-4 border-transparent hover:border-{{PRIMARY_COLOR}} font-bold text-slate-700 transition">Contacto</a></nav><button @click="open = !open" class="md:hidden"><i class="fas fa-bars text-2xl"></i></button></div><div x-show="open" class="md:hidden bg-white p-4 flex flex-col space-y-4 font-bold border-t" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/contacto.html">Contacto</a></div></header>`,
+        // 10. Cyberpunk / Neon
+        `<header x-data="{ open: false }" class="w-full bg-black text-white border-b border-{{PRIMARY_COLOR}} shadow-[0_0_15px_rgba(0,255,255,0.3)] sticky top-0 z-50"><div class="max-w-7xl mx-auto px-4 flex justify-between items-center h-20"><div class="text-3xl font-black italic tracking-widest text-{{PRIMARY_COLOR}}">{{LOGO_URL}}</div><nav class="hidden md:flex space-x-8 font-mono text-sm"><a href="/index.html" class="hover:text-{{PRIMARY_COLOR}}">INICIO</a><a href="/catalogo.html" class="hover:text-{{PRIMARY_COLOR}}">CATÁLOGO</a><a href="/contacto.html" class="hover:text-{{PRIMARY_COLOR}}">CONTACTO</a></nav><button @click="open = !open" class="md:hidden text-{{PRIMARY_COLOR}}"><i class="fas fa-bars text-2xl"></i></button></div><div x-show="open" class="md:hidden bg-black p-4 flex flex-col space-y-4 font-mono text-{{PRIMARY_COLOR}} border-t border-slate-800" x-cloak><a href="/index.html">INICIO</a><a href="/catalogo.html">CATÁLOGO</a><a href="/contacto.html">CONTACTO</a></div></header>`,
+        // 11 a 15 (Versiones ultra-limpias de refuerzo para sumar variedad sin romper CSS)
+        `<header x-data="{ open: false }" class="w-full bg-slate-50 shadow-sm sticky top-0 z-50"><div class="max-w-6xl mx-auto px-4 h-16 flex justify-between items-center"><div class="font-bold text-lg text-slate-800">{{LOGO_URL}}</div><nav class="hidden md:flex gap-6 text-sm font-semibold text-slate-600"><a href="/index.html" class="hover:text-slate-900">Inicio</a><a href="/catalogo.html" class="hover:text-slate-900">Catálogo</a><a href="/contacto.html" class="hover:text-slate-900">Contacto</a></nav><button @click="open = !open" class="md:hidden"><i class="fas fa-bars"></i></button></div><div x-show="open" class="md:hidden bg-slate-100 p-4 flex flex-col gap-4 text-sm font-bold" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/contacto.html">Contacto</a></div></header>`,
+        `<header x-data="{ open: false }" class="w-full bg-white sticky top-0 z-50 py-4"><div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4"><div class="flex justify-between w-full md:w-auto"><div class="font-black text-2xl">{{LOGO_URL}}</div><button @click="open = !open" class="md:hidden"><i class="fas fa-bars text-xl"></i></button></div><nav class="hidden md:flex gap-4 bg-slate-100 px-6 py-2 rounded-full font-bold text-sm text-slate-600"><a href="/index.html" class="hover:text-black">Inicio</a><a href="/catalogo.html" class="hover:text-black">Catálogo</a><a href="/nosotros.html" class="hover:text-black">Nosotros</a><a href="/contacto.html" class="hover:text-black">Contacto</a></nav></div><div x-show="open" class="md:hidden bg-slate-50 p-4 flex flex-col gap-4 font-bold text-center rounded-xl mx-4 mt-2" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/contacto.html">Contacto</a></div></header>`,
+        `<header x-data="{ open: false }" class="w-full bg-indigo-950 text-white sticky top-0 z-50"><div class="max-w-7xl mx-auto px-6 h-24 flex justify-between items-center"><div class="font-serif text-3xl italic">{{LOGO_URL}}</div><nav class="hidden md:flex gap-8 font-light tracking-widest text-sm uppercase"><a href="/index.html" class="hover:opacity-70">Inicio</a><a href="/catalogo.html" class="hover:opacity-70">Catálogo</a><a href="/contacto.html" class="hover:opacity-70">Contacto</a></nav><button @click="open = !open" class="md:hidden"><i class="fas fa-bars text-2xl"></i></button></div><div x-show="open" class="md:hidden bg-indigo-900 p-6 flex flex-col gap-6 uppercase font-bold text-sm tracking-widest border-t border-indigo-800" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/contacto.html">Contacto</a></div></header>`,
+        `<header x-data="{ open: false }" class="w-full bg-transparent absolute top-0 z-50"><div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center"><div class="bg-white/80 backdrop-blur px-6 py-2 rounded-xl font-bold text-xl shadow-lg">{{LOGO_URL}}</div><nav class="hidden md:flex gap-6 bg-white/80 backdrop-blur px-8 py-3 rounded-xl shadow-lg font-bold text-slate-700"><a href="/index.html" class="hover:text-{{PRIMARY_COLOR}}">Inicio</a><a href="/catalogo.html" class="hover:text-{{PRIMARY_COLOR}}">Catálogo</a><a href="/contacto.html" class="hover:text-{{PRIMARY_COLOR}}">Contacto</a></nav><button @click="open = !open" class="md:hidden bg-white/80 p-3 rounded-xl shadow-lg"><i class="fas fa-bars"></i></button></div><div x-show="open" class="md:hidden bg-white mx-4 rounded-xl shadow-2xl p-4 flex flex-col gap-4 font-bold z-50" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/contacto.html">Contacto</a></div></header>`,
+        `<header x-data="{ open: false }" class="w-full bg-white border-b-8 border-slate-900 sticky top-0 z-50"><div class="max-w-7xl mx-auto px-4 h-20 flex justify-between items-center"><div class="font-black text-2xl tracking-tighter">{{LOGO_URL}}</div><nav class="hidden md:flex gap-8 font-black uppercase text-sm"><a href="/index.html" class="hover:underline decoration-4 underline-offset-4 decoration-{{PRIMARY_COLOR}}">Inicio</a><a href="/catalogo.html" class="hover:underline decoration-4 underline-offset-4 decoration-{{PRIMARY_COLOR}}">Catálogo</a><a href="/contacto.html" class="hover:underline decoration-4 underline-offset-4 decoration-{{PRIMARY_COLOR}}">Contacto</a></nav><button @click="open = !open" class="md:hidden"><i class="fas fa-bars text-2xl"></i></button></div><div x-show="open" class="md:hidden bg-slate-100 p-4 flex flex-col gap-4 font-black uppercase" x-cloak><a href="/index.html">Inicio</a><a href="/catalogo.html">Catálogo</a><a href="/contacto.html">Contacto</a></div></header>`
+    ],
 
-    <link href="https://fonts.googleapis.com/css2?family={{FONT_FAMILY}}:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    // ==========================================
+    // 2. HEROES (15 Variaciones)
+    // ==========================================
+    heroes: [
+        `<section class="w-full min-h-[80vh] flex items-center pt-24 pb-12 px-4 bg-slate-50"><div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center"><div class="text-center lg:text-left"><h1 class="text-5xl lg:text-7xl font-extrabold text-slate-900 leading-tight mb-6">{{HERO_TITLE}}</h1><p class="text-xl text-slate-600 mb-8">{{HERO_SUBTITLE}}</p><div class="flex gap-4 justify-center lg:justify-start"><a href="/catalogo.html" class="px-8 py-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition">Ver Catálogo</a></div></div><div class="hidden lg:flex justify-end"><div class="w-full max-w-md aspect-square bg-slate-200 rounded-[3rem] border-8 border-white shadow-2xl flex items-center justify-center text-slate-400"><i class="fas fa-shopping-bag text-6xl"></i></div></div></div></section>`,
+        `<section class="w-full min-h-[70vh] flex items-center justify-center text-center px-4 py-32 bg-slate-950 text-white"><div class="max-w-4xl mx-auto"><h1 class="text-6xl md:text-8xl font-black mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-500">{{HERO_TITLE}}</h1><p class="text-2xl text-slate-300 font-light mb-10">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="inline-block px-10 py-4 bg-white text-slate-950 font-black rounded-full hover:scale-105 transition shadow-lg">Explorar</a></div></section>`,
+        `<section class="w-full py-32 px-4 bg-white"><div class="max-w-5xl mx-auto text-center"><span class="px-4 py-1.5 bg-blue-100 text-blue-700 font-bold rounded-full text-sm uppercase tracking-wider mb-6 inline-block">{{SITE_NAME}}</span><h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 mb-6">{{HERO_TITLE}}</h1><p class="text-xl text-slate-500 mb-10">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 hover:-translate-y-1 transition">Comprar Ahora</a></div></section>`,
+        `<section class="w-full min-h-[80vh] flex flex-col justify-center items-center px-4 bg-gradient-to-br from-slate-100 to-slate-200"><div class="w-full max-w-6xl bg-white p-12 lg:p-20 rounded-[3rem] shadow-2xl text-center"><h1 class="text-5xl lg:text-7xl font-black text-slate-800 tracking-tight mb-6">{{HERO_TITLE}}</h1><p class="text-2xl text-slate-500 mb-10">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="px-10 py-5 bg-slate-900 text-white font-bold rounded-full text-lg hover:bg-slate-800 transition">Descubrir</a></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-900 text-white border-b-8 border-{{PRIMARY_COLOR}}"><div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12"><div class="w-full lg:w-1/2 order-2 lg:order-1"><div class="aspect-video bg-slate-800 rounded-xl border border-slate-700 flex items-center justify-center shadow-2xl"><i class="fas fa-play text-4xl text-slate-600"></i></div></div><div class="w-full lg:w-1/2 order-1 lg:order-2"><h1 class="text-5xl font-black mb-4">{{HERO_TITLE}}</h1><p class="text-xl text-slate-400 mb-8">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="px-8 py-3 bg-{{PRIMARY_COLOR}} text-white font-bold rounded-lg uppercase tracking-widest text-sm hover:opacity-80 transition">Ver Productos</a></div></div></section>`,
+        `<section class="w-full min-h-[60vh] flex items-center px-4 bg-white"><div class="max-w-7xl mx-auto border-l-8 border-{{PRIMARY_COLOR}} pl-8 lg:pl-16 py-12"><h1 class="text-6xl lg:text-8xl font-black text-slate-900 uppercase tracking-tighter mb-6">{{HERO_TITLE}}</h1><p class="text-2xl text-slate-500 font-medium mb-10 max-w-2xl">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="text-xl font-bold text-{{PRIMARY_COLOR}} hover:underline decoration-4 underline-offset-8">Ir al catálogo <i class="fas fa-arrow-right ml-2"></i></a></div></section>`,
+        `<section class="w-full py-32 px-4 bg-slate-100 relative overflow-hidden"><div class="absolute -top-40 -right-40 w-96 h-96 bg-{{PRIMARY_COLOR}} rounded-full opacity-20 blur-3xl"></div><div class="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-400 rounded-full opacity-20 blur-3xl"></div><div class="max-w-4xl mx-auto text-center relative z-10"><h1 class="text-6xl font-extrabold text-slate-800 mb-6">{{HERO_TITLE}}</h1><p class="text-xl text-slate-600 mb-10">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="px-10 py-4 bg-white border border-slate-200 shadow-xl text-slate-800 font-bold rounded-2xl hover:scale-105 transition">Explorar</a></div></section>`,
+        `<section class="w-full min-h-[70vh] flex items-center px-4 bg-black text-white"><div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center"><div><h1 class="text-5xl lg:text-7xl font-mono font-bold text-{{PRIMARY_COLOR}} mb-4">> {{HERO_TITLE}}_</h1><p class="text-xl font-mono text-slate-400 mb-8">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="px-8 py-3 border-2 border-{{PRIMARY_COLOR}} text-{{PRIMARY_COLOR}} font-mono font-bold hover:bg-{{PRIMARY_COLOR}} hover:text-black transition">START_SHOPPING</a></div><div class="hidden md:flex justify-center"><i class="fas fa-microchip text-9xl text-slate-800"></i></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-white"><div class="max-w-7xl mx-auto text-center"><h1 class="text-4xl md:text-6xl font-serif italic text-slate-900 mb-6">{{HERO_TITLE}}</h1><div class="w-24 h-1 bg-{{PRIMARY_COLOR}} mx-auto mb-6"></div><p class="text-lg text-slate-500 uppercase tracking-widest mb-10">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="px-12 py-4 bg-slate-900 text-white text-sm tracking-widest uppercase hover:bg-slate-800 transition">Ver Colección</a></div></section>`,
+        `<section class="w-full py-32 px-4 bg-slate-800 text-center"><h1 class="text-5xl md:text-8xl font-black text-white uppercase transform -skew-x-6 mb-6">{{HERO_TITLE}}</h1><p class="text-2xl text-slate-400 font-bold transform -skew-x-6 mb-10">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="inline-block px-10 py-4 bg-{{PRIMARY_COLOR}} text-white font-black text-xl uppercase transform -skew-x-6 hover:translate-y-1 transition shadow-[8px_8px_0_0_#fff]">COMPRAR YA</a></section>`,
+        `<section class="w-full min-h-[80vh] flex items-center px-4 bg-slate-50"><div class="max-w-7xl mx-auto text-center"><div class="grid grid-cols-3 gap-4 mb-10 opacity-30 pointer-events-none"><div class="h-32 bg-slate-300 rounded-2xl"></div><div class="h-32 bg-slate-400 rounded-2xl translate-y-8"></div><div class="h-32 bg-slate-300 rounded-2xl"></div></div><h1 class="text-6xl md:text-8xl font-black text-slate-900 tracking-tight mb-6">{{HERO_TITLE}}</h1><p class="text-xl text-slate-500 font-medium mb-10">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="px-8 py-4 bg-slate-900 text-white font-bold rounded-full shadow-2xl hover:scale-105 transition">Comprar Ahora</a></div></section>`,
+        `<section class="w-full py-24 px-4 bg-white border-b border-slate-200"><div class="max-w-5xl mx-auto flex flex-col items-center"><i class="fas fa-star text-5xl text-yellow-400 mb-6"></i><h1 class="text-5xl md:text-6xl font-bold text-center text-slate-800 mb-6">{{HERO_TITLE}}</h1><p class="text-xl text-center text-slate-600 mb-10 max-w-2xl">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="px-8 py-3 border-2 border-slate-900 text-slate-900 font-bold rounded-lg hover:bg-slate-900 hover:text-white transition">Ir a la tienda</a></div></section>`,
+        `<section class="w-full min-h-[70vh] flex items-center px-4 bg-indigo-50"><div class="max-w-7xl mx-auto w-full flex flex-col lg:flex-row items-center justify-between"><div class="w-full lg:w-1/2 mb-10 lg:mb-0"><h1 class="text-5xl lg:text-7xl font-extrabold text-indigo-900 mb-6">{{HERO_TITLE}}</h1><p class="text-xl text-indigo-700 opacity-80 mb-8">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="px-8 py-4 bg-indigo-600 text-white font-bold rounded-xl shadow-xl hover:bg-indigo-700 transition">Ver Ofertas</a></div><div class="w-full lg:w-5/12 bg-white p-8 rounded-3xl shadow-2xl flex flex-col items-center justify-center text-center"><i class="fas fa-box-open text-6xl text-indigo-200 mb-4"></i><h3 class="text-2xl font-bold text-slate-800 mb-2">Nuevos Ingresos</h3><p class="text-slate-500 mb-6">Descubre lo último del catálogo.</p><a href="/catalogo.html" class="text-indigo-600 font-bold">Ver novedades <i class="fas fa-arrow-right text-sm"></i></a></div></div></section>`,
+        `<section class="w-full py-32 px-4 bg-slate-950 text-white"><div class="max-w-7xl mx-auto border border-slate-800 p-12 lg:p-24 rounded-[3rem] relative overflow-hidden"><div class="absolute top-0 right-0 w-64 h-64 bg-slate-800 rounded-bl-full opacity-20"></div><h1 class="text-5xl lg:text-7xl font-light tracking-wide mb-6 relative z-10">{{HERO_TITLE}}</h1><p class="text-xl text-slate-400 font-light mb-10 max-w-2xl relative z-10">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="px-10 py-4 bg-white text-slate-950 font-bold rounded-full relative z-10 hover:bg-slate-200 transition">Explorar catálogo</a></div></section>`,
+        `<section class="w-full min-h-[60vh] flex items-center px-4 bg-white"><div class="max-w-7xl mx-auto text-center w-full"><h1 class="text-7xl lg:text-9xl font-black text-transparent -webkit-text-stroke text-stroke-slate-900 mb-4 opacity-20">{{SITE_NAME}}</h1><h2 class="text-4xl lg:text-6xl font-bold text-slate-900 -mt-16 lg:-mt-24 mb-6 relative z-10">{{HERO_TITLE}}</h2><p class="text-xl text-slate-500 mb-10">{{HERO_SUBTITLE}}</p><a href="/catalogo.html" class="px-12 py-4 bg-slate-900 text-white font-bold hover:bg-slate-800 transition">INGRESAR</a></div></section>`
+    ],
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '{{PRIMARY_COLOR}}',
-                        secondary: '{{SECONDARY_COLOR}}',
-                        dark: '{{BG_COLOR}}',
-                        light: '{{TEXT_COLOR}}'
-                    },
-                    fontFamily: {
-                        sans: ['"{{FONT_FAMILY}}"', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <style>
-        body { font-family: '{{FONT_FAMILY}}', sans-serif; background-color: {{BG_COLOR}}; color: {{TEXT_COLOR}}; }
-        /* Scrollbar personalizada */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: {{PRIMARY_COLOR}}; border-radius: 4px; }
-        .glass-effect { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-    </style>
-</head>
-<body class="antialiased flex flex-col min-h-screen">
+    // ==========================================
+    // 3. CATALOGOS (15 Variaciones) - TODOS TIENEN EL ID VITAL
+    // ==========================================
+    catalogs: [
+        `<section class="w-full py-20 px-4 bg-white"><div class="max-w-7xl mx-auto"><h2 class="text-4xl font-bold text-slate-900 mb-2">Nuestro Catálogo</h2><p class="text-slate-500 mb-12">Encuentra exactamente lo que buscas.</p><div id="wuepy-dynamic-products" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-50"><div class="max-w-7xl mx-auto"><h2 class="text-5xl font-black text-center text-slate-800 mb-16 uppercase tracking-tight">Colección</h2><div id="wuepy-dynamic-products" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12"></div></div></section>`,
+        `<section class="w-full py-20 px-4 bg-slate-950"><div class="max-w-7xl mx-auto"><h2 class="text-4xl font-bold text-white mb-10 border-l-4 border-{{PRIMARY_COLOR}} pl-4">Productos</h2><div id="wuepy-dynamic-products" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-white"><div class="max-w-7xl mx-auto bg-slate-50 p-8 lg:p-12 rounded-[3rem] shadow-sm border border-slate-100"><h2 class="text-3xl font-extrabold text-slate-800 mb-10 text-center">Selección Especial</h2><div id="wuepy-dynamic-products" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div></div></section>`,
+        `<section class="w-full py-20 px-4 bg-slate-100"><div class="max-w-[1400px] mx-auto"><div class="flex justify-between items-end mb-10"><h2 class="text-4xl font-black text-slate-900">Catálogo General</h2></div><div id="wuepy-dynamic-products" class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"></div></div></section>`,
+        `<section class="w-full py-20 px-4 bg-white"><div class="max-w-5xl mx-auto"><h2 class="text-center text-5xl font-serif italic text-slate-900 mb-12">El Catálogo</h2><div id="wuepy-dynamic-products" class="w-full grid grid-cols-1 md:grid-cols-2 gap-12"></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-black"><div class="max-w-7xl mx-auto"><h2 class="text-5xl font-mono font-bold text-{{PRIMARY_COLOR}} mb-12">> INVENTORY_</h2><div id="wuepy-dynamic-products" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div></div></section>`,
+        `<section class="w-full py-20 px-4 bg-white"><div class="max-w-7xl mx-auto flex flex-col items-center"><h2 class="text-3xl font-bold uppercase tracking-widest text-slate-800 mb-4">Descubre</h2><div class="w-16 h-1 bg-slate-300 mb-12"></div><div id="wuepy-dynamic-products" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10"></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-800"><div class="max-w-7xl mx-auto border-4 border-white p-8"><h2 class="text-4xl font-black text-white uppercase transform -skew-x-6 mb-10 text-center">¡OFERTAS!</h2><div id="wuepy-dynamic-products" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div></div></section>`,
+        `<section class="w-full py-20 px-4 bg-slate-50"><div class="max-w-7xl mx-auto"><div class="flex items-center gap-4 mb-10"><i class="fas fa-gem text-3xl text-{{PRIMARY_COLOR}}"></i><h2 class="text-4xl font-extrabold text-slate-900">Premium</h2></div><div id="wuepy-dynamic-products" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div></div></section>`,
+        `<section class="w-full py-32 px-4 bg-white"><div class="max-w-7xl mx-auto"><h2 class="text-7xl font-black text-slate-100 mb-[-40px] relative z-0">CATÁLOGO</h2><div class="relative z-10" id="wuepy-dynamic-products" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div></div></section>`,
+        `<section class="w-full py-20 px-4 bg-gradient-to-b from-slate-50 to-white"><div class="max-w-7xl mx-auto"><h2 class="text-center text-3xl font-bold text-slate-800 mb-12">Todos los productos</h2><div id="wuepy-dynamic-products" class="w-full grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8"></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-indigo-50"><div class="max-w-7xl mx-auto bg-white p-6 lg:p-10 rounded-3xl shadow-xl"><h2 class="text-3xl font-extrabold text-indigo-900 mb-8 border-b border-slate-100 pb-4">Nuestra Tienda</h2><div id="wuepy-dynamic-products" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div></div></section>`,
+        `<section class="w-full py-20 px-4 bg-white border-y border-slate-200"><div class="max-w-7xl mx-auto"><h2 class="text-4xl font-black tracking-tighter text-slate-900 mb-10">/ Catálogo</h2><div id="wuepy-dynamic-products" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-950"><div class="max-w-7xl mx-auto text-center"><h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-10">Explora nuestro universo de productos</h2><div id="wuepy-dynamic-products" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-left"></div></div></section>`
+    ],
 
-    {{NAV_BLOCK}}
+    // ==========================================
+    // 4. ABOUT (Nosotros) (15 Variaciones)
+    // ==========================================
+    about: [
+        `<section class="w-full py-24 px-4 bg-white"><div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16"><div class="w-full lg:w-1/2"><div class="aspect-[4/3] w-full bg-slate-100 rounded-3xl border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400"><i class="fas fa-store text-6xl"></i></div></div><div class="w-full lg:w-1/2"><h2 class="text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6">Sobre Nosotros</h2><div class="w-20 h-2 bg-{{PRIMARY_COLOR}} mb-8 rounded-full"></div><p class="text-lg text-slate-600 leading-relaxed">{{ABOUT_TEXT}}</p></div></div></section>`,
+        `<section class="w-full py-32 px-4 bg-slate-900 text-white"><div class="max-w-4xl mx-auto text-center"><i class="fas fa-quote-left text-5xl text-slate-600 mb-8"></i><h2 class="text-4xl md:text-5xl font-black mb-8">Quiénes Somos</h2><p class="text-xl md:text-2xl text-slate-300 leading-relaxed font-light">{{ABOUT_TEXT}}</p></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-50"><div class="max-w-5xl mx-auto bg-white p-12 shadow-xl rounded-2xl text-center"><h2 class="text-3xl font-bold uppercase tracking-widest text-slate-800 mb-8">Nuestra Historia</h2><p class="text-lg text-slate-600 max-w-3xl mx-auto">{{ABOUT_TEXT}}</p></div></section>`,
+        `<section class="w-full py-20 px-4 bg-black text-white"><div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12"><div class="flex flex-col justify-center"><h2 class="text-5xl font-mono text-{{PRIMARY_COLOR}} mb-6">> ABOUT_US</h2><p class="font-mono text-slate-400 text-lg leading-relaxed">{{ABOUT_TEXT}}</p></div><div class="border border-slate-800 flex items-center justify-center p-12"><i class="fas fa-terminal text-8xl text-slate-800"></i></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-white"><div class="max-w-7xl mx-auto text-center"><h2 class="text-5xl font-serif italic text-slate-900 mb-10">Nuestra Misión</h2><p class="text-xl text-slate-600 max-w-4xl mx-auto leading-loose">{{ABOUT_TEXT}}</p></div></section>`,
+        `<section class="w-full py-32 px-4 bg-slate-100"><div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12"><div class="w-full md:w-1/3 text-right"><h2 class="text-5xl font-black text-slate-800 mb-4">Nosotros.</h2><p class="text-slate-500 font-bold uppercase">Conócenos</p></div><div class="w-full md:w-2/3 border-l-4 border-slate-300 pl-8"><p class="text-xl text-slate-700 leading-relaxed">{{ABOUT_TEXT}}</p></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-white border-y border-slate-200"><div class="max-w-7xl mx-auto"><div class="grid grid-cols-1 md:grid-cols-3 gap-8"><div class="col-span-1 md:col-span-2"><h2 class="text-4xl font-extrabold mb-6">El equipo detrás de {{SITE_NAME}}</h2><p class="text-lg text-slate-600">{{ABOUT_TEXT}}</p></div><div class="col-span-1 bg-slate-50 p-8 rounded-xl flex items-center justify-center"><i class="fas fa-users text-6xl text-slate-300"></i></div></div></div></section>`,
+        `<section class="w-full py-32 px-4 bg-{{PRIMARY_COLOR}} text-white text-center"><div class="max-w-4xl mx-auto"><i class="fas fa-heart text-6xl mb-8 opacity-50"></i><h2 class="text-5xl font-black mb-8">Nuestra Pasión</h2><p class="text-2xl font-medium leading-relaxed">{{ABOUT_TEXT}}</p></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-50"><div class="max-w-6xl mx-auto flex flex-col items-center"><div class="w-24 h-24 bg-white shadow-xl rounded-full flex items-center justify-center text-3xl text-slate-400 mb-8"><i class="fas fa-info"></i></div><h2 class="text-4xl font-bold text-slate-900 mb-6 text-center">Información de la Empresa</h2><p class="text-lg text-center text-slate-600 max-w-3xl">{{ABOUT_TEXT}}</p></div></section>`,
+        `<section class="w-full py-20 px-4 bg-slate-950 text-slate-400"><div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"><div class="order-2 lg:order-1"><p class="text-lg leading-relaxed">{{ABOUT_TEXT}}</p></div><div class="order-1 lg:order-2"><h2 class="text-6xl font-black text-white tracking-tighter mb-4">Sobre<br>Nosotros.</h2></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-white"><div class="max-w-4xl mx-auto border-4 border-slate-900 p-8 md:p-16 relative"><div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-6 font-black uppercase text-2xl">Nosotros</div><p class="text-xl text-center text-slate-700 font-medium">{{ABOUT_TEXT}}</p></div></section>`,
+        `<section class="w-full py-32 px-4 bg-indigo-50"><div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-12 items-start"><div class="w-full md:w-1/2"><h2 class="text-5xl font-extrabold text-indigo-900 mb-6">Nuestra Esencia</h2><p class="text-lg text-indigo-800 opacity-80">{{ABOUT_TEXT}}</p></div><div class="w-full md:w-1/2 grid grid-cols-2 gap-4"><div class="aspect-square bg-indigo-200 rounded-2xl"></div><div class="aspect-square bg-indigo-300 rounded-2xl mt-8"></div></div></div></section>`,
+        `<section class="w-full py-20 px-4 bg-slate-100"><div class="max-w-7xl mx-auto"><h2 class="text-4xl font-black text-slate-800 mb-10 text-center uppercase tracking-widest border-b-2 border-slate-300 pb-4 inline-block mx-auto">Nuestra Visión</h2><p class="text-xl text-slate-600 text-center max-w-4xl mx-auto mt-8">{{ABOUT_TEXT}}</p></div></section>`,
+        `<section class="w-full py-24 px-4 bg-white"><div class="max-w-6xl mx-auto flex flex-col lg:flex-row items-center shadow-2xl rounded-3xl overflow-hidden"><div class="w-full lg:w-1/2 bg-slate-900 text-white p-12 lg:p-20"><h2 class="text-4xl font-bold mb-6">Conócenos</h2><div class="w-16 h-1 bg-white mb-6"></div><p class="text-lg opacity-80">La historia detrás de {{SITE_NAME}}.</p></div><div class="w-full lg:w-1/2 p-12 lg:p-20 bg-slate-50"><p class="text-slate-700 leading-relaxed">{{ABOUT_TEXT}}</p></div></div></section>`,
+        `<section class="w-full py-32 px-4 bg-black text-white text-center"><div class="max-w-5xl mx-auto"><h2 class="text-7xl font-black mb-10 opacity-20 uppercase">{{SITE_NAME}}</h2><p class="text-2xl font-light leading-relaxed -mt-16 relative z-10">{{ABOUT_TEXT}}</p></div></section>`
+    ],
 
-    <main class="flex-grow">
-        {{BODY_BLOCKS}}
-    </main>
+    // ==========================================
+    // 5. CONTACTO (15 Variaciones)
+    // ==========================================
+    contact: [
+        `<section class="w-full py-24 px-4 bg-slate-50"><div class="max-w-7xl mx-auto"><div class="text-center mb-16"><h2 class="text-4xl font-extrabold text-slate-900">Contacto</h2><p class="text-slate-500 mt-4 text-lg">Estamos aquí para ayudarte.</p></div><div class="grid grid-cols-1 md:grid-cols-3 gap-8"><div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 text-center flex flex-col items-center"><div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl mb-4"><i class="fab fa-whatsapp"></i></div><h3 class="font-bold text-xl mb-2">WhatsApp</h3><p class="text-slate-500 font-medium">{{WHATSAPP}}</p></div><div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 text-center flex flex-col items-center"><div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl mb-4"><i class="fas fa-envelope"></i></div><h3 class="font-bold text-xl mb-2">Email</h3><p class="text-slate-500 font-medium">{{EMAIL}}</p></div><div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 text-center flex flex-col items-center"><div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-2xl mb-4"><i class="fas fa-map-marker-alt"></i></div><h3 class="font-bold text-xl mb-2">Ubicación</h3><p class="text-slate-500 font-medium">{{ADDRESS}}</p></div></div></div></section>`,
+        `<section class="w-full py-32 px-4 bg-white border-y border-slate-100"><div class="max-w-3xl mx-auto text-center"><h2 class="text-6xl font-black text-slate-900 mb-10 tracking-tighter">Hablemos.</h2><div class="flex flex-col gap-6 text-xl text-slate-600 font-medium"><a href="https://wa.me/{{WHATSAPP}}" class="hover:text-green-500 transition"><i class="fab fa-whatsapp mr-3"></i> {{WHATSAPP}}</a><a href="mailto:{{EMAIL}}" class="hover:text-blue-500 transition"><i class="fas fa-envelope mr-3"></i> {{EMAIL}}</a><span><i class="fas fa-map-pin mr-3 text-slate-400"></i> {{ADDRESS}}</span></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-900 text-white"><div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16"><div class="flex flex-col justify-center"><h2 class="text-5xl font-black mb-6">Ponte en contacto</h2><p class="text-slate-400 mb-10 text-lg">Envíanos un mensaje o visítanos.</p><div class="space-y-6 text-lg"><p><i class="fab fa-whatsapp text-{{PRIMARY_COLOR}} mr-4"></i> {{WHATSAPP}}</p><p><i class="fas fa-envelope text-{{PRIMARY_COLOR}} mr-4"></i> {{EMAIL}}</p><p><i class="fas fa-map-marker-alt text-{{PRIMARY_COLOR}} mr-4"></i> {{ADDRESS}}</p></div></div><div class="bg-slate-800 p-8 rounded-2xl flex items-center justify-center text-slate-500 font-bold text-2xl border border-slate-700 min-h-[400px]"><i class="fas fa-map-marked-alt text-6xl"></i></div></div></section>`,
+        `<section class="w-full py-20 px-4 bg-white"><div class="max-w-4xl mx-auto bg-slate-50 p-10 md:p-16 rounded-[3rem] text-center shadow-lg"><i class="fas fa-headset text-6xl text-slate-300 mb-6"></i><h2 class="text-4xl font-bold text-slate-800 mb-10">Soporte y Contacto</h2><div class="flex flex-col md:flex-row justify-center gap-8 md:gap-16 text-lg font-medium text-slate-600"><div><p class="text-slate-400 text-sm mb-1 uppercase">Teléfono</p><p>{{WHATSAPP}}</p></div><div><p class="text-slate-400 text-sm mb-1 uppercase">Correo</p><p>{{EMAIL}}</p></div><div><p class="text-slate-400 text-sm mb-1 uppercase">Dirección</p><p>{{ADDRESS}}</p></div></div></div></section>`,
+        `<section class="w-full py-32 px-4 bg-black text-{{PRIMARY_COLOR}} font-mono"><div class="max-w-3xl mx-auto border border-{{PRIMARY_COLOR}} p-10 shadow-[0_0_20px_rgba(0,255,255,0.2)]"><h2 class="text-3xl font-bold mb-8">> INICIAR_COMUNICACION</h2><div class="space-y-4 text-lg"><p>> TEL: {{WHATSAPP}}</p><p>> EMAIL: {{EMAIL}}</p><p>> LOC: {{ADDRESS}}</p><p class="mt-8 animate-pulse">> Esperando conexión...</p></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-white"><div class="max-w-7xl mx-auto"><h2 class="text-center text-5xl font-serif italic mb-16 text-slate-900">Nuestros Canales</h2><div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center"><div class="border-t-2 border-slate-200 pt-6"><h3 class="font-bold text-xl mb-2">Llámanos</h3><p class="text-slate-500">{{WHATSAPP}}</p></div><div class="border-t-2 border-slate-200 pt-6"><h3 class="font-bold text-xl mb-2">Escríbenos</h3><p class="text-slate-500">{{EMAIL}}</p></div><div class="border-t-2 border-slate-200 pt-6"><h3 class="font-bold text-xl mb-2">Visítanos</h3><p class="text-slate-500">{{ADDRESS}}</p></div></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-800 text-white"><div class="max-w-5xl mx-auto border-4 border-white p-8 md:p-16 text-center transform skew-x-3"><h2 class="text-5xl font-black uppercase mb-10 transform -skew-x-3">¡HABLEMOS YA!</h2><div class="flex flex-col gap-6 text-2xl font-bold transform -skew-x-3"><p>{{WHATSAPP}}</p><p>{{EMAIL}}</p><p>{{ADDRESS}}</p></div></div></section>`,
+        `<section class="w-full py-32 px-4 bg-slate-100"><div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-12 items-center"><div class="w-full md:w-1/2"><h2 class="text-6xl font-black text-slate-900 tracking-tighter mb-6">Hola.</h2><p class="text-2xl text-slate-500 font-medium">Estamos listos para escucharte.</p></div><div class="w-full md:w-1/2 bg-white p-10 rounded-3xl shadow-xl flex flex-col gap-6"><div class="flex items-center gap-4"><div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-600"><i class="fab fa-whatsapp"></i></div><span class="text-lg font-bold text-slate-700">{{WHATSAPP}}</span></div><div class="flex items-center gap-4"><div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-600"><i class="fas fa-envelope"></i></div><span class="text-lg font-bold text-slate-700">{{EMAIL}}</span></div><div class="flex items-center gap-4"><div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-600"><i class="fas fa-map-marker-alt"></i></div><span class="text-lg font-bold text-slate-700">{{ADDRESS}}</span></div></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-indigo-600 text-white"><div class="max-w-4xl mx-auto text-center"><i class="far fa-paper-plane text-6xl mb-8 opacity-80"></i><h2 class="text-4xl font-bold mb-10">Contáctanos</h2><div class="flex flex-col md:flex-row justify-center gap-8 md:gap-16 text-lg"><p><i class="fab fa-whatsapp mr-2"></i> {{WHATSAPP}}</p><p><i class="fas fa-envelope mr-2"></i> {{EMAIL}}</p><p><i class="fas fa-map-marker-alt mr-2"></i> {{ADDRESS}}</p></div></div></section>`,
+        `<section class="w-full py-20 px-4 bg-white"><div class="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4"><div class="aspect-square bg-slate-50 p-6 flex flex-col items-center justify-center text-center rounded-2xl"><i class="fas fa-phone text-3xl mb-4 text-slate-400"></i><p class="font-bold text-slate-800">{{WHATSAPP}}</p></div><div class="aspect-square bg-slate-50 p-6 flex flex-col items-center justify-center text-center rounded-2xl"><i class="fas fa-at text-3xl mb-4 text-slate-400"></i><p class="font-bold text-slate-800">{{EMAIL}}</p></div><div class="aspect-square bg-slate-50 p-6 flex flex-col items-center justify-center text-center rounded-2xl"><i class="fas fa-map-pin text-3xl mb-4 text-slate-400"></i><p class="font-bold text-slate-800">{{ADDRESS}}</p></div><div class="aspect-square bg-slate-900 text-white p-6 flex flex-col items-center justify-center text-center rounded-2xl"><h3 class="text-2xl font-black uppercase mb-2">24/7</h3><p class="text-sm opacity-70">Soporte continuo</p></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-950 text-center"><div class="max-w-3xl mx-auto"><h2 class="text-3xl font-light text-white tracking-widest uppercase mb-12">Detalles de Contacto</h2><ul class="text-2xl text-slate-400 font-light space-y-6"><li>{{WHATSAPP}}</li><li>{{EMAIL}}</li><li>{{ADDRESS}}</li></ul></div></section>`,
+        `<section class="w-full py-24 px-4 bg-white border-t-8 border-slate-100"><div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10"><h2 class="text-5xl font-extrabold text-slate-800">Contacto</h2><div class="text-right text-lg text-slate-600 font-medium"><p class="mb-2 hover:text-slate-900 cursor-pointer">{{WHATSAPP}}</p><p class="mb-2 hover:text-slate-900 cursor-pointer">{{EMAIL}}</p><p class="hover:text-slate-900 cursor-pointer">{{ADDRESS}}</p></div></div></section>`,
+        `<section class="w-full py-32 px-4 bg-gradient-to-b from-white to-slate-100"><div class="max-w-5xl mx-auto bg-white shadow-2xl rounded-3xl p-12 text-center border border-slate-100"><h2 class="text-4xl font-bold text-slate-900 mb-8">Información Rápida</h2><div class="flex flex-wrap justify-center gap-6"><span class="px-6 py-3 bg-slate-100 text-slate-700 rounded-full font-bold"><i class="fab fa-whatsapp mr-2 text-green-500"></i> {{WHATSAPP}}</span><span class="px-6 py-3 bg-slate-100 text-slate-700 rounded-full font-bold"><i class="fas fa-envelope mr-2 text-blue-500"></i> {{EMAIL}}</span><span class="px-6 py-3 bg-slate-100 text-slate-700 rounded-full font-bold"><i class="fas fa-map-marker-alt mr-2 text-red-500"></i> {{ADDRESS}}</span></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-50"><div class="max-w-7xl mx-auto border-l-4 border-slate-900 pl-8"><h2 class="text-4xl font-black uppercase text-slate-900 mb-8">Canales Oficiales</h2><div class="space-y-4 text-xl font-medium text-slate-700"><p>WA: {{WHATSAPP}}</p><p>ML: {{EMAIL}}</p><p>DR: {{ADDRESS}}</p></div></div></section>`,
+        `<section class="w-full py-24 px-4 bg-black text-white text-center"><div class="max-w-4xl mx-auto"><h2 class="text-6xl font-black mb-12 opacity-50 uppercase hover:opacity-100 transition duration-500 cursor-default">CONTACTO</h2><div class="flex flex-col gap-4 text-xl"><p>{{WHATSAPP}}</p><p>{{EMAIL}}</p><p>{{ADDRESS}}</p></div></div></section>`
+    ],
 
-    {{FOOTER_BLOCK}}
+    // ==========================================
+    // 6. PRODUCT DETAIL (15 Variaciones) - TODOS TIENEN EL ID VITAL
+    // ==========================================
+    productDetail: [
+        `<section class="w-full py-20 px-4 bg-white"><div id="wuepy-dynamic-product-detail" class="w-full max-w-7xl mx-auto min-h-[60vh]"></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-100"><div id="wuepy-dynamic-product-detail" class="w-full max-w-6xl mx-auto min-h-[70vh] bg-white rounded-[2rem] shadow-2xl p-6 lg:p-12"></div></section>`,
+        `<section class="w-full py-16 px-4 bg-slate-950 text-white"><div id="wuepy-dynamic-product-detail" class="w-full max-w-7xl mx-auto min-h-[60vh] bg-slate-900 rounded-2xl p-6 lg:p-10 border border-slate-800"></div></section>`,
+        `<section class="w-full py-24 px-4 bg-white border-t border-slate-200"><div id="wuepy-dynamic-product-detail" class="w-full max-w-5xl mx-auto min-h-[60vh]"></div></section>`,
+        `<section class="w-full py-20 px-4 bg-slate-50"><div id="wuepy-dynamic-product-detail" class="w-full max-w-[1400px] mx-auto min-h-[60vh] bg-white shadow-sm border border-slate-100 p-8"></div></section>`,
+        `<section class="w-full py-32 px-4 bg-gradient-to-br from-slate-100 to-white"><div id="wuepy-dynamic-product-detail" class="w-full max-w-6xl mx-auto min-h-[60vh] bg-white/80 backdrop-blur rounded-3xl shadow-xl p-8 lg:p-16 border border-white"></div></section>`,
+        `<section class="w-full py-20 px-4 bg-black"><div id="wuepy-dynamic-product-detail" class="w-full max-w-7xl mx-auto min-h-[60vh] text-slate-200 border-2 border-{{PRIMARY_COLOR}} p-8"></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-800"><div id="wuepy-dynamic-product-detail" class="w-full max-w-7xl mx-auto min-h-[60vh] bg-white text-slate-900 p-10 transform -skew-x-2"></div></section>`,
+        `<section class="w-full pt-10 pb-24 px-4 bg-white"><div class="w-full flex justify-center mb-10"><span class="px-4 py-1 bg-slate-100 text-slate-500 rounded-full text-sm font-bold uppercase tracking-widest">Detalle de Producto</span></div><div id="wuepy-dynamic-product-detail" class="w-full max-w-7xl mx-auto min-h-[60vh]"></div></section>`,
+        `<section class="w-full py-24 px-4 bg-indigo-50"><div id="wuepy-dynamic-product-detail" class="w-full max-w-6xl mx-auto min-h-[60vh] bg-white rounded-3xl shadow-2xl p-8 lg:p-12 border-t-8 border-indigo-600"></div></section>`,
+        `<section class="w-full py-20 px-4 bg-white border-y-8 border-slate-900"><div id="wuepy-dynamic-product-detail" class="w-full max-w-7xl mx-auto min-h-[60vh] py-10"></div></section>`,
+        `<section class="w-full py-32 px-4 bg-slate-100 relative"><div class="absolute top-0 left-0 w-full h-64 bg-slate-900"></div><div id="wuepy-dynamic-product-detail" class="relative z-10 w-full max-w-6xl mx-auto min-h-[60vh] bg-white shadow-2xl rounded-2xl p-8"></div></section>`,
+        `<section class="w-full py-20 px-4 bg-white"><div class="max-w-7xl mx-auto text-center mb-10"><h2 class="text-4xl font-serif italic text-slate-900">El Elegido</h2></div><div id="wuepy-dynamic-product-detail" class="w-full max-w-5xl mx-auto min-h-[60vh]"></div></section>`,
+        `<section class="w-full py-24 px-4 bg-slate-50"><div id="wuepy-dynamic-product-detail" class="w-full max-w-[1200px] mx-auto min-h-[60vh] bg-white shadow-sm p-4 lg:p-8 rounded-xl border border-slate-200"></div></section>`,
+        `<section class="w-full py-20 px-4 bg-black text-white"><div class="max-w-7xl mx-auto"><div class="w-full h-1 bg-white mb-10 opacity-20"></div><div id="wuepy-dynamic-product-detail" class="w-full w-full mx-auto min-h-[60vh]"></div><div class="w-full h-1 bg-white mt-10 opacity-20"></div></div></section>`
+    ],
 
-</body>
-</html>
-        `
-    },
-
-    // ----------------------------------------------------------------------
-    // 2. NAVEGACIONES (Headers)
-    // ----------------------------------------------------------------------
-    navs: {
-        modern_glass: `
-<nav x-data="{ mobileMenuOpen: false, scrolled: false }" 
-     @scroll.window="scrolled = (window.pageYOffset > 20)"
-     :class="{ 'glass-effect shadow-lg': scrolled, 'bg-transparent': !scrolled }"
-     class="fixed w-full z-50 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
-            <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
-                <div class="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-primary/30">
-                    {{SITE_INITIAL}}
-                </div>
-                <span class="font-bold text-2xl tracking-tight">{{SITE_NAME}}</span>
-            </div>
-            
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="index.html" class="hover:text-primary transition-colors font-medium">Inicio</a>
-                <a href="nosotros.html" class="hover:text-primary transition-colors font-medium">Nosotros</a>
-                <a href="faq.html" class="hover:text-primary transition-colors font-medium">FAQ</a>
-                <a href="contacto.html" class="bg-primary text-white px-6 py-2.5 rounded-full font-medium hover:opacity-90 transition-all shadow-md shadow-primary/20">Contacto</a>
-            </div>
-
-            <div class="md:hidden flex items-center">
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-2xl focus:outline-none">
-                    <i class="fas" :class="mobileMenuOpen ? 'fa-times' : 'fa-bars'"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div x-show="mobileMenuOpen" 
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="opacity-0 -translate-y-2"
-         x-transition:enter-end="opacity-100 translate-y-0"
-         class="md:hidden glass-effect border-t border-gray-200/20 absolute w-full">
-        <div class="px-4 pt-2 pb-6 space-y-2 flex flex-col">
-            <a href="index.html" class="block px-3 py-3 rounded-lg hover:bg-primary/10 font-medium">Inicio</a>
-            <a href="nosotros.html" class="block px-3 py-3 rounded-lg hover:bg-primary/10 font-medium">Nosotros</a>
-            <a href="faq.html" class="block px-3 py-3 rounded-lg hover:bg-primary/10 font-medium">FAQ</a>
-            <a href="contacto.html" class="block px-3 py-3 mt-2 text-center rounded-lg bg-primary text-white font-medium">Contacto</a>
-        </div>
-    </div>
-</nav>
-        `
-    },
-
-    // ----------------------------------------------------------------------
-    // 3. HEROS (Bloques de inicio impactantes)
-    // ----------------------------------------------------------------------
-    heros: {
-        split_image: `
-<section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="grid lg:grid-cols-2 gap-12 items-center">
-            <div class="text-center lg:text-left">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-semibold text-sm mb-6 border border-primary/20">
-                    <span class="relative flex h-2 w-2">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                    </span>
-                    {{HERO_BADGE}}
-                </div>
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-tight">
-                    {{HERO_TITLE}}
-                </h1>
-                <p class="text-lg md:text-xl opacity-80 mb-8 max-w-2xl mx-auto lg:mx-0">
-                    {{HERO_SUBTITLE}}
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                    <button class="bg-primary text-white px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-primary/30">
-                        {{HERO_CTA1}}
-                    </button>
-                    <button class="glass-effect px-8 py-4 rounded-full font-bold text-lg hover:bg-primary/5 transition-colors border-2">
-                        {{HERO_CTA2}}
-                    </button>
-                </div>
-            </div>
-            
-            <div class="relative hidden lg:block">
-                <div class="absolute inset-0 bg-gradient-to-tr from-primary to-secondary rounded-[3rem] blur-3xl opacity-30 animate-pulse"></div>
-                <img src="https://loremflickr.com/800/1000/{{IMAGE_KEYWORD}}" alt="Hero Image" class="relative z-10 w-full h-[600px] object-cover rounded-[3rem] shadow-2xl border-4 border-white/10">
-                
-                <div class="absolute -bottom-10 -left-10 glass-effect p-6 rounded-2xl shadow-xl z-20 flex items-center gap-4 animate-bounce" style="animation-duration: 3s;">
-                    <div class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white text-xl">
-                        <i class="fas fa-check"></i>
-                    </div>
-                    <div>
-                        <p class="font-bold">Calidad Premium</p>
-                        <p class="text-sm opacity-80">Garantizada</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-        `,
-        centered_gradient: `
-<section class="relative pt-40 pb-32 overflow-hidden flex items-center justify-center min-h-[90vh] text-center">
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-primary/30 rounded-full blur-[120px] -z-10"></div>
-    
-    <div class="max-w-4xl mx-auto px-4 relative z-10">
-        <h1 class="text-6xl md:text-8xl font-extrabold mb-8 tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-white to-secondary">
-            {{HERO_TITLE}}
-        </h1>
-        <p class="text-xl md:text-2xl mb-10 opacity-80 max-w-2xl mx-auto font-light">
-            {{HERO_SUBTITLE}}
-        </p>
-        <div class="flex flex-col sm:flex-row gap-6 justify-center">
-            <a href="#catalogo" class="bg-primary text-white px-10 py-4 rounded-full font-bold text-lg hover:shadow-[0_0_40px_rgba(var(--primary),0.5)] transition-all">
-                {{HERO_CTA1}} <i class="fas fa-arrow-right ml-2"></i>
-            </a>
-        </div>
-    </div>
-</section>
-        `
-    },
-
-    // ----------------------------------------------------------------------
-    // 4. PRODUCTOS / CATÁLOGO (Para E-commerce o Servicios)
-    // ----------------------------------------------------------------------
-    products: {
-        modern_grid: `
-<section id="catalogo" class="py-24 relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <h2 class="text-4xl md:text-5xl font-bold mb-4">{{CATALOG_TITLE}}</h2>
-            <p class="text-xl opacity-70">{{CATALOG_SUBTITLE}}</p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="group rounded-3xl overflow-hidden glass-effect border hover:-translate-y-2 transition-all duration-300">
-                <div class="relative h-64 overflow-hidden">
-                    <img src="https://loremflickr.com/600/400/{{IMAGE_KEYWORD}},1" alt="Product" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur text-black px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                        Destacado
-                    </div>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-2xl font-bold mb-2">{{PRODUCT_1_NAME}}</h3>
-                    <p class="opacity-70 mb-4">{{PRODUCT_1_DESC}}</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-2xl font-extrabold text-primary">{{PRODUCT_1_PRICE}}</span>
-                        <button class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-primary/30">
-                            <i class="fas fa-shopping-cart"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="group rounded-3xl overflow-hidden glass-effect border hover:-translate-y-2 transition-all duration-300">
-                <div class="relative h-64 overflow-hidden">
-                    <img src="https://loremflickr.com/600/400/{{IMAGE_KEYWORD}},2" alt="Product" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                </div>
-                <div class="p-6">
-                    <h3 class="text-2xl font-bold mb-2">{{PRODUCT_2_NAME}}</h3>
-                    <p class="opacity-70 mb-4">{{PRODUCT_2_DESC}}</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-2xl font-extrabold text-primary">{{PRODUCT_2_PRICE}}</span>
-                        <button class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-primary/30">
-                            <i class="fas fa-shopping-cart"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="group rounded-3xl overflow-hidden glass-effect border hover:-translate-y-2 transition-all duration-300">
-                <div class="relative h-64 overflow-hidden">
-                    <img src="https://loremflickr.com/600/400/{{IMAGE_KEYWORD}},3" alt="Product" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                    <div class="absolute top-4 right-4 bg-primary/90 backdrop-blur text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-                        Oferta
-                    </div>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-2xl font-bold mb-2">{{PRODUCT_3_NAME}}</h3>
-                    <p class="opacity-70 mb-4">{{PRODUCT_3_DESC}}</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-2xl font-extrabold text-primary">{{PRODUCT_3_PRICE}}</span>
-                        <button class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-primary/30">
-                            <i class="fas fa-shopping-cart"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="mt-16 text-center">
-            <button class="px-8 py-4 border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-full font-bold transition-colors">
-                Ver todo el catálogo <i class="fas fa-arrow-right ml-2"></i>
-            </button>
-        </div>
-    </div>
-</section>
-        `
-    },
-
-    // ----------------------------------------------------------------------
-    // 5. SOBRE NOSOTROS (Para página nosotros.html)
-    // ----------------------------------------------------------------------
-    about: {
-        story_split: `
-<section class="py-24">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid lg:grid-cols-2 gap-16 items-center">
-            <div class="relative">
-                <div class="absolute -inset-4 bg-primary/20 rounded-[3rem] transform rotate-3 -z-10"></div>
-                <img src="https://loremflickr.com/800/800/team,business" alt="Nuestro Equipo" class="rounded-[2rem] shadow-2xl w-full object-cover h-[500px]">
-                <div class="absolute -bottom-8 -right-8 glass-effect p-8 rounded-2xl shadow-xl max-w-xs hidden md:block">
-                    <p class="text-4xl font-extrabold text-primary mb-2">{{YEARS_EXPERIENCE}}+</p>
-                    <p class="font-medium opacity-80">Años de experiencia transformando ideas en realidad.</p>
-                </div>
-            </div>
-            
-            <div>
-                <h4 class="text-primary font-bold tracking-wider uppercase mb-2">Nuestra Historia</h4>
-                <h2 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">{{ABOUT_TITLE}}</h2>
-                <div class="space-y-6 opacity-80 text-lg leading-relaxed">
-                    <p>{{ABOUT_PARAGRAPH_1}}</p>
-                    <p>{{ABOUT_PARAGRAPH_2}}</p>
-                </div>
-                
-                <div class="mt-10 grid grid-cols-2 gap-6">
-                    <div class="glass-effect p-6 rounded-xl border-t-4 border-primary">
-                        <i class="fas fa-bullseye text-3xl text-primary mb-4"></i>
-                        <h3 class="font-bold text-xl mb-2">Misión</h3>
-                        <p class="opacity-70 text-sm">{{MISSION_TEXT}}</p>
-                    </div>
-                    <div class="glass-effect p-6 rounded-xl border-t-4 border-secondary">
-                        <i class="fas fa-eye text-3xl text-secondary mb-4"></i>
-                        <h3 class="font-bold text-xl mb-2">Visión</h3>
-                        <p class="opacity-70 text-sm">{{VISION_TEXT}}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-        `
-    },
-
-    // ----------------------------------------------------------------------
-    // 6. CARACTERÍSTICAS / VENTAJAS (Features)
-    // ----------------------------------------------------------------------
-    features: {
-        bento_box: `
-<section class="py-24 bg-black/5">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-            <h2 class="text-4xl font-bold mb-4">{{FEATURES_TITLE}}</h2>
-            <p class="text-xl opacity-70">{{FEATURES_SUBTITLE}}</p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="md:col-span-2 glass-effect p-10 rounded-3xl relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10 group-hover:bg-primary/20 transition-all"></div>
-                <i class="{{FEATURE_1_ICON}} text-5xl text-primary mb-6"></i>
-                <h3 class="text-3xl font-bold mb-4">{{FEATURE_1_TITLE}}</h3>
-                <p class="opacity-80 text-lg max-w-md">{{FEATURE_1_DESC}}</p>
-            </div>
-            
-            <div class="glass-effect p-8 rounded-3xl group hover:bg-primary hover:text-white transition-colors duration-300">
-                <i class="{{FEATURE_2_ICON}} text-4xl text-primary group-hover:text-white mb-6"></i>
-                <h3 class="text-2xl font-bold mb-3">{{FEATURE_2_TITLE}}</h3>
-                <p class="opacity-80">{{FEATURE_2_DESC}}</p>
-            </div>
-
-            <div class="glass-effect p-8 rounded-3xl group hover:bg-primary hover:text-white transition-colors duration-300">
-                <i class="{{FEATURE_3_ICON}} text-4xl text-primary group-hover:text-white mb-6"></i>
-                <h3 class="text-2xl font-bold mb-3">{{FEATURE_3_TITLE}}</h3>
-                <p class="opacity-80">{{FEATURE_3_DESC}}</p>
-            </div>
-
-            <div class="md:col-span-2 glass-effect p-10 rounded-3xl flex flex-col justify-center items-center text-center bg-gradient-to-br from-primary/10 to-transparent">
-                <h3 class="text-3xl font-bold mb-4">{{FEATURE_4_TITLE}}</h3>
-                <p class="opacity-80 text-lg mb-6">{{FEATURE_4_DESC}}</p>
-                <button class="bg-primary text-white px-6 py-2 rounded-full font-bold">Saber más</button>
-            </div>
-        </div>
-    </div>
-</section>
-        `
-    },
-
-    // ----------------------------------------------------------------------
-    // 7. PREGUNTAS FRECUENTES (Para faq.html)
-    // ----------------------------------------------------------------------
-    faq: {
-        accordion: `
-<section class="py-24">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <h2 class="text-4xl font-bold mb-4">{{FAQ_TITLE}}</h2>
-            <p class="text-lg opacity-70">{{FAQ_SUBTITLE}}</p>
-        </div>
-
-        <div class="space-y-4">
-            <div x-data="{ open: false }" class="glass-effect rounded-2xl overflow-hidden">
-                <button @click="open = !open" class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none">
-                    <span class="font-bold text-lg">{{QUESTION_1}}</span>
-                    <i class="fas" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                </button>
-                <div x-show="open" x-collapse class="px-6 pb-5 opacity-80">
-                    {{ANSWER_1}}
-                </div>
-            </div>
-
-            <div x-data="{ open: false }" class="glass-effect rounded-2xl overflow-hidden">
-                <button @click="open = !open" class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none">
-                    <span class="font-bold text-lg">{{QUESTION_2}}</span>
-                    <i class="fas" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                </button>
-                <div x-show="open" x-collapse class="px-6 pb-5 opacity-80">
-                    {{ANSWER_2}}
-                </div>
-            </div>
-
-            <div x-data="{ open: false }" class="glass-effect rounded-2xl overflow-hidden">
-                <button @click="open = !open" class="w-full px-6 py-5 text-left flex justify-between items-center focus:outline-none">
-                    <span class="font-bold text-lg">{{QUESTION_3}}</span>
-                    <i class="fas" :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                </button>
-                <div x-show="open" x-collapse class="px-6 pb-5 opacity-80">
-                    {{ANSWER_3}}
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-        `
-    },
-
-    // ----------------------------------------------------------------------
-    // 8. TESTIMONIOS (Social Proof)
-    // ----------------------------------------------------------------------
-    testimonials: {
-        cards_row: `
-<section class="py-24 bg-black/5 overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <h2 class="text-4xl font-bold mb-4">{{TESTIMONIALS_TITLE}}</h2>
-            <div class="flex justify-center gap-1 text-yellow-400 text-xl mb-4">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-            </div>
-        </div>
-        
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="glass-effect p-8 rounded-3xl relative">
-                <i class="fas fa-quote-right absolute top-8 right-8 text-4xl opacity-10 text-primary"></i>
-                <p class="italic opacity-80 mb-6 relative z-10">"{{TESTIMONIAL_1_TEXT}}"</p>
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">{{TESTIMONIAL_1_INITIAL}}</div>
-                    <div>
-                        <p class="font-bold">{{TESTIMONIAL_1_NAME}}</p>
-                        <p class="text-sm opacity-60">{{TESTIMONIAL_1_ROLE}}</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="glass-effect p-8 rounded-3xl relative bg-primary text-white transform md:-translate-y-4 shadow-xl shadow-primary/30">
-                <i class="fas fa-quote-right absolute top-8 right-8 text-4xl opacity-20"></i>
-                <p class="italic mb-6 relative z-10">"{{TESTIMONIAL_2_TEXT}}"</p>
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center font-bold">{{TESTIMONIAL_2_INITIAL}}</div>
-                    <div>
-                        <p class="font-bold">{{TESTIMONIAL_2_NAME}}</p>
-                        <p class="text-sm opacity-80">{{TESTIMONIAL_2_ROLE}}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-effect p-8 rounded-3xl relative">
-                <i class="fas fa-quote-right absolute top-8 right-8 text-4xl opacity-10 text-primary"></i>
-                <p class="italic opacity-80 mb-6 relative z-10">"{{TESTIMONIAL_3_TEXT}}"</p>
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">{{TESTIMONIAL_3_INITIAL}}</div>
-                    <div>
-                        <p class="font-bold">{{TESTIMONIAL_3_NAME}}</p>
-                        <p class="text-sm opacity-60">{{TESTIMONIAL_3_ROLE}}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-        `
-    },
-
-    // ----------------------------------------------------------------------
-    // 9. CALL TO ACTION (CTA)
-    // ----------------------------------------------------------------------
-    cta: {
-        split_cta: `
-<section class="py-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-gradient-to-r from-primary to-secondary rounded-[3rem] p-12 md:p-20 text-white relative overflow-hidden shadow-2xl">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/3"></div>
-            <div class="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/3"></div>
-            
-            <div class="relative z-10 grid md:grid-cols-2 gap-10 items-center">
-                <div>
-                    <h2 class="text-4xl md:text-5xl font-extrabold mb-4">{{CTA_TITLE}}</h2>
-                    <p class="text-lg opacity-90">{{CTA_SUBTITLE}}</p>
-                </div>
-                <div class="flex flex-col sm:flex-row gap-4 md:justify-end">
-                    <button class="bg-white text-primary px-8 py-4 rounded-full font-bold text-lg hover:shadow-lg transition-all">
-                        {{CTA_BUTTON_1}}
-                    </button>
-                    <button class="border-2 border-white/30 hover:bg-white/10 px-8 py-4 rounded-full font-bold text-lg transition-all">
-                        {{CTA_BUTTON_2}}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-        `
-    },
-
-    // ----------------------------------------------------------------------
-    // 10. FOOTERS
-    // ----------------------------------------------------------------------
-    footers: {
-        modern_dark: `
-<footer class="bg-gray-900 text-white pt-20 pb-10 border-t border-white/10 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-            
-            <div class="col-span-1 md:col-span-2 lg:col-span-1">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center font-bold text-xl">
-                        {{SITE_INITIAL}}
-                    </div>
-                    <span class="font-bold text-2xl tracking-tight">{{SITE_NAME}}</span>
-                </div>
-                <p class="opacity-70 mb-6 leading-relaxed">{{FOOTER_ABOUT}}</p>
-                <div class="flex space-x-4">
-                    <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors"><i class="fab fa-twitter"></i></a>
-                </div>
-            </div>
-
-            <div>
-                <h4 class="font-bold text-lg mb-6">Enlaces Rápidos</h4>
-                <ul class="space-y-3 opacity-70">
-                    <li><a href="index.html" class="hover:text-primary transition-colors">Inicio</a></li>
-                    <li><a href="nosotros.html" class="hover:text-primary transition-colors">Sobre Nosotros</a></li>
-                    <li><a href="faq.html" class="hover:text-primary transition-colors">Preguntas Frecuentes</a></li>
-                    <li><a href="contacto.html" class="hover:text-primary transition-colors">Contacto</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h4 class="font-bold text-lg mb-6">Contacto</h4>
-                <ul class="space-y-4 opacity-70">
-                    <li class="flex items-start gap-3">
-                        <i class="fas fa-map-marker-alt mt-1 text-primary"></i>
-                        <span>{{FOOTER_ADDRESS}}</span>
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <i class="fas fa-clock text-primary"></i>
-                        <span>{{FOOTER_HOURS}}</span>
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <i class="fas fa-envelope text-primary"></i>
-                        <span>hola@{{SITE_NAME}}.com</span>
-                    </li>
-                </ul>
-            </div>
-
-            <div>
-                <h4 class="font-bold text-lg mb-6">Boletín</h4>
-                <p class="opacity-70 mb-4">Suscríbete para recibir nuestras últimas ofertas y noticias.</p>
-                <form class="flex">
-                    <input type="email" placeholder="Tu email" class="w-full bg-white/10 px-4 py-3 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary text-white">
-                    <button type="submit" class="bg-primary px-4 py-3 rounded-r-lg hover:opacity-90 transition-opacity">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <div class="border-t border-white/10 pt-8 text-center opacity-50 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p>&copy; 2026 {{SITE_NAME}}. Todos los derechos reservados.</p>
-            <p class="text-sm">Creado con Wuepy IA 🧠</p>
-        </div>
-    </div>
-</footer>
-        `
-    }
+    // ==========================================
+    // 7. FOOTERS (15 Variaciones)
+    // ==========================================
+    footers: [
+        `<footer class="w-full bg-slate-950 pt-20 pb-10 px-4 text-slate-300"><div class="max-w-7xl mx-auto"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16"><div><div class="text-white text-2xl font-bold mb-6">{{LOGO_URL}}</div><p class="text-sm leading-relaxed opacity-70">Ofrecemos la mejor calidad y servicio. Tu satisfacción es nuestra prioridad.</p></div><div><h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Enlaces Rápidos</h4><ul class="space-y-3 opacity-70"><li><a href="/index.html" class="hover:text-white transition">Inicio</a></li><li><a href="/catalogo.html" class="hover:text-white transition">Catálogo</a></li><li><a href="/nosotros.html" class="hover:text-white transition">Nosotros</a></li></ul></div><div><h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Contacto</h4><ul class="space-y-3 opacity-70"><li><i class="fab fa-whatsapp w-6"></i> {{WHATSAPP}}</li><li><i class="fas fa-envelope w-6"></i> {{EMAIL}}</li><li><i class="fas fa-map-marker-alt w-6"></i> {{ADDRESS}}</li></ul></div><div><h4 class="text-white font-bold mb-6 uppercase tracking-wider text-sm">Seguridad</h4><div class="flex gap-4 opacity-50 text-2xl"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fas fa-shield-alt"></i></div></div></div><div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm opacity-50"><p>&copy; 2024 {{SITE_NAME}}. Todos los derechos reservados.</p><p class="mt-2 md:mt-0">Impulsado por Wuepy</p></div></div></footer>`,
+        `<footer class="w-full bg-white border-t border-slate-200 py-12 px-4 text-center"><div class="max-w-3xl mx-auto flex flex-col items-center"><div class="mb-6 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition duration-300 text-xl font-bold">{{LOGO_URL}}</div><div class="flex gap-6 mb-8 text-slate-500 font-medium text-sm uppercase tracking-widest"><a href="/index.html" class="hover:text-slate-900">Inicio</a><a href="/catalogo.html" class="hover:text-slate-900">Catálogo</a><a href="/contacto.html" class="hover:text-slate-900">Contacto</a></div><div class="flex gap-4 mb-8 text-xl text-slate-400"><a href="#" class="hover:text-slate-900"><i class="fab fa-instagram"></i></a><a href="#" class="hover:text-slate-900"><i class="fab fa-facebook"></i></a></div><p class="text-slate-400 text-sm">&copy; {{SITE_NAME}}. Creado con tecnología Wuepy.</p></div></footer>`,
+        `<footer class="w-full bg-slate-100 pt-16 pb-8 px-4"><div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-8 border-b border-slate-300 pb-12 mb-8"><div class="text-3xl font-black text-slate-800">{{LOGO_URL}}</div><nav class="flex flex-wrap justify-center gap-8 font-bold text-slate-600"><a href="/index.html" class="hover:text-slate-900">Inicio</a><a href="/catalogo.html" class="hover:text-slate-900">Catálogo</a><a href="/nosotros.html" class="hover:text-slate-900">Nosotros</a><a href="/contacto.html" class="hover:text-slate-900">Contacto</a></nav></div><div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-slate-500 text-sm"><p>&copy; {{SITE_NAME}}.</p><p>{{WHATSAPP}} | {{EMAIL}}</p></div></footer>`,
+        `<footer class="w-full bg-black text-white py-16 px-4 border-t-4 border-{{PRIMARY_COLOR}}"><div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left"><div><div class="font-mono text-2xl text-{{PRIMARY_COLOR}} mb-4">> {{LOGO_URL}}</div><p class="font-mono text-sm opacity-70">Sistema operativo comercial activo.</p></div><div class="font-mono text-sm space-y-2 opacity-70"><p>> DIR: {{ADDRESS}}</p><p>> TEL: {{WHATSAPP}}</p></div><div class="flex justify-center md:justify-end items-center"><a href="/catalogo.html" class="px-6 py-2 border border-{{PRIMARY_COLOR}} text-{{PRIMARY_COLOR}} font-mono text-sm hover:bg-{{PRIMARY_COLOR}} hover:text-black">INICIAR_COMPRA</a></div></div></footer>`,
+        `<footer class="w-full bg-white py-24 px-4 text-center"><div class="max-w-4xl mx-auto"><h3 class="text-5xl font-serif italic text-slate-900 mb-10">{{SITE_NAME}}</h3><div class="flex justify-center gap-8 mb-12 text-slate-500 uppercase tracking-widest text-sm"><a href="/index.html" class="hover:text-slate-900">Inicio</a><a href="/catalogo.html" class="hover:text-slate-900">Colección</a><a href="/contacto.html" class="hover:text-slate-900">Contacto</a></div><p class="text-slate-400 text-sm">Diseñado para la excelencia. &copy; 2024</p></div></footer>`,
+        `<footer class="w-full bg-slate-900 text-slate-400 py-12 px-4"><div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center"><div class="text-2xl font-black text-white mb-6 md:mb-0">{{LOGO_URL}}</div><div class="text-center md:text-right text-sm space-y-2"><p>{{ADDRESS}}</p><p>{{WHATSAPP}} - {{EMAIL}}</p></div></div></footer>`,
+        `<footer class="w-full bg-slate-50 border-t border-slate-200 py-20 px-4"><div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-sm"><div class="col-span-2"><div class="font-bold text-xl text-slate-900 mb-4">{{LOGO_URL}}</div><p class="text-slate-500 max-w-xs">Ofreciendo los mejores productos del mercado directamente a tu puerta.</p></div><div><h4 class="font-bold text-slate-900 mb-4 uppercase">Menú</h4><ul class="space-y-2 text-slate-600"><li><a href="/index.html">Inicio</a></li><li><a href="/catalogo.html">Catálogo</a></li><li><a href="/nosotros.html">Nosotros</a></li></ul></div><div><h4 class="font-bold text-slate-900 mb-4 uppercase">Ayuda</h4><ul class="space-y-2 text-slate-600"><li><a href="/contacto.html">Contacto</a></li><li><a href="https://wa.me/{{WHATSAPP}}">Soporte por WA</a></li></ul></div></div></footer>`,
+        `<footer class="w-full bg-slate-800 text-white py-16 px-4 transform skew-y-2 mt-12"><div class="max-w-7xl mx-auto transform -skew-y-2 text-center"><h3 class="text-4xl font-black uppercase mb-8">{{SITE_NAME}}</h3><div class="flex justify-center gap-6 font-bold uppercase text-slate-400 mb-8"><a href="/index.html" class="hover:text-white">Inicio</a><a href="/catalogo.html" class="hover:text-white">Catálogo</a><a href="/contacto.html" class="hover:text-white">Contacto</a></div><p class="text-slate-500 font-bold">&copy; TODOS LOS DERECHOS RESERVADOS</p></div></footer>`,
+        `<footer class="w-full bg-indigo-950 text-indigo-200 py-16 px-4 text-center"><div class="max-w-3xl mx-auto"><div class="w-16 h-16 bg-indigo-900 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl text-white"><i class="fas fa-shopping-bag"></i></div><h3 class="text-2xl font-bold text-white mb-6">{{LOGO_URL}}</h3><p class="opacity-80 mb-8 max-w-md mx-auto">Gracias por visitar nuestra tienda. Esperamos verte de nuevo pronto.</p><p class="text-sm opacity-50">&copy; {{SITE_NAME}} - Wuepy E-commerce</p></div></footer>`,
+        `<footer class="w-full bg-white border-t-8 border-slate-900 py-12 px-4"><div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6"><div class="font-black text-2xl text-slate-900 tracking-tighter">{{LOGO_URL}}</div><div class="flex gap-6 text-slate-600 font-bold text-sm"><a href="/index.html">INICIO</a><a href="/catalogo.html">CATÁLOGO</a><a href="/contacto.html">CONTACTO</a></div></div></footer>`,
+        `<footer class="w-full bg-slate-100 py-24 px-4"><div class="max-w-7xl mx-auto text-center"><h2 class="text-5xl font-extrabold text-slate-800 mb-10">¿Listo para comprar?</h2><a href="/catalogo.html" class="inline-block px-10 py-4 bg-slate-900 text-white font-bold rounded-full hover:bg-slate-800 mb-16">Ver todo el catálogo</a><div class="border-t border-slate-300 pt-8 flex flex-col md:flex-row justify-between items-center text-slate-500 font-medium"><p>{{SITE_NAME}}</p><p>{{WHATSAPP}}</p></div></div></footer>`,
+        `<footer class="w-full bg-black text-white py-12 px-4 border-t border-slate-800"><div class="max-w-7xl mx-auto flex justify-between items-center text-xs font-mono uppercase tracking-widest"><p>&copy; {{SITE_NAME}} 2024</p><div class="flex gap-4"><a href="/catalogo.html" class="hover:text-{{PRIMARY_COLOR}}">CATÁLOGO</a><a href="/contacto.html" class="hover:text-{{PRIMARY_COLOR}}">SOPORTE</a></div></div></footer>`,
+        `<footer class="w-full bg-slate-50 py-16 px-4 text-center border-t border-slate-200"><div class="max-w-2xl mx-auto"><div class="text-3xl text-slate-300 mb-6"><i class="fas fa-leaf"></i></div><h3 class="text-xl font-bold text-slate-800 mb-4">{{LOGO_URL}}</h3><p class="text-slate-500 mb-8">{{ADDRESS}}</p><p class="text-sm text-slate-400">&copy; {{SITE_NAME}}. Wuepy platform.</p></div></footer>`,
+        `<footer class="w-full bg-gradient-to-r from-slate-900 to-slate-800 text-white py-16 px-4"><div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center gap-8"><div><h3 class="text-3xl font-black mb-4">{{LOGO_URL}}</h3><p class="text-slate-400">{{EMAIL}} | {{WHATSAPP}}</p></div><div class="flex md:justify-end gap-6 font-bold text-sm"><a href="/index.html" class="hover:text-slate-300">INICIO</a><a href="/catalogo.html" class="hover:text-slate-300">CATÁLOGO</a></div></div></footer>`,
+        `<footer class="w-full bg-white py-12 px-4"><div class="max-w-7xl mx-auto border-t-2 border-dashed border-slate-200 pt-12 text-center"><div class="font-extrabold text-2xl text-slate-900 mb-6">{{LOGO_URL}}</div><p class="text-slate-500 font-medium mb-6">Hecho con pasión. Impulsado por Wuepy.</p><div class="flex justify-center gap-4 text-slate-400"><i class="fab fa-facebook text-xl hover:text-slate-600 cursor-pointer"></i><i class="fab fa-instagram text-xl hover:text-slate-600 cursor-pointer"></i><i class="fab fa-twitter text-xl hover:text-slate-600 cursor-pointer"></i></div></div></footer>`
+    ]
 };
