@@ -94,40 +94,24 @@ router.get('/search', async (req, res) => {
 // ==========================================================================
 // 3. DETALLE DE PRODUCTO Y REDIRECCIÓN GLOBAL (/p/:id)
 // ==========================================================================
+// 3. DETALLE DE PRODUCTO (Ahora apunta directo al controlador sin redirección extra)
 router.get('/p/:id', async (req, res) => {
     if (!req.isMainDomain && req.subdomainName) {
         return siteController.renderStoreProduct(req, res);
     }
     
+    // Si no es subdominio, lógica de marketplace global
     try {
         const product = await Product.findById(req.params.id).populate('site');
-        
         if (!product || !product.site || !product.site.isActive) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Este producto ya no está disponible o la tienda fue desactivada.' 
-            });
+            return res.status(404).json({ success: false, message: 'No disponible' });
         }
-
+        // Redirección solo si es necesario para el marketplace
         const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
         const frontendDomain = process.env.FRONTEND_DOMAIN || 'wuepy.com'; 
-        
-        const redirectUrl = `${protocol}://${product.site.subdomain}.${frontendDomain}/p/${product._id}`;
-
-        return res.status(200).json({ 
-            success: true, 
-            redirectUrl: redirectUrl,
-            message: 'Redirigiendo a la tienda oficial...'
-        });
-
+        return res.json({ success: true, redirectUrl: `${protocol}://${product.site.subdomain}.${frontendDomain}/p/${product._id}` });
     } catch (error) {
-        if (error.name === 'CastError') {
-            return res.status(404).json({ success: false, message: 'El identificador del producto no es válido.' });
-        }
-        return res.status(500).json({ 
-            success: false, 
-            message: 'Error interno del servidor al procesar el producto.' 
-        });
+        return res.status(500).json({ success: false, message: 'Error' });
     }
 });
 
