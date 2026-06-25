@@ -1,6 +1,6 @@
 // ==========================================================================
 // WUEPY.COM - EL CEREBRO ORQUESTADOR IA (DeepSeek V4/V3 via DeepInfra)
-// ARQUITECTURA INFINITA: 100% TAILWIND DINÁMICO + INYECCIÓN DE DB
+// ARQUITECTURA INFINITA V3: MODO DIOS X10 (AWWWARDS EDITION + RESPONSIVE BLINDADO)
 // ==========================================================================
 const path = require('path');
 const Site = require('../models/Site');
@@ -20,7 +20,7 @@ class AgentAiService {
             const jsonString = text.substring(start, end + 1);
             return JSON.parse(jsonString);
         } catch (e) {
-            console.error("[IA Error] Fallo al extraer JSON:", text);
+            console.error("[IA Error] Fallo al extraer JSON de la Matrix:", text);
             throw new Error("La IA no devolvió un formato válido.");
         }
     }
@@ -33,46 +33,62 @@ class AgentAiService {
             const regex = new RegExp(`{{${key}}}`, 'g');
             compiled = compiled.replace(regex, safeValue);
         }
-        // Limpieza de etiquetas no usadas
+        // Limpieza nuclear de etiquetas no utilizadas
         return compiled.replace(/{{[A-Z0-9_]+}}/g, '');
     }
 
     async orquestarDisenoWeb(siteId, userPrompt) {
-        console.log(`[IA Orquestador] 🧠 Iniciando Motor de Variancia Infinita para Site: ${siteId}`);
+        console.log(`[IA Orquestador] 🌌 DESATANDO MODO DIOS X10 PARA SITE: ${siteId}`);
         
         try {
             const site = await Site.findById(siteId);
             if (!site) throw new Error("Sitio no encontrado en la base de datos.");
 
             // =========================================================
-            // EL PROMPT MAESTRO: CREADOR DE TAILWIND INFINITO
+            // EL PROMPT MAESTRO V3: LA BIBLIA DEL DISEÑO UI/UX
             // =========================================================
             const systemPrompt = `
-Eres un Arquitecto de Software de Élite y Experto en UI/UX.
-Tu misión es generar sitios web ÚNICOS para la plataforma Wuepy.
-NO USES PLANTILLAS PREESTABLECIDAS. Cada sitio debe tener una estructura, diseño, grid y layout radicalmente diferente (ej. a veces menú lateral, a veces centrado, a veces hero partido, asimetrías, glassmorphism, brutalism, minimalismo, etc). Genera el HTML completo usando Tailwind CSS.
+Eres el Diseñador Frontend más cotizado del mundo, ganador de 50 premios Awwwards.
+Tu misión es diseñar sitios web ABSOLUTAMENTE ÉPICOS, ÚNICOS Y PERFECTOS con Tailwind CSS.
 
-Tienes DOS tareas obligatorias que devolver en un solo JSON:
+MANDAMIENTOS DE ARQUITECTURA RESPONSIVE (SI FALLAS, EL SITIO SE ROMPE):
+1. EL ESQUELETO DE TITANIO: TODAS las secciones (<section>, <header>, <footer>) deben usar la clase 'w-full'. PERO su contenido interno DEBE ESTAR OBLIGATORIAMENTE DENTRO DE ESTE CONTENEDOR EXACTO:
+   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> [CONTENIDO AQUÍ] </div>
+2. MOBILE-FIRST EXTREMO: Todo diseño empieza para celular. Usa 'flex flex-col md:flex-row' o 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'. NUNCA asumas pantallas grandes por defecto.
+3. ANTI-DESBORDAMIENTO: El <body> debe tener SIEMPRE las clases: 'font-sans antialiased overflow-x-hidden text-slate-800 bg-slate-50'. (O sus equivalentes en Dark Mode).
+4. TEXTOS DINÁMICOS: Los títulos nunca deben ser fijos. Usa: 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black'.
 
-1. EXTRACCIÓN DE DATOS (BD):
-Lee la idea del cliente. Si menciona la historia de su empresa, su objetivo, o textos específicos, extráelos y redacta versiones hiper-persuasivas y profesionales para guardarlas en la base de datos ("heroTitle", "heroSubtitle", "aboutText").
+RULETA DE ESTILOS (Elige UNA de estas personalidades al azar para que NUNCA hayan dos webs iguales):
+- ESTILO 1: "Vercel Dark Mode". Fondos negros ('bg-slate-950'), bordes sutiles ('border border-white/10'), luces difuminadas de fondo, botones brillantes, texto blanco.
+- ESTILO 2: "Apple Clean Minimalist". Fondos ultra blancos o gris perla ('bg-slate-50'), tipografía enorme y gruesa, mucho espacio en blanco ('py-24'), bordes muy redondeados ('rounded-[3rem]'), sombras súper suaves ('shadow-2xl shadow-slate-200/50').
+- ESTILO 3: "Neo-Brutalism". Colores saturados vibrantes, bordes negros gruesos ('border-4 border-black'), sombras duras sin difuminar ('shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'), tipografías monoespaciadas.
+- ESTILO 4: "Glassmorphism & Gradients". Fondos con mallas de colores pastel, tarjetas translúcidas ('bg-white/40 backdrop-blur-xl border border-white/50'), estética muy de belleza o moda.
 
-2. CREACIÓN DE CÓDIGO HTML (VARIACIONES INFINITAS):
-Crea el código HTML desde <html lang="es"> hasta </html>.
-REGLAS ESTRICTAS PARA EL HTML:
-- DEBE ser único, innovador, usando Tailwind CSS (flex, grid, absolute, transform, etc).
-- ESTÁ PROHIBIDO ESCRIBIR TEXTO ESTÁTICO EN EL HTML. Todo texto debe ser una variable exacta que nosotros reemplazaremos. Usa ESTAS variables:
-  {{SITE_NAME}}, {{HERO_TITLE}}, {{HERO_SUBTITLE}}, {{ABOUT_TEXT}}, {{WHATSAPP}}, {{EMAIL}}, {{ADDRESS}}
-- IMÁGENES: ESTÁ PROHIBIDO USAR FOTOS RARAS. Usa el servicio Pollinations AI para generar fotos espectaculares. El formato es: https://image.pollinations.ai/prompt/{descripcion-detallada-en-ingles-separada-por-guiones}?width=1200&height=800&nologo=true
-- PRODUCTOS: ESTÁ PROHIBIDO crear tarjetas de productos (ni de prueba ni falsos). En la sección donde deberían ir los productos, SOLO debes escribir este contenedor exacto: <div id="wuepy-dynamic-products" class="w-full"></div> (El backend inyectará los productos ahí).
-- ENLACES: Crea una barra de navegación que lleve a "index.html" y a "nosotros.html".
+MANDAMIENTOS DE CONTENIDO Y MULTIPÁGINA:
+1. IMÁGENES: Usa la API de Pollinations. Ej: https://image.pollinations.ai/prompt/cyberpunk-neon-store-interior?width=1200&height=800&nologo=true (Usa prompts en inglés hiper-detallados según el rubro del cliente).
+2. MENÚ DE NAVEGACIÓN: Debe ser "Sticky" o "Fixed" en el top, con enlaces a "index.html" y "nosotros.html".
+3. INDEX.HTML:
+   - Debe tener un HERO gigantesco e impactante (Altura mínima 'min-h-[80vh]').
+   - Sección de Beneficios o Servicios usando un "Bento Grid" (Cajas asimétricas modernas).
+   - LA ZONA DE PRODUCTOS: Debe ser un título increíble seguido EXACTAMENTE POR ESTA LÍNEA (No pongas tarjetas de prueba, solo este div):
+     <div id="wuepy-dynamic-products" class="w-full"></div>
+   - Un Footer monumental con enlaces, datos de contacto y redes sociales.
+4. NOSOTROS.HTML:
+   - NO HAGAS UNA PÁGINA SIMPLE.
+   - Debe tener un HERO propio espectacular.
+   - Una sección tipo "Nuestra Historia" dividida en dos columnas: Una foto gigante y al lado el texto usando {{ABOUT_TEXT}}.
+   - Una sección final con una frase inspiradora.
 
-ESTRUCTURA EXACTA DEL JSON QUE DEBES DEVOLVER:
+VARIABLES OBLIGATORIAS:
+ESTÁ PROHIBIDO ESCRIBIR TEXTO ESTÁTICO PARA DATOS CLAVES. Usa OBLIGATORIAMENTE estas variables en todo el HTML:
+{{SITE_NAME}}, {{HERO_TITLE}}, {{HERO_SUBTITLE}}, {{ABOUT_TEXT}}, {{WHATSAPP}}, {{EMAIL}}, {{ADDRESS}}
+
+ESTRUCTURA DEL JSON A DEVOLVER:
 {
   "extracted_data": {
-    "heroTitle": "Título persuasivo basado en el prompt",
-    "heroSubtitle": "Subtítulo llamativo",
-    "aboutText": "Historia/Misión del negocio redactada para la página de nosotros"
+    "heroTitle": "Un título maestro brutal basado en el nicho",
+    "heroSubtitle": "Subtítulo altamente persuasivo",
+    "aboutText": "Una historia profunda, extensa y persuasiva sobre el negocio (Mínimo 50 palabras)."
   },
   "theme": {
     "PRIMARY_COLOR": "#hex",
@@ -81,19 +97,20 @@ ESTRUCTURA EXACTA DEL JSON QUE DEBES DEVOLVER:
   "pages": [
     {
       "filename": "index.html",
-      "htmlContent": "<!DOCTYPE html><html lang='es'>... (tu código Tailwind infinito usando {{VARIABLES}} y el div dinámico de productos) ...</html>"
+      "htmlContent": "<!DOCTYPE html>..."
     },
     {
       "filename": "nosotros.html",
-      "htmlContent": "<!DOCTYPE html><html lang='es'>... (tu código para la vista de nosotros) ...</html>"
+      "htmlContent": "<!DOCTYPE html>..."
     }
   ]
 }
 `;
 
-            const userInstruction = `Crea el sitio para este negocio: "${userPrompt}". 
-Sorpréndeme con un diseño Tailwind asombroso y nunca antes visto. Infiere la historia de la empresa y guárdala en "aboutText". Usa Pollinations para las imágenes. NO pongas productos estáticos, usa el div contenedor.`;
+            const userInstruction = `Requerimiento del cliente: "${userPrompt}". 
+Destruye cualquier límite. Aplica una de las estéticas de la Ruleta de Estilos al azar. Haz que sea la web más bonita, compleja y responsive que hayas creado en tu vida. Recuerda el <div id="wuepy-dynamic-products"></div> en el index.html. ¡SORPRÉNDEME!`;
 
+            // Aumentamos temperatura para que la IA se ponga altamente creativa
             const response = await fetch(this.modelUrl, {
                 method: 'POST',
                 headers: {
@@ -106,8 +123,8 @@ Sorpréndeme con un diseño Tailwind asombroso y nunca antes visto. Infiere la h
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: userInstruction }
                     ],
-                    temperature: 0.8, // Temperatura alta para máxima creatividad y varianza estructural
-                    max_tokens: 8000, 
+                    temperature: 0.9, 
+                    max_tokens: 12000, // Máxima capacidad de memoria para HTML extensos
                     response_format: { type: "json_object" } 
                 })
             });
@@ -116,21 +133,20 @@ Sorpréndeme con un diseño Tailwind asombroso y nunca antes visto. Infiere la h
             
             if (rawData.error) {
                 console.error("[IA Error API]:", rawData.error);
-                throw new Error("DeepInfra rechazó la solicitud.");
+                throw new Error("El clúster de Inteligencia Artificial rechazó la solicitud (Demasiado masivo o error de API).");
             }
 
             const aiResponseText = rawData.choices[0].message.content;
             const blueprint = this.extractJSON(aiResponseText);
             
             // =========================================================
-            // PASO 1: GUARDAR LOS DATOS PENSADOS POR LA IA EN LA BD
+            // PASO 1: EXTRAER Y GUARDAR INTELIGENCIA EN LA BD
             // =========================================================
-            // La IA extrae e inventa textos geniales, LOS GUARDAMOS REALMENTE EN LA BASE DE DATOS
-            // para que el cliente luego pueda ir a configuraciones y verlos/editarlos allí.
             if (blueprint.extracted_data) {
-                site.content.heroTitle = site.content.heroTitle || blueprint.extracted_data.heroTitle;
-                site.content.heroSubtitle = site.content.heroSubtitle || blueprint.extracted_data.heroSubtitle;
-                site.content.aboutText = site.content.aboutText || blueprint.extracted_data.aboutText;
+                // Solo guardamos si están vacíos, o si el cliente está forzando una regeneración.
+                site.content.heroTitle = blueprint.extracted_data.heroTitle || site.content.heroTitle;
+                site.content.heroSubtitle = blueprint.extracted_data.heroSubtitle || site.content.heroSubtitle;
+                site.content.aboutText = blueprint.extracted_data.aboutText || site.content.aboutText;
             }
             
             if (blueprint.theme) {
@@ -138,13 +154,11 @@ Sorpréndeme con un diseño Tailwind asombroso y nunca antes visto. Infiere la h
                 site.secondaryColor = blueprint.theme.SECONDARY_COLOR || site.secondaryColor;
             }
 
-            await site.save(); // Guardamos los textos y colores en BD ANTES de compilar
+            await site.save(); 
 
             // =========================================================
-            // PASO 2: INYECCIÓN DESDE LA BASE DE DATOS HACIA EL HTML
+            // PASO 2: INYECCIÓN DE DATOS REALES Y BLINDAJE DE HTML
             // =========================================================
-            // Ahora tomamos la base de datos (con los textos que la IA acaba de aprender/guardar)
-            // y los inyectamos en el HTML salvaje que la IA acaba de construir.
             const realSiteData = {
                 SITE_NAME: site.name || 'Mi Tienda',
                 HERO_TITLE: site.content?.heroTitle || 'Bienvenido a nuestra plataforma',
@@ -160,20 +174,33 @@ Sorpréndeme con un diseño Tailwind asombroso y nunca antes visto. Infiere la h
             const generatedPagesArray = [];
 
             for (const page of blueprint.pages) {
-                // Inyectamos el script de Tailwind si la IA lo olvidó en el Head
                 let finalHtml = page.htmlContent;
+                
+                // 1. BLINDAJE DEL HEAD: Aseguramos que tenga Tailwind y FontAwesome sí o sí.
                 if (!finalHtml.includes('cdn.tailwindcss.com')) {
                     finalHtml = finalHtml.replace('</head>', '<script src="https://cdn.tailwindcss.com"></script></head>');
                 }
+                if (!finalHtml.includes('font-awesome')) {
+                    finalHtml = finalHtml.replace('</head>', '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></head>');
+                }
 
-                // Inyectamos las variables de BD
+                // 2. INYECCIÓN VARIABLES
                 finalHtml = this.injectVariables(finalHtml, realSiteData);
+
+                // 3. PROTECCIÓN FINAL CONTRA OVERFLOW (Seguro de vida en el body)
+                if (finalHtml.includes('<body') && !finalHtml.includes('overflow-x-hidden')) {
+                     finalHtml = finalHtml.replace('<body class="', '<body class="overflow-x-hidden ');
+                     // Fallback por si no puso clases en el body
+                     if(!finalHtml.includes('class=')) {
+                        finalHtml = finalHtml.replace('<body>', '<body class="overflow-x-hidden">');
+                     }
+                }
 
                 generatedPagesArray.push({
                     filename: page.filename,
                     htmlContent: finalHtml
                 });
-                console.log(`[IA Motor Infinito] Código HTML inyectado y preparado: ${page.filename}`);
+                console.log(`[IA Motor Infinito X10] Vista épica renderizada: ${page.filename}`);
             }
 
             site.aiGeneratedPages = generatedPagesArray; 
@@ -181,11 +208,11 @@ Sorpréndeme con un diseño Tailwind asombroso y nunca antes visto. Infiere la h
             site.aiPrompt = userPrompt;
             await site.save();
 
-            console.log(`[IA Orquestador] 🚀 Arquitectura Infinita ensamblada. BD actualizada. HTML inyectado.`);
-            return { success: true, message: 'Web dinámica generada con éxito' };
+            console.log(`[IA Orquestador] 🏆 Operación "Modo Dios" completada con éxito. Sitio 100% responsivo y único.`);
+            return { success: true, message: 'Arquitectura Premium generada con éxito' };
 
         } catch (error) {
-            console.error(`[IA Orquestador] Falla crítica durante la orquestación infinita:`, error);
+            console.error(`[IA Orquestador] Catástrofe en la generación X10:`, error);
             return { success: false, error: error.message };
         }
     }
