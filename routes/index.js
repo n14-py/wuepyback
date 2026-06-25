@@ -7,8 +7,13 @@ const router = express.Router();
 const siteController = require('../controllers/siteController');
 const Product = require('../models/Product');
 
+// ==========================================================================
+// 0. API PÚBLICA PARA TIENDAS (Consumidas por el frontend SPA/IA)
+// ==========================================================================
 // Permite que las plantillas y el index principal consulten los datos de cualquier tienda de forma directa
 router.get('/store/public/:subdomain', siteController.renderStoreHome);
+router.get('/store/public/:subdomain/p/:id', siteController.renderStoreProduct);
+router.get('/store/public/:subdomain/search', siteController.renderStoreSearch);
 
 // ==========================================================================
 // 1. RUTA PRINCIPAL (MARKETPLACE WUEPY O INICIO DE TIENDA)
@@ -21,7 +26,6 @@ router.get('/', async (req, res) => {
 
     // B) LÓGICA DEL MARKETPLACE GLOBAL
     try {
-        // CORRECCIÓN: Filtro tolerante
         const globalProducts = await Product.find({ 
             showInGlobalMarketplace: true, 
             isActive: { $ne: false } 
@@ -59,7 +63,6 @@ router.get('/search', async (req, res) => {
     // B) LÓGICA DEL BUSCADOR GLOBAL (wuepy.com/search)
     try {
         const query = req.query.q || '';
-        // CORRECCIÓN: Filtro tolerante
         let filter = { showInGlobalMarketplace: true, isActive: { $ne: false } };
         
         let sortOption = { createdAt: -1 };
@@ -94,7 +97,6 @@ router.get('/search', async (req, res) => {
 // ==========================================================================
 // 3. DETALLE DE PRODUCTO Y REDIRECCIÓN GLOBAL (/p/:id)
 // ==========================================================================
-// 3. DETALLE DE PRODUCTO (Ahora apunta directo al controlador sin redirección extra)
 router.get('/p/:id', async (req, res) => {
     if (!req.isMainDomain && req.subdomainName) {
         return siteController.renderStoreProduct(req, res);

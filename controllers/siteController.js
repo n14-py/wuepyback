@@ -164,11 +164,11 @@ module.exports = {
         try {
             const siteId = req.params.siteId;
             const { 
-                name, template, showInMarketplace,
+                name, template, showInMarketplace, designMode, aiPrompt,
                 primaryColor, secondaryColor, 
                 heroTitle, heroSubtitle, aboutText,
                 whatsapp, phone, contactEmail, address, schedule,
-                facebook, instagram, tiktok 
+                facebook, instagram, tiktok, triggerAiRegen
             } = req.body;
 
             const site = await Site.findOne({ _id: siteId, owner: req.user._id });
@@ -178,6 +178,17 @@ module.exports = {
 
             const cleanWhatsapp = whatsapp ? whatsapp.replace(/[^0-9]/g, '') : '';
             const isShowInMarketplace = showInMarketplace === 'on' || showInMarketplace === true || showInMarketplace === 'true';
+
+            // Guardamos cambios de modo y prompt si vienen en la petición
+            if (designMode) site.designMode = designMode;
+            if (aiPrompt !== undefined) site.aiPrompt = aiPrompt;
+
+            // SOLUCIÓN AL ERROR DE VUELTA A TEMPLATE 1:
+            // Si el sitio está en modo IA, NO sobreescribimos con una plantilla clásica por defecto.
+            // Solo actualizamos la plantilla si el usuario explícitamente cambió a modo clásico 'template'.
+            if (site.designMode !== 'ai_generated') {
+                site.template = template || 'template1';
+            }
 
             // =========================================================
             // 🔄 SINCRONIZACIÓN AUTOMÁTICA DE DATOS EN PLANTILLA IA
@@ -205,7 +216,6 @@ module.exports = {
             }
 
             site.name = name;
-            site.template = template;
             site.showInMarketplace = isShowInMarketplace; 
             site.primaryColor = primaryColor;
             site.secondaryColor = secondaryColor;
@@ -223,7 +233,17 @@ module.exports = {
             if (req.file) site.logoUrl = req.file.path; 
 
             await site.save();
-            return res.status(200).json({ success: true, message: '¡Configuración guardada!', site });
+
+            // Si el usuario marcó regenerar con IA de forma amigable o cambió la idea
+            if ((triggerAiRegen === true || triggerAiRegen === 'true') && site.designMode === 'ai_generated' && site.aiPrompt) {
+                console.log(`[API Wuepy] 🔄 Regeneración Inteligente activada desde Configuraciones para: ${site.subdomain}`);
+                await agentAiService.orquestarDisenoWeb(site._id, site.aiPrompt);
+                // Volvemos a buscar el sitio actualizado por la IA para retornarlo
+                const updatedSite = await Site.findById(siteId);
+                return res.status(200).json({ success: true, message: '¡Configuración e idea guardada! La IA ha rediseñado tu web.', site: updatedSite });
+            }
+
+            return res.status(200).json({ success: true, message: '¡Configuración guardada correctamente!', site });
 
         } catch (error) {
             console.error(error);
@@ -232,7 +252,7 @@ module.exports = {
     },
 
     // =========================================================
-    // 🔥 NUEVO: BOTÓN DE LA DESTRUCCIÓN (REGENERAR DISEÑO IA) 🔥
+    // 🔥 BOTÓN DE LA DESTRUCCIÓN / ACTUALIZACIÓN DIRECTA IA 🔥
     // =========================================================
     regenerateAiDesign: async (req, res) => {
         try {
@@ -245,16 +265,15 @@ module.exports = {
             const finalPrompt = aiPrompt || site.aiPrompt;
             if (!finalPrompt) return res.status(400).json({ success: false, message: 'Se necesita una idea para que la IA trabaje.' });
 
-            console.log(`[API Wuepy] 💥 BOTÓN DE DESTRUCCIÓN: Regenerando sitio IA para ${site.subdomain}`);
+            console.log(`[API Wuepy] 💥 Regenerando sitio IA para ${site.subdomain}`);
             
-            // Llamamos de vuelta al motor infinito
             const aiResult = await agentAiService.orquestarDisenoWeb(site._id, finalPrompt);
 
             if (!aiResult.success) {
                 return res.status(500).json({ success: false, message: 'Error de la IA al regenerar: ' + aiResult.error });
             }
 
-            return res.status(200).json({ success: true, message: '¡Diseño destruido y regenerado con éxito! Revisa tu tienda.' });
+            return res.status(200).json({ success: true, message: '¡Diseño regenerado con éxito! Revisa tu tienda.' });
 
         } catch (error) {
             console.error("Error al regenerar diseño IA:", error);
@@ -385,7 +404,6 @@ module.exports = {
             if (site.designMode === 'ai_generated' && site.aiGeneratedPages && site.aiGeneratedPages.length > 0) {
                 let targetPage = site.aiGeneratedPages.find(p => p.filename === 'product.html');
                 
-                // Si por alguna razón la IA falló y no existe product.html, forzamos el index como fallback para que no crashee
                 if (!targetPage) targetPage = site.aiGeneratedPages.find(p => p.filename === 'index.html');
 
                 return res.status(200).json({
