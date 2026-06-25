@@ -1,6 +1,6 @@
 // ==========================================================================
 // WUEPY.COM - EL CEREBRO ORQUESTADOR IA (DeepSeek V4/V3 via DeepInfra)
-// ARQUITECTURA INFINITA V3: MODO DIOS X10 (AWWWARDS EDITION + RESPONSIVE BLINDADO)
+// ARQUITECTURA INFINITA V4: MODO DIOS X100 (MULTIPÁGINA + ANTI-BREAK + MEGA FOOTER)
 // ==========================================================================
 const path = require('path');
 const Site = require('../models/Site');
@@ -38,50 +38,46 @@ class AgentAiService {
     }
 
     async orquestarDisenoWeb(siteId, userPrompt) {
-        console.log(`[IA Orquestador] 🌌 DESATANDO MODO DIOS X10 PARA SITE: ${siteId}`);
+        console.log(`[IA Orquestador] 🌌 DESATANDO MODO DIOS X100 PARA SITE: ${siteId}`);
         
         try {
             const site = await Site.findById(siteId);
             if (!site) throw new Error("Sitio no encontrado en la base de datos.");
 
             // =========================================================
-            // EL PROMPT MAESTRO V3: LA BIBLIA DEL DISEÑO UI/UX
+            // EL PROMPT MAESTRO V4: LA BIBLIA ABSOLUTA DEL DISEÑO UI/UX
             // =========================================================
             const systemPrompt = `
-Eres el Diseñador Frontend más cotizado del mundo, ganador de 50 premios Awwwards.
-Tu misión es diseñar sitios web ABSOLUTAMENTE ÉPICOS, ÚNICOS Y PERFECTOS con Tailwind CSS.
+Eres el Diseñador y Desarrollador Frontend más cotizado del mundo, ganador de múltiples premios Awwwards.
+Tu misión es diseñar sitios web ABSOLUTAMENTE ÉPICOS, ÚNICOS, PERFECTOS y COMPLETAMENTE FUNCIONALES con Tailwind CSS.
 
-MANDAMIENTOS DE ARQUITECTURA RESPONSIVE (SI FALLAS, EL SITIO SE ROMPE):
-1. EL ESQUELETO DE TITANIO: TODAS las secciones (<section>, <header>, <footer>) deben usar la clase 'w-full'. PERO su contenido interno DEBE ESTAR OBLIGATORIAMENTE DENTRO DE ESTE CONTENEDOR EXACTO:
+MANDAMIENTOS DE ARQUITECTURA RESPONSIVE (ANTI-ROTURAS - OBLIGATORIO):
+1. EL ESQUELETO DE TITANIO: TODAS las secciones (<section>, <header>, <footer>) deben usar la clase 'w-full'. PERO su contenido interno DEBE ESTAR OBLIGATORIAMENTE DENTRO DE ESTE CONTENEDOR:
    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> [CONTENIDO AQUÍ] </div>
-2. MOBILE-FIRST EXTREMO: Todo diseño empieza para celular. Usa 'flex flex-col md:flex-row' o 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3'. NUNCA asumas pantallas grandes por defecto.
-3. ANTI-DESBORDAMIENTO: El <body> debe tener SIEMPRE las clases: 'font-sans antialiased overflow-x-hidden text-slate-800 bg-slate-50'. (O sus equivalentes en Dark Mode).
-4. TEXTOS DINÁMICOS: Los títulos nunca deben ser fijos. Usa: 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black'.
+2. ANTI-CORTES DE TEXTO (CRÍTICO): JAMÁS uses alturas fijas destructivas como 'h-screen' o 'h-96' en contenedores con mucho texto. Para secciones divididas (imagen/texto), usa SIEMPRE: 'flex flex-col lg:flex-row items-center gap-12 py-20 lg:py-32'. El 'items-center' y los paddings 'py' garantizan que el texto nunca se suba ni se corte. Deja que el contenido dicte la altura.
+3. MOBILE-FIRST EXTREMO: Todo diseño empieza para celular. NUNCA asumas pantallas grandes por defecto.
+4. ANTI-DESBORDAMIENTO: El <body> debe tener SIEMPRE las clases: 'font-sans antialiased overflow-x-hidden'.
 
-RULETA DE ESTILOS (Elige UNA de estas personalidades al azar para que NUNCA hayan dos webs iguales):
-- ESTILO 1: "Vercel Dark Mode". Fondos negros ('bg-slate-950'), bordes sutiles ('border border-white/10'), luces difuminadas de fondo, botones brillantes, texto blanco.
-- ESTILO 2: "Apple Clean Minimalist". Fondos ultra blancos o gris perla ('bg-slate-50'), tipografía enorme y gruesa, mucho espacio en blanco ('py-24'), bordes muy redondeados ('rounded-[3rem]'), sombras súper suaves ('shadow-2xl shadow-slate-200/50').
-- ESTILO 3: "Neo-Brutalism". Colores saturados vibrantes, bordes negros gruesos ('border-4 border-black'), sombras duras sin difuminar ('shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]'), tipografías monoespaciadas.
-- ESTILO 4: "Glassmorphism & Gradients". Fondos con mallas de colores pastel, tarjetas translúcidas ('bg-white/40 backdrop-blur-xl border border-white/50'), estética muy de belleza o moda.
+MANDAMIENTOS DE DISEÑO Y ESTRUCTURA (LA EXPERIENCIA PREMIUM):
+1. NAV/HEADER: Debe ser moderno, sticky (fijo al hacer scroll), con enlaces a las 4 páginas generadas. Usa la variable {{LOGO_URL}} si existe, si no, usa un texto estilizado con {{SITE_NAME}}.
+2. FOOTER MONUMENTAL (CRÍTICO): ESTÁ ESTRICTAMENTE PROHIBIDO HACER UN FOOTER BÁSICO. Tu footer debe ser una obra de arte masiva. Debe contener mínimo 4 columnas: (1) Logo y bio, (2) Enlaces rápidos, (3) Contacto con iconos, (4) Un formulario de Newsletter hermoso. Usa fondos oscuros ('bg-slate-950') o cristalinos para contrastar con el resto de la web.
+3. IMÁGENES: Usa la API de Pollinations. Ej: https://image.pollinations.ai/prompt/cyberpunk-neon-store-interior?width=1200&height=800&nologo=true. Crea prompts en inglés hiper-detallados, fotorealistas, 8k, cinematográficos. NADA de imágenes aburridas.
 
-MANDAMIENTOS DE CONTENIDO Y MULTIPÁGINA:
-1. IMÁGENES: Usa la API de Pollinations. Ej: https://image.pollinations.ai/prompt/cyberpunk-neon-store-interior?width=1200&height=800&nologo=true (Usa prompts en inglés hiper-detallados según el rubro del cliente).
-2. MENÚ DE NAVEGACIÓN: Debe ser "Sticky" o "Fixed" en el top, con enlaces a "index.html" y "nosotros.html".
-3. INDEX.HTML:
-   - Debe tener un HERO gigantesco e impactante (Altura mínima 'min-h-[80vh]').
-   - Sección de Beneficios o Servicios usando un "Bento Grid" (Cajas asimétricas modernas).
-   - LA ZONA DE PRODUCTOS: Debe ser un título increíble seguido EXACTAMENTE POR ESTA LÍNEA (No pongas tarjetas de prueba, solo este div):
-     <div id="wuepy-dynamic-products" class="w-full"></div>
-   - Un Footer monumental con enlaces, datos de contacto y redes sociales.
-4. NOSOTROS.HTML:
-   - NO HAGAS UNA PÁGINA SIMPLE.
-   - Debe tener un HERO propio espectacular.
-   - Una sección tipo "Nuestra Historia" dividida en dos columnas: Una foto gigante y al lado el texto usando {{ABOUT_TEXT}}.
-   - Una sección final con una frase inspiradora.
+MANDAMIENTOS MULTIPÁGINA (DEBES GENERAR ESTAS 4 PÁGINAS SÍ O SÍ):
+1. index.html: Hero impactante (min-h-[80vh] flex items-center), Bento Grid de beneficios, y EXACTAMENTE ESTA LÍNEA para el catálogo:
+   <div id="wuepy-dynamic-products" class="w-full py-10"></div>
+2. nosotros.html: Hero propio. Sección de "Nuestra Historia" a dos columnas (usando 'items-center' para no cortar texto) con {{ABOUT_TEXT}}. Equipo o Valores.
+3. contacto.html: Diseño espectacular con información de contacto ({{WHATSAPP}}, {{EMAIL}}, {{ADDRESS}}) en tarjetas interactivas y un formulario de contacto visualmente increíble.
+4. product.html (CRÍTICO PARA QUE NO SE VEA PANTALLA NEGRA): Esta es la plantilla maestra para ver un solo producto. Debe tener el header y footer, y en el medio EXACTAMENTE ESTE CONTENEDOR:
+   <div id="wuepy-dynamic-product-detail" class="w-full min-h-[70vh] py-20"></div>
 
-VARIABLES OBLIGATORIAS:
-ESTÁ PROHIBIDO ESCRIBIR TEXTO ESTÁTICO PARA DATOS CLAVES. Usa OBLIGATORIAMENTE estas variables en todo el HTML:
-{{SITE_NAME}}, {{HERO_TITLE}}, {{HERO_SUBTITLE}}, {{ABOUT_TEXT}}, {{WHATSAPP}}, {{EMAIL}}, {{ADDRESS}}
+RULETA DE ESTILOS (Elige UNA estética al azar y aplícala de forma extrema en las 4 páginas):
+- ESTILO 1: "Vercel Dark Mode". 'bg-slate-950 text-white', luces difuminadas de fondo ('blur-3xl bg-blue-500/20'), botones brillantes.
+- ESTILO 2: "Apple Clean Minimalist". 'bg-slate-50', tipografía gruesa, muchísimo espacio ('py-32'), bordes muy redondeados ('rounded-[3rem]'), sombras súper suaves.
+- ESTILO 3: "Neo-Brutalism". Colores saturados, bordes negros gruesos ('border-4 border-black'), sombras duras sin difuminar, tipografías monoespaciadas.
+
+VARIABLES OBLIGATORIAS (Úsalas en todo el HTML):
+{{SITE_NAME}}, {{HERO_TITLE}}, {{HERO_SUBTITLE}}, {{ABOUT_TEXT}}, {{WHATSAPP}}, {{EMAIL}}, {{ADDRESS}}, {{LOGO_URL}}
 
 ESTRUCTURA DEL JSON A DEVOLVER:
 {
@@ -95,22 +91,17 @@ ESTRUCTURA DEL JSON A DEVOLVER:
     "SECONDARY_COLOR": "#hex"
   },
   "pages": [
-    {
-      "filename": "index.html",
-      "htmlContent": "<!DOCTYPE html>..."
-    },
-    {
-      "filename": "nosotros.html",
-      "htmlContent": "<!DOCTYPE html>..."
-    }
+    { "filename": "index.html", "htmlContent": "<!DOCTYPE html>..." },
+    { "filename": "nosotros.html", "htmlContent": "<!DOCTYPE html>..." },
+    { "filename": "contacto.html", "htmlContent": "<!DOCTYPE html>..." },
+    { "filename": "product.html", "htmlContent": "<!DOCTYPE html>..." }
   ]
 }
 `;
 
             const userInstruction = `Requerimiento del cliente: "${userPrompt}". 
-Destruye cualquier límite. Aplica una de las estéticas de la Ruleta de Estilos al azar. Haz que sea la web más bonita, compleja y responsive que hayas creado en tu vida. Recuerda el <div id="wuepy-dynamic-products"></div> en el index.html. ¡SORPRÉNDEME!`;
+Aplica todo tu conocimiento de diseño UI/UX. Recuerda usar 'items-center' para que los textos no se corten. Genera el Footer más épico que puedas imaginar. Y asegúrate de crear el product.html con el id 'wuepy-dynamic-product-detail'. ¡CONSTRUYE EL SITIO DEFINITIVO!`;
 
-            // Aumentamos temperatura para que la IA se ponga altamente creativa
             const response = await fetch(this.modelUrl, {
                 method: 'POST',
                 headers: {
@@ -124,7 +115,7 @@ Destruye cualquier límite. Aplica una de las estéticas de la Ruleta de Estilos
                         { role: 'user', content: userInstruction }
                     ],
                     temperature: 0.9, 
-                    max_tokens: 12000, // Máxima capacidad de memoria para HTML extensos
+                    max_tokens: 16000, // Aumentamos para soportar 4 páginas complejas sin cortes
                     response_format: { type: "json_object" } 
                 })
             });
@@ -143,7 +134,6 @@ Destruye cualquier límite. Aplica una de las estéticas de la Ruleta de Estilos
             // PASO 1: EXTRAER Y GUARDAR INTELIGENCIA EN LA BD
             // =========================================================
             if (blueprint.extracted_data) {
-                // Solo guardamos si están vacíos, o si el cliente está forzando una regeneración.
                 site.content.heroTitle = blueprint.extracted_data.heroTitle || site.content.heroTitle;
                 site.content.heroSubtitle = blueprint.extracted_data.heroSubtitle || site.content.heroSubtitle;
                 site.content.aboutText = blueprint.extracted_data.aboutText || site.content.aboutText;
@@ -159,6 +149,17 @@ Destruye cualquier límite. Aplica una de las estéticas de la Ruleta de Estilos
             // =========================================================
             // PASO 2: INYECCIÓN DE DATOS REALES Y BLINDAJE DE HTML
             // =========================================================
+            // Lógica para mostrar logo real o dejar vacío si no hay
+            let finalLogoHtml = '';
+            if (site.logoUrl) {
+                // Asumiendo que logoUrl viene como un path relativo guardado en R2/Cloudinary/Local
+                const baseUrl = process.env.NODE_ENV === 'production' ? 'https://wuepy.com' : 'http://localhost:3000';
+                const fullLogoUrl = site.logoUrl.startsWith('http') ? site.logoUrl : `${baseUrl}/${site.logoUrl}`;
+                finalLogoHtml = `<img src="${fullLogoUrl}" alt="${site.name}" class="h-12 w-auto object-contain">`;
+            } else {
+                finalLogoHtml = `<span class="font-extrabold text-2xl tracking-tighter">${site.name}</span>`;
+            }
+
             const realSiteData = {
                 SITE_NAME: site.name || 'Mi Tienda',
                 HERO_TITLE: site.content?.heroTitle || 'Bienvenido a nuestra plataforma',
@@ -168,7 +169,8 @@ Destruye cualquier límite. Aplica una de las estéticas de la Ruleta de Estilos
                 EMAIL: site.contact?.email || 'No especificado',
                 ADDRESS: site.contact?.address || 'Ubicación no especificada',
                 PRIMARY_COLOR: site.primaryColor,
-                SECONDARY_COLOR: site.secondaryColor
+                SECONDARY_COLOR: site.secondaryColor,
+                LOGO_URL: finalLogoHtml // Se inyecta la etiqueta img o el texto directamente
             };
 
             const generatedPagesArray = [];
@@ -176,12 +178,15 @@ Destruye cualquier límite. Aplica una de las estéticas de la Ruleta de Estilos
             for (const page of blueprint.pages) {
                 let finalHtml = page.htmlContent;
                 
-                // 1. BLINDAJE DEL HEAD: Aseguramos que tenga Tailwind y FontAwesome sí o sí.
+                // 1. BLINDAJE DEL HEAD: Aseguramos Tailwind, FontAwesome y AlpineJS
                 if (!finalHtml.includes('cdn.tailwindcss.com')) {
                     finalHtml = finalHtml.replace('</head>', '<script src="https://cdn.tailwindcss.com"></script></head>');
                 }
                 if (!finalHtml.includes('font-awesome')) {
                     finalHtml = finalHtml.replace('</head>', '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></head>');
+                }
+                if (!finalHtml.includes('alpinejs')) {
+                    finalHtml = finalHtml.replace('</head>', '<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script></head>');
                 }
 
                 // 2. INYECCIÓN VARIABLES
@@ -200,7 +205,7 @@ Destruye cualquier límite. Aplica una de las estéticas de la Ruleta de Estilos
                     filename: page.filename,
                     htmlContent: finalHtml
                 });
-                console.log(`[IA Motor Infinito X10] Vista épica renderizada: ${page.filename}`);
+                console.log(`[IA Motor Infinito X100] Vista épica renderizada: ${page.filename}`);
             }
 
             site.aiGeneratedPages = generatedPagesArray; 
@@ -208,11 +213,11 @@ Destruye cualquier límite. Aplica una de las estéticas de la Ruleta de Estilos
             site.aiPrompt = userPrompt;
             await site.save();
 
-            console.log(`[IA Orquestador] 🏆 Operación "Modo Dios" completada con éxito. Sitio 100% responsivo y único.`);
+            console.log(`[IA Orquestador] 🏆 Operación "Modo Dios V4" completada. Multipágina y Mega Footer listos.`);
             return { success: true, message: 'Arquitectura Premium generada con éxito' };
 
         } catch (error) {
-            console.error(`[IA Orquestador] Catástrofe en la generación X10:`, error);
+            console.error(`[IA Orquestador] Catástrofe en la generación X100:`, error);
             return { success: false, error: error.message };
         }
     }
