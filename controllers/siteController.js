@@ -1,6 +1,6 @@
 // ==========================================================================
 // WUEPY.COM - CONTROLADOR CENTRAL DEL SITIO (VERSIÓN API REST)
-// ARQUITECTURA BLUEPRINT: MODO ESQUELETO Y NAVEGACIÓN MULTIPÁGINA IA
+// ARQUITECTURA BLUEPRINT: MODO INFINITO + INYECCIÓN DE PRODUCTOS + REGENERACIÓN IA
 // ==========================================================================
 const path = require('path');
 const Site = require('../models/Site');
@@ -87,7 +87,7 @@ module.exports = {
             await newSite.save();
 
             // =========================================================
-            // 🔥 ACTIVACIÓN DEL ORQUESTADOR IA (DEEPSEEK) 🔥
+            // 🔥 ACTIVACIÓN DEL ORQUESTADOR IA (NÚCLEO INFINITO) 🔥
             // =========================================================
             if (newSite.designMode === 'ai_generated' && newSite.aiPrompt) {
                 console.log(`[API Wuepy] 🧠 Despertando a DeepSeek para la tienda: ${newSite.subdomain}`);
@@ -182,7 +182,6 @@ module.exports = {
             // =========================================================
             // 🔄 SINCRONIZACIÓN AUTOMÁTICA DE DATOS EN PLANTILLA IA
             // =========================================================
-            // Si el sitio fue hecho con IA, interceptamos los cambios y limpiamos el HTML viejo
             if (site.designMode === 'ai_generated' && site.aiGeneratedPages && site.aiGeneratedPages.length > 0) {
                 const oldWhatsapp = site.contact?.whatsapp || '';
                 const oldEmail = site.contact?.email || '';
@@ -190,6 +189,7 @@ module.exports = {
                 const oldPrimary = site.primaryColor || '#3b82f6';
                 const oldSecondary = site.secondaryColor || '#1e293b';
                 const oldName = site.name || '';
+                const oldAboutText = site.content?.aboutText || '';
 
                 site.aiGeneratedPages = site.aiGeneratedPages.map(page => {
                     let html = page.htmlContent;
@@ -199,6 +199,7 @@ module.exports = {
                     if (oldPrimary && primaryColor) html = html.split(oldPrimary).join(primaryColor);
                     if (oldSecondary && secondaryColor) html = html.split(oldSecondary).join(secondaryColor);
                     if (oldName && name) html = html.split(oldName).join(name);
+                    if (oldAboutText && aboutText) html = html.split(oldAboutText).join(aboutText);
                     return { filename: page.filename, htmlContent: html };
                 });
             }
@@ -227,6 +228,37 @@ module.exports = {
         } catch (error) {
             console.error(error);
             return res.status(500).json({ success: false, message: 'Error al actualizar.' });
+        }
+    },
+
+    // =========================================================
+    // 🔥 NUEVO: BOTÓN DE LA DESTRUCCIÓN (REGENERAR DISEÑO IA) 🔥
+    // =========================================================
+    regenerateAiDesign: async (req, res) => {
+        try {
+            const siteId = req.params.siteId;
+            const { aiPrompt } = req.body;
+
+            const site = await Site.findOne({ _id: siteId, owner: req.user._id });
+            if (!site) return res.status(403).json({ success: false, message: 'Acceso denegado o tienda no encontrada.' });
+
+            const finalPrompt = aiPrompt || site.aiPrompt;
+            if (!finalPrompt) return res.status(400).json({ success: false, message: 'Se necesita una idea para que la IA trabaje.' });
+
+            console.log(`[API Wuepy] 💥 BOTÓN DE DESTRUCCIÓN: Regenerando sitio IA para ${site.subdomain}`);
+            
+            // Llamamos de vuelta al motor infinito
+            const aiResult = await agentAiService.orquestarDisenoWeb(site._id, finalPrompt);
+
+            if (!aiResult.success) {
+                return res.status(500).json({ success: false, message: 'Error de la IA al regenerar: ' + aiResult.error });
+            }
+
+            return res.status(200).json({ success: true, message: '¡Diseño destruido y regenerado con éxito! Revisa tu tienda.' });
+
+        } catch (error) {
+            console.error("Error al regenerar diseño IA:", error);
+            return res.status(500).json({ success: false, message: 'Error interno al regenerar la web.' });
         }
     },
 
@@ -276,23 +308,29 @@ module.exports = {
             // 🔥 MAGIA DE LA IA: DETECCIÓN Y RENDERIZACIÓN MULTIPÁGINA
             // =========================================================
             if (site.designMode === 'ai_generated' && site.aiGeneratedPages && site.aiGeneratedPages.length > 0) {
-                // Buscamos si el frontend solicita una página específica (ej: ?page=nosotros.html)
-                // Si no se especifica ninguna, enviamos por defecto 'index.html'
                 const requestedPageName = req.query.page || 'index.html';
                 let targetPage = site.aiGeneratedPages.find(p => p.filename === requestedPageName);
                 
-                // Fallback de seguridad por si piden una página que no se generó
                 if (!targetPage) {
                     targetPage = site.aiGeneratedPages.find(p => p.filename === 'index.html');
                 }
+
+                // 🟢 SOLUCIÓN: BUSCAMOS LOS PRODUCTOS IGUAL QUE EN EL MODO CLÁSICO Y LOS MANDAMOS AL FRONTEND
+                const products = await Product.find({ site: site._id, isActive: { $ne: false } })
+                                              .sort({ createdAt: -1 })
+                                              .limit(12).lean();
+
+                const categories = await Product.distinct('category', { site: site._id, isActive: { $ne: false } });
 
                 return res.status(200).json({
                     success: true,
                     isAiGenerated: true,
                     activePage: targetPage.filename,
-                    htmlContent: targetPage.htmlContent, // Enviamos el HTML específico solicitado
-                    aiPages: site.aiGeneratedPages, // Enviamos también todo el array por si el front hace pre-fetch
+                    htmlContent: targetPage.htmlContent,
+                    aiPages: site.aiGeneratedPages, 
                     site,
+                    products,    // <- PRODUCTOS LISTOS PARA EL INYECTOR DEL FRONTEND
+                    categories,  // <- CATEGORÍAS LISTAS
                     message: 'Esta tienda es servida por la Bóveda IA de Wuepy directamente desde la Base de Datos'
                 });
             }

@@ -1,10 +1,9 @@
 // ==========================================================================
 // WUEPY.COM - EL CEREBRO ORQUESTADOR IA (DeepSeek V4/V3 via DeepInfra)
-// ARQUITECTURA BLUEPRINT: MODO ESQUELETO (Inyección de Datos Reales)
+// ARQUITECTURA INFINITA: 100% TAILWIND DINÁMICO + INYECCIÓN DE DB
 // ==========================================================================
 const path = require('path');
 const Site = require('../models/Site');
-const aiBlocks = require('./ai/aiBlocks'); // Nuestra bóveda de componentes
 
 class AgentAiService {
     constructor() {
@@ -21,7 +20,7 @@ class AgentAiService {
             const jsonString = text.substring(start, end + 1);
             return JSON.parse(jsonString);
         } catch (e) {
-            console.error("[IA Error] Fallo al extraer JSON de la respuesta:", text);
+            console.error("[IA Error] Fallo al extraer JSON:", text);
             throw new Error("La IA no devolvió un formato válido.");
         }
     }
@@ -29,112 +28,71 @@ class AgentAiService {
     injectVariables(template, variables) {
         if (!template) return '';
         let compiled = template;
-        
         for (const [key, value] of Object.entries(variables)) {
-            // Reemplaza globalmente todas las coincidencias, manejando undefined o null
             const safeValue = value !== undefined && value !== null ? value : '';
             const regex = new RegExp(`{{${key}}}`, 'g');
             compiled = compiled.replace(regex, safeValue);
         }
-        return compiled;
+        // Limpieza de etiquetas no usadas
+        return compiled.replace(/{{[A-Z0-9_]+}}/g, '');
     }
 
     async orquestarDisenoWeb(siteId, userPrompt) {
-        console.log(`[IA Orquestador] 🧠 Iniciando análisis y arquitectura para Site: ${siteId}`);
+        console.log(`[IA Orquestador] 🧠 Iniciando Motor de Variancia Infinita para Site: ${siteId}`);
         
         try {
             const site = await Site.findById(siteId);
             if (!site) throw new Error("Sitio no encontrado en la base de datos.");
 
-            const availableNavs = Object.keys(aiBlocks?.navs || {}).join(', ');
-            const availableHeros = Object.keys(aiBlocks?.heros || {}).join(', ');
-            const availableProducts = Object.keys(aiBlocks?.products || {}).join(', ');
-            const availableFeatures = Object.keys(aiBlocks?.features || {}).join(', ');
-            const availableAbout = Object.keys(aiBlocks?.about || {}).join(', ');
-            const availableTestimonials = Object.keys(aiBlocks?.testimonials || {}).join(', ');
-            const availableFaq = Object.keys(aiBlocks?.faq || {}).join(', ');
-            const availableCta = Object.keys(aiBlocks?.cta || {}).join(', ');
-            const availableFooters = Object.keys(aiBlocks?.footers || {}).join(', ');
-
             // =========================================================
-            // EL PROMPT MAESTRO (REESCRITO PARA MODO ESQUELETO Y DISEÑO)
+            // EL PROMPT MAESTRO: CREADOR DE TAILWIND INFINITO
             // =========================================================
             const systemPrompt = `
-Eres el "Arquitecto IA Master" de Wuepy, experto en UX/UI y diseño de estructuras web.
-Tu misión es diseñar un "Blueprint" (plano JSON) para el sitio web del cliente.
+Eres un Arquitecto de Software de Élite y Experto en UI/UX.
+Tu misión es generar sitios web ÚNICOS para la plataforma Wuepy.
+NO USES PLANTILLAS PREESTABLECIDAS. Cada sitio debe tener una estructura, diseño, grid y layout radicalmente diferente (ej. a veces menú lateral, a veces centrado, a veces hero partido, asimetrías, glassmorphism, brutalism, minimalismo, etc). Genera el HTML completo usando Tailwind CSS.
 
-REGLAS ESTRICTAS DE SUPERVIVENCIA (MODO ESQUELETO):
-1. ERES UN CREADOR DE PLANTILLAS Y DISEÑO, NO DE DATOS FALSOS.
-2. PROHIBIDO INVENTAR: No inventes correos electrónicos, ubicaciones, teléfonos ni nombres de empresas. El sistema inyectará los datos reales del usuario de forma automática.
-3. PROHIBIDO INVENTAR PRODUCTOS: Si decides usar el bloque de productos, trátalo solo como un contenedor visual (esqueleto). Los productos reales se cargarán dinámicamente desde la base de datos.
-4. IMÁGENES EXACTAS: Usa keywords en inglés para Unsplash que sean elegantes, hiper-precisas al nicho y profesionales (ej: "minimalist,coffee", "dark,tech,workspace", "fashion,boutique"). NADA de imágenes raras o abstractas.
-5. DEBES DEVOLVER ÚNICAMENTE UN OBJETO JSON VÁLIDO. Cero texto, cero explicaciones.
+Tienes DOS tareas obligatorias que devolver en un solo JSON:
 
-BLOQUES DISPONIBLES EN LA BÓVEDA:
-- Navs: ${availableNavs}
-- Heros: ${availableHeros}
-- Products: ${availableProducts} (Úsalo solo como contenedor estructural en index.html)
-- Features: ${availableFeatures}
-- About: ${availableAbout}
-- Testimonials: ${availableTestimonials}
-- Faq: ${availableFaq}
-- Cta: ${availableCta}
-- Footers: ${availableFooters}
+1. EXTRACCIÓN DE DATOS (BD):
+Lee la idea del cliente. Si menciona la historia de su empresa, su objetivo, o textos específicos, extráelos y redacta versiones hiper-persuasivas y profesionales para guardarlas en la base de datos ("heroTitle", "heroSubtitle", "aboutText").
+
+2. CREACIÓN DE CÓDIGO HTML (VARIACIONES INFINITAS):
+Crea el código HTML desde <html lang="es"> hasta </html>.
+REGLAS ESTRICTAS PARA EL HTML:
+- DEBE ser único, innovador, usando Tailwind CSS (flex, grid, absolute, transform, etc).
+- ESTÁ PROHIBIDO ESCRIBIR TEXTO ESTÁTICO EN EL HTML. Todo texto debe ser una variable exacta que nosotros reemplazaremos. Usa ESTAS variables:
+  {{SITE_NAME}}, {{HERO_TITLE}}, {{HERO_SUBTITLE}}, {{ABOUT_TEXT}}, {{WHATSAPP}}, {{EMAIL}}, {{ADDRESS}}
+- IMÁGENES: ESTÁ PROHIBIDO USAR FOTOS RARAS. Usa el servicio Pollinations AI para generar fotos espectaculares. El formato es: https://image.pollinations.ai/prompt/{descripcion-detallada-en-ingles-separada-por-guiones}?width=1200&height=800&nologo=true
+- PRODUCTOS: ESTÁ PROHIBIDO crear tarjetas de productos (ni de prueba ni falsos). En la sección donde deberían ir los productos, SOLO debes escribir este contenedor exacto: <div id="wuepy-dynamic-products" class="w-full"></div> (El backend inyectará los productos ahí).
+- ENLACES: Crea una barra de navegación que lleve a "index.html" y a "nosotros.html".
 
 ESTRUCTURA EXACTA DEL JSON QUE DEBES DEVOLVER:
 {
-  "theme": {
-    "PRIMARY_COLOR": "#codigohex",
-    "SECONDARY_COLOR": "#codigohex",
-    "BG_COLOR": "#ffffff o #0f172a",
-    "TEXT_COLOR": "#1e293b o #f8fafc",
-    "FONT_FAMILY": "Inter, Roboto, Poppins, etc"
+  "extracted_data": {
+    "heroTitle": "Título persuasivo basado en el prompt",
+    "heroSubtitle": "Subtítulo llamativo",
+    "aboutText": "Historia/Misión del negocio redactada para la página de nosotros"
   },
-  "global_vars": {
-    "SITE_DESCRIPTION": "Breve descripción persuasiva y genérica sobre el rubro (SEO)"
+  "theme": {
+    "PRIMARY_COLOR": "#hex",
+    "SECONDARY_COLOR": "#hex"
   },
   "pages": [
     {
       "filename": "index.html",
-      "PAGE_TITLE": "Inicio",
-      "nav": "modern_glass",
-      "blocks": [
-        {
-          "type": "heros",
-          "name": "split_image",
-          "content": {
-            "HERO_BADGE": "NUEVA COLECCIÓN",
-            "HERO_CTA1": "Ver Catálogo",
-            "HERO_CTA2": "Conócenos",
-            "IMAGE_KEYWORD": "clothing,store"
-          }
-        }
-      ],
-      "footer": "modern_dark",
-      "footer_content": {}
+      "htmlContent": "<!DOCTYPE html><html lang='es'>... (tu código Tailwind infinito usando {{VARIABLES}} y el div dinámico de productos) ...</html>"
     },
     {
       "filename": "nosotros.html",
-      "PAGE_TITLE": "Nosotros",
-      "nav": "modern_glass",
-      "blocks": [
-        {
-          "type": "about",
-          "name": "vision_mission",
-          "content": {
-            "IMAGE_KEYWORD": "team,office"
-          }
-        }
-      ],
-      "footer": "modern_dark",
-      "footer_content": {}
+      "htmlContent": "<!DOCTYPE html><html lang='es'>... (tu código para la vista de nosotros) ...</html>"
     }
   ]
 }
 `;
 
-            const userInstruction = `Requerimiento del cliente: "${userPrompt}". 
-Crea la estructura JSON completa (index.html y nosotros.html). Define una paleta de colores profesional. No inventes datos de contacto ni nombres, el servidor Node.js inyectará la información real del cliente.`;
+            const userInstruction = `Crea el sitio para este negocio: "${userPrompt}". 
+Sorpréndeme con un diseño Tailwind asombroso y nunca antes visto. Infiere la historia de la empresa y guárdala en "aboutText". Usa Pollinations para las imágenes. NO pongas productos estáticos, usa el div contenedor.`;
 
             const response = await fetch(this.modelUrl, {
                 method: 'POST',
@@ -148,8 +106,8 @@ Crea la estructura JSON completa (index.html y nosotros.html). Define una paleta
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: userInstruction }
                     ],
-                    temperature: 0.4, // Bajamos temperatura para evitar alucinaciones
-                    max_tokens: 4000, 
+                    temperature: 0.8, // Temperatura alta para máxima creatividad y varianza estructural
+                    max_tokens: 8000, 
                     response_format: { type: "json_object" } 
                 })
             });
@@ -163,70 +121,59 @@ Crea la estructura JSON completa (index.html y nosotros.html). Define una paleta
 
             const aiResponseText = rawData.choices[0].message.content;
             const blueprint = this.extractJSON(aiResponseText);
-            console.log(`[IA Orquestador] Blueprint generado exitosamente. Páginas a crear: ${blueprint.pages.length}`);
+            
+            // =========================================================
+            // PASO 1: GUARDAR LOS DATOS PENSADOS POR LA IA EN LA BD
+            // =========================================================
+            // La IA extrae e inventa textos geniales, LOS GUARDAMOS REALMENTE EN LA BASE DE DATOS
+            // para que el cliente luego pueda ir a configuraciones y verlos/editarlos allí.
+            if (blueprint.extracted_data) {
+                site.content.heroTitle = site.content.heroTitle || blueprint.extracted_data.heroTitle;
+                site.content.heroSubtitle = site.content.heroSubtitle || blueprint.extracted_data.heroSubtitle;
+                site.content.aboutText = site.content.aboutText || blueprint.extracted_data.aboutText;
+            }
+            
+            if (blueprint.theme) {
+                site.primaryColor = blueprint.theme.PRIMARY_COLOR || site.primaryColor;
+                site.secondaryColor = blueprint.theme.SECONDARY_COLOR || site.secondaryColor;
+            }
+
+            await site.save(); // Guardamos los textos y colores en BD ANTES de compilar
 
             // =========================================================
-            // EL COMPILADOR - INYECCIÓN FORZADA DE DATOS REALES (DB)
+            // PASO 2: INYECCIÓN DESDE LA BASE DE DATOS HACIA EL HTML
             // =========================================================
-            // Aquí extraemos los datos que el usuario REALMENTE guardó en la base de datos.
-            // Esto anula cualquier intento de la IA de inventar correos, nombres o teléfonos.
+            // Ahora tomamos la base de datos (con los textos que la IA acaba de aprender/guardar)
+            // y los inyectamos en el HTML salvaje que la IA acaba de construir.
             const realSiteData = {
                 SITE_NAME: site.name || 'Mi Tienda',
-                SITE_INITIAL: site.name ? site.name.charAt(0).toUpperCase() : 'W',
-                HERO_TITLE: site.content?.heroTitle || site.name,
-                HERO_SUBTITLE: site.content?.heroSubtitle || 'Bienvenido a nuestra plataforma',
-                ABOUT_TEXT: site.content?.aboutText || 'Conoce más sobre nuestros servicios.',
-                FOOTER_ABOUT: site.content?.aboutText || site.name,
-                FOOTER_ADDRESS: site.contact?.address || 'Ubicación no especificada',
-                FOOTER_HOURS: site.contact?.schedule || 'Horario a convenir',
-                CONTACT_EMAIL: site.contact?.email || '',
-                CONTACT_WHATSAPP: site.contact?.whatsapp || '',
-                CONTACT_PHONE: site.contact?.phone || site.contact?.whatsapp || '',
-                FACEBOOK_LINK: site.social?.facebook || '#',
-                INSTAGRAM_LINK: site.social?.instagram || '#',
-                TIKTOK_LINK: site.social?.tiktok || '#'
+                HERO_TITLE: site.content?.heroTitle || 'Bienvenido a nuestra plataforma',
+                HERO_SUBTITLE: site.content?.heroSubtitle || 'La mejor calidad para ti.',
+                ABOUT_TEXT: site.content?.aboutText || 'Conoce nuestra historia y nuestra misión.',
+                WHATSAPP: site.contact?.whatsapp || 'No especificado',
+                EMAIL: site.contact?.email || 'No especificado',
+                ADDRESS: site.contact?.address || 'Ubicación no especificada',
+                PRIMARY_COLOR: site.primaryColor,
+                SECONDARY_COLOR: site.secondaryColor
             };
-
-            // Fusionamos: 1. Diseño IA (Colores) -> 2. Textos IA -> 3. Datos Reales DB (Sobrescribe todo)
-            const globalVariables = { ...blueprint.theme, ...blueprint.global_vars, ...realSiteData };
 
             const generatedPagesArray = [];
 
             for (const page of blueprint.pages) {
-                let pageHtml = aiBlocks?.base?.layout || '<html><body>{{NAV_BLOCK}}{{BODY_BLOCKS}}{{FOOTER_BLOCK}}</body></html>';
-                
-                const navTemplate = (aiBlocks?.navs && aiBlocks.navs[page.nav]) ? aiBlocks.navs[page.nav] : (aiBlocks?.navs?.['modern_glass'] || '');
-                pageHtml = pageHtml.replace('{{NAV_BLOCK}}', navTemplate);
-
-                const footerTemplate = (aiBlocks?.footers && aiBlocks.footers[page.footer]) ? aiBlocks.footers[page.footer] : (aiBlocks?.footers?.['modern_dark'] || '');
-                const footerCompiled = this.injectVariables(footerTemplate, { ...page.footer_content, ...globalVariables });
-                pageHtml = pageHtml.replace('{{FOOTER_BLOCK}}', footerCompiled);
-
-                let bodyHtml = '';
-                if (page.blocks && page.blocks.length > 0) {
-                    for (const block of page.blocks) {
-                        if (aiBlocks?.[block.type] && aiBlocks[block.type][block.name]) {
-                            const rawBlockHtml = aiBlocks[block.type][block.name];
-                            // Inyectamos las variables de la IA combinadas con las Reales
-                            const blockVariables = { ...block.content, ...globalVariables };
-                            const compiledBlock = this.injectVariables(rawBlockHtml, blockVariables);
-                            bodyHtml += compiledBlock + '\n';
-                        }
-                    }
+                // Inyectamos el script de Tailwind si la IA lo olvidó en el Head
+                let finalHtml = page.htmlContent;
+                if (!finalHtml.includes('cdn.tailwindcss.com')) {
+                    finalHtml = finalHtml.replace('</head>', '<script src="https://cdn.tailwindcss.com"></script></head>');
                 }
-                pageHtml = pageHtml.replace('{{BODY_BLOCKS}}', bodyHtml);
 
-                const pageSpecificVariables = { ...globalVariables, PAGE_TITLE: page.PAGE_TITLE || 'Página' };
-                pageHtml = this.injectVariables(pageHtml, pageSpecificVariables);
-
-                // Limpieza brutal: Eliminar cualquier {{VARIABLE}} huérfana que no se llenó
-                pageHtml = pageHtml.replace(/{{[A-Z0-9_]+}}/g, '');
+                // Inyectamos las variables de BD
+                finalHtml = this.injectVariables(finalHtml, realSiteData);
 
                 generatedPagesArray.push({
                     filename: page.filename,
-                    htmlContent: pageHtml
+                    htmlContent: finalHtml
                 });
-                console.log(`[IA Compilador] Código HTML preparado: ${page.filename}`);
+                console.log(`[IA Motor Infinito] Código HTML inyectado y preparado: ${page.filename}`);
             }
 
             site.aiGeneratedPages = generatedPagesArray; 
@@ -234,11 +181,11 @@ Crea la estructura JSON completa (index.html y nosotros.html). Define una paleta
             site.aiPrompt = userPrompt;
             await site.save();
 
-            console.log(`[IA Orquestador] 🚀 Construcción completada y blindada con datos reales para Site: ${siteId}`);
-            return { success: true, message: 'Web ensamblada' };
+            console.log(`[IA Orquestador] 🚀 Arquitectura Infinita ensamblada. BD actualizada. HTML inyectado.`);
+            return { success: true, message: 'Web dinámica generada con éxito' };
 
         } catch (error) {
-            console.error(`[IA Orquestador] Falla crítica durante la orquestación:`, error);
+            console.error(`[IA Orquestador] Falla crítica durante la orquestación infinita:`, error);
             return { success: false, error: error.message };
         }
     }

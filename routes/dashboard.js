@@ -1,5 +1,6 @@
 // ==========================================================================
 // EL CEREBRO DE WUEPY - ENRUTADOR DEL PANEL (VERSIÓN API REST DEFINITIVA)
+// ARQUITECTURA BLUEPRINT: RUTAS DE DESTRUCCIÓN Y REGENERACIÓN IA AÑADIDAS
 // ==========================================================================
 
 const express = require('express');
@@ -205,6 +206,9 @@ router.post('/site/:siteId/update-design', ensureStoreOwner, upload.fields([{ na
     }
 });
 
+// 🔥 EL BOTÓN DE LA DESTRUCCIÓN EXPUESTO AL FRONTEND 🔥
+router.post('/site/:siteId/regenerate-ai', ensureStoreOwner, siteController.regenerateAiDesign);
+
 // ==========================================================================
 // 4. FACTURACIÓN Y PAGOS DEL SAAS (DUEÑOS PAGANDO A WUEPY)
 // ==========================================================================
@@ -351,7 +355,6 @@ router.get('/site/:siteId/inventory', ensureSiteAccess, async (req, res) => {
 });
 
 router.post('/inventory/add', ensureSiteAccess, upload.single('image'), async (req, res) => {
-    // CORRECCIÓN INTERNA: Leemos el siteId con soporte robusto para query param (?siteId=...) o body
     const siteId = req.body.siteId || req.query.siteId;
     try {
         const site = await Site.findOne({ _id: siteId });
@@ -376,7 +379,6 @@ router.post('/inventory/add', ensureSiteAccess, upload.single('image'), async (r
 });
 
 router.post('/inventory/edit/:productId', ensureSiteAccess, upload.single('image'), async (req, res) => {
-    // CORRECCIÓN INTERNA: Leemos el siteId de forma híbrida
     const siteId = req.body.siteId || req.query.siteId;
     try {
         const site = await Site.findOne({ _id: siteId });
@@ -401,7 +403,6 @@ router.post('/inventory/edit/:productId', ensureSiteAccess, upload.single('image
 });
 
 router.post('/inventory/delete/:productId', ensureSiteAccess, async (req, res) => {
-    // CORRECCIÓN INTERNA: Leemos el siteId de forma híbrida
     const siteId = req.body.siteId || req.query.siteId;
     try {
         await Product.findOneAndDelete({ _id: req.params.productId, site: siteId });
@@ -439,7 +440,6 @@ router.post('/site/:siteId/pos/checkout', ensureSiteAccess, async (req, res) => 
             customerName, customerPhone, discount, deliveryFee
         } = req.body;
 
-        // Soporte robusto por si el frontend envía un string (FormData) o un Array JSON directo
         let cart = typeof cartData === 'string' ? JSON.parse(cartData) : cartData;
         
         if (!cart || cart.length === 0) return res.status(400).json({ success: false, message: 'El carrito está vacío.' });
