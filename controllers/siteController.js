@@ -1,5 +1,6 @@
 // ==========================================================================
 // WUEPY.COM - CONTROLADOR CENTRAL DEL SITIO (VERSIÓN API REST)
+// ARQUITECTURA BLUEPRINT: MODO ESQUELETO Y NAVEGACIÓN MULTIPÁGINA IA
 // ==========================================================================
 const path = require('path');
 const Site = require('../models/Site');
@@ -88,11 +89,9 @@ module.exports = {
             // =========================================================
             // 🔥 ACTIVACIÓN DEL ORQUESTADOR IA (DEEPSEEK) 🔥
             // =========================================================
-            // Quitamos la restricción del plan básico para que puedas hacer pruebas tranquilo
             if (newSite.designMode === 'ai_generated' && newSite.aiPrompt) {
                 console.log(`[API Wuepy] 🧠 Despertando a DeepSeek para la tienda: ${newSite.subdomain}`);
                 
-                // El servidor se queda "congelado" aquí esperando a que la IA termine de crear los HTMLs
                 const aiResult = await agentAiService.orquestarDisenoWeb(newSite._id, newSite.aiPrompt);
                 
                 if (!aiResult.success) {
@@ -180,6 +179,30 @@ module.exports = {
             const cleanWhatsapp = whatsapp ? whatsapp.replace(/[^0-9]/g, '') : '';
             const isShowInMarketplace = showInMarketplace === 'on' || showInMarketplace === true || showInMarketplace === 'true';
 
+            // =========================================================
+            // 🔄 SINCRONIZACIÓN AUTOMÁTICA DE DATOS EN PLANTILLA IA
+            // =========================================================
+            // Si el sitio fue hecho con IA, interceptamos los cambios y limpiamos el HTML viejo
+            if (site.designMode === 'ai_generated' && site.aiGeneratedPages && site.aiGeneratedPages.length > 0) {
+                const oldWhatsapp = site.contact?.whatsapp || '';
+                const oldEmail = site.contact?.email || '';
+                const oldAddress = site.contact?.address || '';
+                const oldPrimary = site.primaryColor || '#3b82f6';
+                const oldSecondary = site.secondaryColor || '#1e293b';
+                const oldName = site.name || '';
+
+                site.aiGeneratedPages = site.aiGeneratedPages.map(page => {
+                    let html = page.htmlContent;
+                    if (oldWhatsapp && cleanWhatsapp) html = html.split(oldWhatsapp).join(cleanWhatsapp);
+                    if (oldEmail && contactEmail) html = html.split(oldEmail).join(contactEmail);
+                    if (oldAddress && address) html = html.split(oldAddress).join(address);
+                    if (oldPrimary && primaryColor) html = html.split(oldPrimary).join(primaryColor);
+                    if (oldSecondary && secondaryColor) html = html.split(oldSecondary).join(secondaryColor);
+                    if (oldName && name) html = html.split(oldName).join(name);
+                    return { filename: page.filename, htmlContent: html };
+                });
+            }
+
             site.name = name;
             site.template = template;
             site.showInMarketplace = isShowInMarketplace; 
@@ -249,18 +272,32 @@ module.exports = {
 
             await Site.updateOne({ _id: site._id }, { $inc: { views: 1 } });
 
-            // 🔥 MAGIA DE LA IA: Si el sitio tiene diseño generado, enviamos el HTML desde la base de datos
+            // =========================================================
+            // 🔥 MAGIA DE LA IA: DETECCIÓN Y RENDERIZACIÓN MULTIPÁGINA
+            // =========================================================
             if (site.designMode === 'ai_generated' && site.aiGeneratedPages && site.aiGeneratedPages.length > 0) {
+                // Buscamos si el frontend solicita una página específica (ej: ?page=nosotros.html)
+                // Si no se especifica ninguna, enviamos por defecto 'index.html'
+                const requestedPageName = req.query.page || 'index.html';
+                let targetPage = site.aiGeneratedPages.find(p => p.filename === requestedPageName);
+                
+                // Fallback de seguridad por si piden una página que no se generó
+                if (!targetPage) {
+                    targetPage = site.aiGeneratedPages.find(p => p.filename === 'index.html');
+                }
+
                 return res.status(200).json({
                     success: true,
                     isAiGenerated: true,
-                    aiPages: site.aiGeneratedPages, // 🟢 NUEVO: Enviamos directamente el array con el HTML
+                    activePage: targetPage.filename,
+                    htmlContent: targetPage.htmlContent, // Enviamos el HTML específico solicitado
+                    aiPages: site.aiGeneratedPages, // Enviamos también todo el array por si el front hace pre-fetch
                     site,
                     message: 'Esta tienda es servida por la Bóveda IA de Wuepy directamente desde la Base de Datos'
                 });
             }
 
-            // Si es una tienda normal, cargamos sus productos
+            // Si es una tienda normal con plantilla tradicional, cargamos sus productos
             const products = await Product.find({ site: site._id, isActive: { $ne: false } })
                                           .sort({ createdAt: -1 })
                                           .limit(12).lean();

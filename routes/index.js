@@ -1,5 +1,6 @@
 // ==========================================================================
 // RUTAS PÚBLICAS: ENRUTADOR INTELIGENTE API (Marketplace Global + Tiendas)
+// ARQUITECTURA BLUEPRINT: CAPTURA Y ENRUTAMIENTO MULTIPÁGINA DINÁMICO IA
 // ==========================================================================
 const express = require('express');
 const router = express.Router();
@@ -128,6 +129,21 @@ router.get('/p/:id', async (req, res) => {
             message: 'Error interno del servidor al procesar el producto.' 
         });
     }
+});
+
+// ==========================================================================
+// 4. CAPTURADOR COMODÍN MULTIPÁGINA PARA SUBDOMINIOS IA (Ej: /nosotros.html)
+// ==========================================================================
+router.get('/:pageName', async (req, res, next) => {
+    // Si la petición no ocurre en el dominio principal y tiene un subdominio activo
+    if (!req.isMainDomain && req.subdomainName) {
+        console.log(`[Rutas Wuepy] 🧭 Detectada navegación interna en subdominio para la página: ${req.params.pageName}`);
+        // Mapeamos el parámetro de la URL hacia el query string para el controlador
+        req.query.page = req.params.pageName;
+        return siteController.renderStoreHome(req, res);
+    }
+    // Si es el dominio principal, dejamos que continúe el flujo normal o el manejador de errores 404
+    next();
 });
 
 module.exports = router;

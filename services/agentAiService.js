@@ -1,6 +1,6 @@
 // ==========================================================================
 // WUEPY.COM - EL CEREBRO ORQUESTADOR IA (DeepSeek V4/V3 via DeepInfra)
-// ARQUITECTURA BLUEPRINT: La IA diseña el JSON, Node.js ensambla los bloques.
+// ARQUITECTURA BLUEPRINT: MODO ESQUELETO (Inyección de Datos Reales)
 // ==========================================================================
 const path = require('path');
 const Site = require('../models/Site');
@@ -10,11 +10,9 @@ class AgentAiService {
     constructor() {
         this.apiKey = process.env.DEEPINFRA_API_KEY;
         this.modelUrl = 'https://api.deepinfra.com/v1/openai/chat/completions';
-        // Usamos el modelo más rápido y potente que configuraste
         this.modelName = process.env.DEEPINFRA_MODEL || 'deepseek-ai/DeepSeek-V3';
     }
 
-    // Función auxiliar para extraer JSON puro si la IA decide agregar texto extra o Markdown
     extractJSON(text) {
         try {
             const start = text.indexOf('{');
@@ -28,16 +26,15 @@ class AgentAiService {
         }
     }
 
-    // Función que inyecta variables como {{TITULO}} en el texto del bloque
     injectVariables(template, variables) {
         if (!template) return '';
         let compiled = template;
         
-        // Iterar el objeto para reemplazar variables
         for (const [key, value] of Object.entries(variables)) {
-            // Reemplaza globalmente todas las coincidencias de {{VARIABLE}}
+            // Reemplaza globalmente todas las coincidencias, manejando undefined o null
+            const safeValue = value !== undefined && value !== null ? value : '';
             const regex = new RegExp(`{{${key}}}`, 'g');
-            compiled = compiled.replace(regex, value);
+            compiled = compiled.replace(regex, safeValue);
         }
         return compiled;
     }
@@ -49,11 +46,6 @@ class AgentAiService {
             const site = await Site.findById(siteId);
             if (!site) throw new Error("Sitio no encontrado en la base de datos.");
 
-            // =========================================================
-            // 1. EXTRAER INVENTARIO DE BLOQUES PARA LA IA
-            // =========================================================
-            // Le pasamos a la IA la lista de piezas que tenemos en la bóveda
-            // para que ella sepa qué puede elegir. BLINDADO contra undefined.
             const availableNavs = Object.keys(aiBlocks?.navs || {}).join(', ');
             const availableHeros = Object.keys(aiBlocks?.heros || {}).join(', ');
             const availableProducts = Object.keys(aiBlocks?.products || {}).join(', ');
@@ -65,22 +57,23 @@ class AgentAiService {
             const availableFooters = Object.keys(aiBlocks?.footers || {}).join(', ');
 
             // =========================================================
-            // 2. EL PROMPT MAESTRO (EL CEREBRO ARQUITECTO)
+            // EL PROMPT MAESTRO (REESCRITO PARA MODO ESQUELETO Y DISEÑO)
             // =========================================================
             const systemPrompt = `
-Eres el "Arquitecto IA Master" de Wuepy, experto en UX/UI, marketing digital y e-commerce.
-Tu misión no es escribir HTML directamente, sino diseñar un "Blueprint" (plano en formato JSON) de un sitio web completo multi-página basándote en la idea del cliente.
+Eres el "Arquitecto IA Master" de Wuepy, experto en UX/UI y diseño de estructuras web.
+Tu misión es diseñar un "Blueprint" (plano JSON) para el sitio web del cliente.
 
-INSTRUCCIONES ESTRICTAS:
-1. DEBES DEVOLVER ÚNICAMENTE UN OBJETO JSON VÁLIDO. Ni una palabra más. Sin explicaciones.
-2. Analiza el nicho del negocio del cliente y decide la paleta de colores (en HEX), la tipografía y los textos persuasivos.
-3. Debes crear al menos 3 páginas si aplica: "index.html" (Inicio), "nosotros.html" (Historia/Misión) y "contacto.html" o "faq.html".
-4. Para cada página, elige los bloques disponibles que mejor encajen y proporciona los textos para sus variables.
+REGLAS ESTRICTAS DE SUPERVIVENCIA (MODO ESQUELETO):
+1. ERES UN CREADOR DE PLANTILLAS Y DISEÑO, NO DE DATOS FALSOS.
+2. PROHIBIDO INVENTAR: No inventes correos electrónicos, ubicaciones, teléfonos ni nombres de empresas. El sistema inyectará los datos reales del usuario de forma automática.
+3. PROHIBIDO INVENTAR PRODUCTOS: Si decides usar el bloque de productos, trátalo solo como un contenedor visual (esqueleto). Los productos reales se cargarán dinámicamente desde la base de datos.
+4. IMÁGENES EXACTAS: Usa keywords en inglés para Unsplash que sean elegantes, hiper-precisas al nicho y profesionales (ej: "minimalist,coffee", "dark,tech,workspace", "fashion,boutique"). NADA de imágenes raras o abstractas.
+5. DEBES DEVOLVER ÚNICAMENTE UN OBJETO JSON VÁLIDO. Cero texto, cero explicaciones.
 
 BLOQUES DISPONIBLES EN LA BÓVEDA:
 - Navs: ${availableNavs}
 - Heros: ${availableHeros}
-- Products: ${availableProducts} (ÚSALO SOLO EN EL INDEX.HTML)
+- Products: ${availableProducts} (Úsalo solo como contenedor estructural en index.html)
 - Features: ${availableFeatures}
 - About: ${availableAbout}
 - Testimonials: ${availableTestimonials}
@@ -93,14 +86,12 @@ ESTRUCTURA EXACTA DEL JSON QUE DEBES DEVOLVER:
   "theme": {
     "PRIMARY_COLOR": "#codigohex",
     "SECONDARY_COLOR": "#codigohex",
-    "BG_COLOR": "#ffffff o #0f172a (según el tono)",
+    "BG_COLOR": "#ffffff o #0f172a",
     "TEXT_COLOR": "#1e293b o #f8fafc",
     "FONT_FAMILY": "Inter, Roboto, Poppins, etc"
   },
   "global_vars": {
-    "SITE_NAME": "Nombre de la tienda (invéntalo si no lo dice)",
-    "SITE_INITIAL": "Inicial del nombre",
-    "SITE_DESCRIPTION": "Breve descripción SEO"
+    "SITE_DESCRIPTION": "Breve descripción persuasiva y genérica sobre el rubro (SEO)"
   },
   "pages": [
     {
@@ -113,44 +104,38 @@ ESTRUCTURA EXACTA DEL JSON QUE DEBES DEVOLVER:
           "name": "split_image",
           "content": {
             "HERO_BADGE": "NUEVA COLECCIÓN",
-            "HERO_TITLE": "Título persuasivo",
-            "HERO_SUBTITLE": "Subtítulo llamativo",
             "HERO_CTA1": "Ver Catálogo",
             "HERO_CTA2": "Conócenos",
-            "IMAGE_KEYWORD": "palabra clave en inglés para Unsplash ej: makeup, cars, clothes"
-          }
-        },
-        {
-          "type": "products",
-          "name": "modern_grid",
-          "content": {
-            "CATALOG_TITLE": "Nuestros Productos",
-            "CATALOG_SUBTITLE": "Lo mejor de lo mejor"
+            "IMAGE_KEYWORD": "clothing,store"
           }
         }
       ],
       "footer": "modern_dark",
-      "footer_content": {
-        "FOOTER_ABOUT": "Texto sobre la empresa en el footer",
-        "FOOTER_ADDRESS": "Ciudad, País",
-        "FOOTER_HOURS": "Lunes a Sábado 08:00 - 18:00"
-      }
+      "footer_content": {}
+    },
+    {
+      "filename": "nosotros.html",
+      "PAGE_TITLE": "Nosotros",
+      "nav": "modern_glass",
+      "blocks": [
+        {
+          "type": "about",
+          "name": "vision_mission",
+          "content": {
+            "IMAGE_KEYWORD": "team,office"
+          }
+        }
+      ],
+      "footer": "modern_dark",
+      "footer_content": {}
     }
   ]
 }
-
-REGLAS DE ORO:
-- INVENTA textos profesionales y persuasivos (Copywriting nivel experto).
-- Adapta los keywords de Unsplash al nicho (ej. si es repuestos, usa "car,engine").
-- Asegúrate de que las variables en "content" cubran todas las necesidades lógicas del bloque.
 `;
 
             const userInstruction = `Requerimiento del cliente: "${userPrompt}". 
-Crea la estructura JSON completa, con colores que encajen con este rubro, crea el index.html y al menos un nosotros.html. Sé creativo con el Copywriting.`;
+Crea la estructura JSON completa (index.html y nosotros.html). Define una paleta de colores profesional. No inventes datos de contacto ni nombres, el servidor Node.js inyectará la información real del cliente.`;
 
-            // =========================================================
-            // 3. LLAMADA DEEPINFRA (Alta velocidad y bajo costo)
-            // =========================================================
             const response = await fetch(this.modelUrl, {
                 method: 'POST',
                 headers: {
@@ -163,9 +148,8 @@ Crea la estructura JSON completa, con colores que encajen con este rubro, crea e
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: userInstruction }
                     ],
-                    temperature: 0.7,
+                    temperature: 0.4, // Bajamos temperatura para evitar alucinaciones
                     max_tokens: 4000, 
-                    // Si DeepInfra soporta response_format para JSON lo forzamos
                     response_format: { type: "json_object" } 
                 })
             });
@@ -178,78 +162,80 @@ Crea la estructura JSON completa, con colores que encajen con este rubro, crea e
             }
 
             const aiResponseText = rawData.choices[0].message.content;
-            
-            // =========================================================
-            // 4. PARSEO DEL BLUEPRINT (El plano del arquitecto)
-            // =========================================================
             const blueprint = this.extractJSON(aiResponseText);
             console.log(`[IA Orquestador] Blueprint generado exitosamente. Páginas a crear: ${blueprint.pages.length}`);
 
-            // Combinamos las variables globales (colores, fuentes, nombre) para inyectarlas en todas partes
-            const globalVariables = { ...blueprint.theme, ...blueprint.global_vars };
+            // =========================================================
+            // EL COMPILADOR - INYECCIÓN FORZADA DE DATOS REALES (DB)
+            // =========================================================
+            // Aquí extraemos los datos que el usuario REALMENTE guardó en la base de datos.
+            // Esto anula cualquier intento de la IA de inventar correos, nombres o teléfonos.
+            const realSiteData = {
+                SITE_NAME: site.name || 'Mi Tienda',
+                SITE_INITIAL: site.name ? site.name.charAt(0).toUpperCase() : 'W',
+                HERO_TITLE: site.content?.heroTitle || site.name,
+                HERO_SUBTITLE: site.content?.heroSubtitle || 'Bienvenido a nuestra plataforma',
+                ABOUT_TEXT: site.content?.aboutText || 'Conoce más sobre nuestros servicios.',
+                FOOTER_ABOUT: site.content?.aboutText || site.name,
+                FOOTER_ADDRESS: site.contact?.address || 'Ubicación no especificada',
+                FOOTER_HOURS: site.contact?.schedule || 'Horario a convenir',
+                CONTACT_EMAIL: site.contact?.email || '',
+                CONTACT_WHATSAPP: site.contact?.whatsapp || '',
+                CONTACT_PHONE: site.contact?.phone || site.contact?.whatsapp || '',
+                FACEBOOK_LINK: site.social?.facebook || '#',
+                INSTAGRAM_LINK: site.social?.instagram || '#',
+                TIKTOK_LINK: site.social?.tiktok || '#'
+            };
 
-            // NUEVO: Array para almacenar las páginas en memoria y luego guardarlas en la BD
+            // Fusionamos: 1. Diseño IA (Colores) -> 2. Textos IA -> 3. Datos Reales DB (Sobrescribe todo)
+            const globalVariables = { ...blueprint.theme, ...blueprint.global_vars, ...realSiteData };
+
             const generatedPagesArray = [];
 
-            // =========================================================
-            // 5. EL COMPILADOR (El Constructor Node.js)
-            // =========================================================
             for (const page of blueprint.pages) {
-                let pageHtml = aiBlocks?.base?.layout || '<html><body>{{NAV_BLOCK}}{{BODY_BLOCKS}}{{FOOTER_BLOCK}}</body></html>'; // Toma el esqueleto base con fallback
+                let pageHtml = aiBlocks?.base?.layout || '<html><body>{{NAV_BLOCK}}{{BODY_BLOCKS}}{{FOOTER_BLOCK}}</body></html>';
                 
-                // 5.1. Construir el Nav
                 const navTemplate = (aiBlocks?.navs && aiBlocks.navs[page.nav]) ? aiBlocks.navs[page.nav] : (aiBlocks?.navs?.['modern_glass'] || '');
                 pageHtml = pageHtml.replace('{{NAV_BLOCK}}', navTemplate);
 
-                // 5.2. Construir el Footer
                 const footerTemplate = (aiBlocks?.footers && aiBlocks.footers[page.footer]) ? aiBlocks.footers[page.footer] : (aiBlocks?.footers?.['modern_dark'] || '');
-                const footerCompiled = this.injectVariables(footerTemplate, page.footer_content || {});
+                const footerCompiled = this.injectVariables(footerTemplate, { ...page.footer_content, ...globalVariables });
                 pageHtml = pageHtml.replace('{{FOOTER_BLOCK}}', footerCompiled);
 
-                // 5.3. Ensamblar el Body (Cuerpo de la página)
                 let bodyHtml = '';
                 if (page.blocks && page.blocks.length > 0) {
                     for (const block of page.blocks) {
-                        // Verifica si el bloque existe en nuestra bóveda
                         if (aiBlocks?.[block.type] && aiBlocks[block.type][block.name]) {
                             const rawBlockHtml = aiBlocks[block.type][block.name];
-                            // Inyecta los textos persuasivos redactados por DeepSeek
-                            const compiledBlock = this.injectVariables(rawBlockHtml, block.content || {});
+                            // Inyectamos las variables de la IA combinadas con las Reales
+                            const blockVariables = { ...block.content, ...globalVariables };
+                            const compiledBlock = this.injectVariables(rawBlockHtml, blockVariables);
                             bodyHtml += compiledBlock + '\n';
-                        } else {
-                            console.warn(`[IA Advertencia] La IA intentó usar un bloque inexistente: ${block.type}.${block.name}`);
                         }
                     }
                 }
                 pageHtml = pageHtml.replace('{{BODY_BLOCKS}}', bodyHtml);
 
-                // 5.4. Inyectar variables globales y variables de página en TODO el HTML
                 const pageSpecificVariables = { ...globalVariables, PAGE_TITLE: page.PAGE_TITLE || 'Página' };
                 pageHtml = this.injectVariables(pageHtml, pageSpecificVariables);
 
-                // 5.5. Limpieza final: Eliminar cualquier {{VARIABLE}} que la IA olvidó llenar
+                // Limpieza brutal: Eliminar cualquier {{VARIABLE}} huérfana que no se llenó
                 pageHtml = pageHtml.replace(/{{[A-Z0-9_]+}}/g, '');
 
-                // 5.6. NUEVO: Guardar en el array para inyectarlo en la base de datos (ya no en archivo físico)
                 generatedPagesArray.push({
                     filename: page.filename,
                     htmlContent: pageHtml
                 });
-                console.log(`[IA Compilador] Código HTML preparado para la BD: ${page.filename}`);
+                console.log(`[IA Compilador] Código HTML preparado: ${page.filename}`);
             }
 
-            // =========================================================
-            // 6. ACTUALIZAR BASE DE DATOS
-            // =========================================================
-            site.aiGeneratedPages = generatedPagesArray; // Asignamos todo el HTML a la BD
-            site.designMode = 'ai_generated'; // Marca que fue hecho por la IA
+            site.aiGeneratedPages = generatedPagesArray; 
+            site.designMode = 'ai_generated'; 
             site.aiPrompt = userPrompt;
-            site.customHtmlFolder = ''; // Dejamos vacío por retrocompatibilidad, ya no se usa carpeta
             await site.save();
 
-            console.log(`[IA Orquestador] 🚀 Construcción completada al 100% y guardada en BD para Site: ${siteId}`);
-            
-            return { success: true, message: 'Web ensamblada y guardada directamente en la base de datos' };
+            console.log(`[IA Orquestador] 🚀 Construcción completada y blindada con datos reales para Site: ${siteId}`);
+            return { success: true, message: 'Web ensamblada' };
 
         } catch (error) {
             console.error(`[IA Orquestador] Falla crítica durante la orquestación:`, error);
