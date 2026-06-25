@@ -2,7 +2,6 @@
 // WUEPY.COM - EL CEREBRO ORQUESTADOR IA (DeepSeek V4/V3 via DeepInfra)
 // ARQUITECTURA BLUEPRINT: La IA diseña el JSON, Node.js ensambla los bloques.
 // ==========================================================================
-const fs = require('fs').promises;
 const path = require('path');
 const Site = require('../models/Site');
 const aiBlocks = require('./ai/aiBlocks'); // Nuestra bóveda de componentes
@@ -34,7 +33,7 @@ class AgentAiService {
         if (!template) return '';
         let compiled = template;
         
-        // CORRECCIÓN APLICADA: 'of' en lugar de '||' para iterar el objeto
+        // Iterar el objeto para reemplazar variables
         for (const [key, value] of Object.entries(variables)) {
             // Reemplaza globalmente todas las coincidencias de {{VARIABLE}}
             const regex = new RegExp(`{{${key}}}`, 'g');
@@ -189,9 +188,8 @@ Crea la estructura JSON completa, con colores que encajen con este rubro, crea e
             // Combinamos las variables globales (colores, fuentes, nombre) para inyectarlas en todas partes
             const globalVariables = { ...blueprint.theme, ...blueprint.global_vars };
 
-            // Definimos la carpeta exclusiva de este cliente
-            const frontendPath = path.join(__dirname, '../../wuepy-frontend/views/templates/ai_stores', siteId.toString());
-            await fs.mkdir(frontendPath, { recursive: true });
+            // NUEVO: Array para almacenar las páginas en memoria y luego guardarlas en la BD
+            const generatedPagesArray = [];
 
             // =========================================================
             // 5. EL COMPILADOR (El Constructor Node.js)
@@ -232,23 +230,26 @@ Crea la estructura JSON completa, con colores que encajen con este rubro, crea e
                 // 5.5. Limpieza final: Eliminar cualquier {{VARIABLE}} que la IA olvidó llenar
                 pageHtml = pageHtml.replace(/{{[A-Z0-9_]+}}/g, '');
 
-                // 5.6. Guardar archivo físico (ej: index.html, nosotros.html)
-                const filePath = path.join(frontendPath, page.filename);
-                await fs.writeFile(filePath, pageHtml, 'utf-8');
-                console.log(`[IA Compilador] Archivo creado: ${page.filename}`);
+                // 5.6. NUEVO: Guardar en el array para inyectarlo en la base de datos (ya no en archivo físico)
+                generatedPagesArray.push({
+                    filename: page.filename,
+                    htmlContent: pageHtml
+                });
+                console.log(`[IA Compilador] Código HTML preparado para la BD: ${page.filename}`);
             }
 
             // =========================================================
-            // 6. ACTUALIZAR BASE DE DATOS Y ENRUTADOR
+            // 6. ACTUALIZAR BASE DE DATOS
             // =========================================================
-            site.customHtmlFolder = `views/templates/ai_stores/${siteId}`;
+            site.aiGeneratedPages = generatedPagesArray; // Asignamos todo el HTML a la BD
             site.designMode = 'ai_generated'; // Marca que fue hecho por la IA
             site.aiPrompt = userPrompt;
+            site.customHtmlFolder = ''; // Dejamos vacío por retrocompatibilidad, ya no se usa carpeta
             await site.save();
 
-            console.log(`[IA Orquestador] 🚀 Construcción completada al 100% para Site: ${siteId}`);
+            console.log(`[IA Orquestador] 🚀 Construcción completada al 100% y guardada en BD para Site: ${siteId}`);
             
-            return { success: true, folder: site.customHtmlFolder, message: 'Web ensamblada correctamente' };
+            return { success: true, message: 'Web ensamblada y guardada directamente en la base de datos' };
 
         } catch (error) {
             console.error(`[IA Orquestador] Falla crítica durante la orquestación:`, error);

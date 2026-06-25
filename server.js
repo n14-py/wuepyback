@@ -8,6 +8,7 @@ const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const cors = require('cors'); 
+const path = require('path'); // 🟢 AGREGADO: Necesario para gestionar las rutas de los archivos
 
 // 1. CARGAR CONFIGURACIÓN DE ENTORNO
 dotenv.config();
@@ -34,6 +35,16 @@ app.use(cors({
 
 app.use(express.json({ limit: '50mb' })); 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// 🟢 NUEVO: SERVIR LOS ARCHIVOS GENERADOS POR LA IA (EL PUENTE AL FRONTEND)
+// Como el backend es quien crea físicamente los HTML, Cloudflare no los tiene.
+// Exponemos esta carpeta estáticamente para que el Iframe pueda consumirlos directamente de la API.
+app.use('/views/templates/ai_stores', express.static(path.join(__dirname, '../wuepy-frontend/views/templates/ai_stores'), {
+    setHeaders: (res, path, stat) => {
+        res.set('Access-Control-Allow-Origin', '*'); // Permite que el iframe de tu frontend lo lea sin bloqueos
+        res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    }
+}));
 
 // --- SISTEMA DE SESIONES DE ALTO RENDIMIENTO ---
 app.use(session({

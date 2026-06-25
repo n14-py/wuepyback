@@ -87,7 +87,13 @@ const siteSchema = new mongoose.Schema({
     // --- IA Y MOTOR DE DISEÑO (Orquestador Gemma) ---
     designMode: { type: String, enum: ['template', 'ai_generated'], default: 'template' },
     aiPrompt: { type: String, default: '' },
-    customHtmlFolder: { type: String, default: '' }, // Para buscar vistas generadas por IA
+    customHtmlFolder: { type: String, default: '' }, // Se mantiene por retrocompatibilidad
+    
+    // NUEVO CAMPO: Aquí guardaremos el código HTML generado por la IA directamente en la BD
+    aiGeneratedPages: [{
+        filename: { type: String, required: true }, // Ej: 'index.html', 'nosotros.html'
+        htmlContent: { type: String, required: true } // El código HTML completo
+    }],
     
     // --- CONFIGURACIÓN VISUAL DIRECTA (Si usa 'template') ---
     template: { type: String, default: 'template1' },

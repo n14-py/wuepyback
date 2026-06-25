@@ -249,14 +249,14 @@ module.exports = {
 
             await Site.updateOne({ _id: site._id }, { $inc: { views: 1 } });
 
-            // 🔥 MAGIA DE LA IA: Si el sitio tiene diseño generado, le decimos al frontend que cargue esa carpeta
-            if (site.designMode === 'ai_generated' && site.customHtmlFolder) {
+            // 🔥 MAGIA DE LA IA: Si el sitio tiene diseño generado, enviamos el HTML desde la base de datos
+            if (site.designMode === 'ai_generated' && site.aiGeneratedPages && site.aiGeneratedPages.length > 0) {
                 return res.status(200).json({
                     success: true,
                     isAiGenerated: true,
-                    aiFolder: site.customHtmlFolder,
+                    aiPages: site.aiGeneratedPages, // 🟢 NUEVO: Enviamos directamente el array con el HTML
                     site,
-                    message: 'Esta tienda es servida por la Bóveda IA de Wuepy'
+                    message: 'Esta tienda es servida por la Bóveda IA de Wuepy directamente desde la Base de Datos'
                 });
             }
 
