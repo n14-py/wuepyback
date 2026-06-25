@@ -64,7 +64,7 @@ class AgentAiService {
                             { role: 'user', content: userPrompt }
                         ],
                         temperature: 0.9,
-                        max_tokens: 3000, // Reducido porque solo pedimos texto, ahorra muchísimo dinero y tiempo
+                        max_tokens: 3000, 
                         response_format: { type: "json_object" }
                     })
                 });
@@ -118,11 +118,18 @@ NO ESCRIBAS CÓDIGO HTML. Solo devuelve un objeto JSON estricto con los siguient
             const aiResponseText = await this.callAIWithRetry(systemPrompt, `Idea del cliente: "${userPrompt}"`);
             const aiData = this.extractJSON(aiResponseText);
 
-            // Guardamos la inteligencia generada en la BD
+            const chosenColor = aiData.design?.tailwindColor || 'blue-600';
+
+            // =========================================================
+            // 🔥 SOLUCIÓN CRÍTICA AL BUG DE LA PLANTILLA 1 Y EL COLOR 🔥
+            // =========================================================
+            // Obligamos a la BD a guardar el color que eligió la IA para que api.js
+            // lo herede al renderizar product.html y el catálogo.
+            site.primaryColor = chosenColor;
+            
             site.content.heroTitle = aiData.copy?.heroTitle || site.content.heroTitle;
             site.content.heroSubtitle = aiData.copy?.heroSubtitle || site.content.heroSubtitle;
             site.content.aboutText = aiData.copy?.aboutText || site.content.aboutText;
-            const chosenColor = aiData.design?.tailwindColor || 'blue-600';
 
             await site.save();
 
