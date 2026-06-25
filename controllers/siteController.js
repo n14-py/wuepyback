@@ -315,7 +315,6 @@ module.exports = {
                     targetPage = site.aiGeneratedPages.find(p => p.filename === 'index.html');
                 }
 
-                // 🟢 SOLUCIÓN: BUSCAMOS LOS PRODUCTOS IGUAL QUE EN EL MODO CLÁSICO Y LOS MANDAMOS AL FRONTEND
                 const products = await Product.find({ site: site._id, isActive: { $ne: false } })
                                               .sort({ createdAt: -1 })
                                               .limit(12).lean();
@@ -329,13 +328,13 @@ module.exports = {
                     htmlContent: targetPage.htmlContent,
                     aiPages: site.aiGeneratedPages, 
                     site,
-                    products,    // <- PRODUCTOS LISTOS PARA EL INYECTOR DEL FRONTEND
-                    categories,  // <- CATEGORÍAS LISTAS
-                    message: 'Esta tienda es servida por la Bóveda IA de Wuepy directamente desde la Base de Datos'
+                    products,    
+                    categories,  
+                    message: 'Esta tienda es servida por la Bóveda IA de Wuepy'
                 });
             }
 
-            // Si es una tienda normal con plantilla tradicional, cargamos sus productos
+            // MODO CLÁSICO
             const products = await Product.find({ site: site._id, isActive: { $ne: false } })
                                           .sort({ createdAt: -1 })
                                           .limit(12).lean();
@@ -380,8 +379,30 @@ module.exports = {
                 isActive: { $ne: false }
             }).limit(4).lean();
 
+            // =========================================================
+            // 🔥 SOLUCIÓN CRÍTICA: ENVIAR PLANTILLA product.html AL FRONTEND 🔥
+            // =========================================================
+            if (site.designMode === 'ai_generated' && site.aiGeneratedPages && site.aiGeneratedPages.length > 0) {
+                let targetPage = site.aiGeneratedPages.find(p => p.filename === 'product.html');
+                
+                // Si por alguna razón la IA falló y no existe product.html, forzamos el index como fallback para que no crashee
+                if (!targetPage) targetPage = site.aiGeneratedPages.find(p => p.filename === 'index.html');
+
+                return res.status(200).json({
+                    success: true,
+                    isAiGenerated: true,
+                    activePage: 'product.html',
+                    htmlContent: targetPage ? targetPage.htmlContent : '',
+                    site,
+                    product,
+                    related
+                });
+            }
+
+            // MODO CLÁSICO
             return res.status(200).json({
                 success: true,
+                isAiGenerated: false,
                 site,
                 product,
                 related
@@ -416,8 +437,31 @@ module.exports = {
             const products = await Product.find(filter).sort({ createdAt: -1 }).lean();
             const categories = await Product.distinct('category', { site: site._id, isActive: { $ne: false } });
 
+            // =========================================================
+            // 🔥 SOLUCIÓN CRÍTICA: ENVIAR PLANTILLA catalogo.html AL FRONTEND 🔥
+            // =========================================================
+            if (site.designMode === 'ai_generated' && site.aiGeneratedPages && site.aiGeneratedPages.length > 0) {
+                let targetPage = site.aiGeneratedPages.find(p => p.filename === 'catalogo.html');
+                
+                if (!targetPage) targetPage = site.aiGeneratedPages.find(p => p.filename === 'index.html');
+
+                return res.status(200).json({
+                    success: true,
+                    isAiGenerated: true,
+                    activePage: 'catalogo.html',
+                    htmlContent: targetPage ? targetPage.htmlContent : '',
+                    site,
+                    products,
+                    categories,
+                    searchQuery: query,
+                    currentCategory: category
+                });
+            }
+
+            // MODO CLÁSICO
             return res.status(200).json({
                 success: true,
+                isAiGenerated: false,
                 site,
                 products,
                 categories,
