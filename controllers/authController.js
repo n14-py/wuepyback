@@ -4,6 +4,7 @@
 const passport = require('passport');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const Site = require('../models/Site'); // <-- AGREGADO PARA PROGRAMA DE REFERIDOS
 const jwt = require('jsonwebtoken'); // <-- AGREGADO PARA SOPORTE MÓVIL (TOKEN)
 
 module.exports = {
@@ -12,7 +13,7 @@ module.exports = {
     // ==========================================
     postRegister: async (req, res) => {
         try {
-            const { name, email, password, confirmPassword } = req.body;
+            const { name, email, password, confirmPassword, referredBy } = req.body;
 
             // Validaciones básicas
             if (!name || !email || !password) {
@@ -39,7 +40,7 @@ module.exports = {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
 
-            // Crear el nuevo usuario (CORREGIDO PARA QUE COINCIDA CON TU MODELO USER.JS)
+            // Crear el nuevo usuario
             const newUser = new User({ 
                 name: name.trim(), 
                 email: emailClean, 
@@ -49,6 +50,29 @@ module.exports = {
             });
 
             await newUser.save();
+
+            // =========================================================
+            // 🔥 PROGRAMA "INVITA Y GANA": PREMIAR AL REFERIDOR 🔥
+            // =========================================================
+            if (referredBy && referredBy.length === 24) { // Validar que sea un ObjectId válido de Mongoose
+                try {
+                    // Buscamos la tienda más antigua (principal) del referidor
+                    const referrerSite = await Site.findOne({ owner: referredBy }).sort({ createdAt: 1 });
+                    
+                    if (referrerSite) {
+                        // Limitar el bono máximo a 30 días (10 amigos * 3 días)
+                        const currentBonus = referrerSite.bonusDays || 0;
+                        if (currentBonus < 30) {
+                            referrerSite.bonusDays = currentBonus + 3;
+                            await referrerSite.save();
+                            console.log(`[Invita y Gana] 🎉 3 días otorgados a la tienda: ${referrerSite.subdomain}`);
+                        }
+                    }
+                } catch (refError) {
+                    console.error('[Invita y Gana] Error al procesar referido:', refError);
+                    // Silenciamos el error para no arruinar la experiencia de registro del nuevo usuario
+                }
+            }
 
             return res.status(201).json({ 
                 success: true, 

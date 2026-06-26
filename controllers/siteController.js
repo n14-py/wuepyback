@@ -43,9 +43,18 @@ module.exports = {
 
             const cleanWhatsapp = whatsapp ? whatsapp.replace(/[^0-9]/g, '') : '';
 
-            // 1 mes de prueba gratis automático
-            const trialEndDate = new Date();
+            // Verificar cuántos sitios tiene el usuario para otorgar el trial solo al primero
+            const userSitesCount = await Site.countDocuments({ owner: req.user._id });
+            
+            let initialStatus = 'trial';
+            let trialEndDate = new Date();
             trialEndDate.setDate(trialEndDate.getDate() + 30);
+
+            // Si ya tiene un sitio, los nuevos requieren pago inmediato
+            if (userSitesCount > 0) {
+                initialStatus = 'pending_payment';
+                trialEndDate = null;
+            }
 
             // Creamos el registro en la base de datos
             const newSite = new Site({
@@ -54,7 +63,7 @@ module.exports = {
                 subdomain: cleanSubdomain,
                 businessType: businessType || 'otro', 
                 plan: plan || 'basico',
-                subscriptionStatus: 'trial', 
+                subscriptionStatus: initialStatus, 
                 trialEndsAt: trialEndDate,   
                 
                 wuepyApoya: { status: 'none', freeMonthsGranted: 0 },
@@ -112,7 +121,7 @@ module.exports = {
                 success: true, 
                 siteId: newSite._id,
                 storeUrl: storeUrl,
-                message: '¡Felicidades! Tu plataforma fue creada con éxito. ¡Disfruta tu primer mes gratis!' 
+                message: userSitesCount === 0 ? '¡Felicidades! Tu plataforma fue creada con éxito. ¡Disfruta tu primer mes gratis!' : 'Sitio creado. Requiere pago para activarse.'
             });
 
         } catch (error) {
@@ -179,15 +188,16 @@ module.exports = {
             const cleanWhatsapp = whatsapp ? whatsapp.replace(/[^0-9]/g, '') : '';
             const isShowInMarketplace = showInMarketplace === 'on' || showInMarketplace === true || showInMarketplace === 'true';
 
-            // Guardamos cambios de modo y prompt si vienen en la petición
-            if (designMode) site.designMode = designMode;
+            // SOLUCIÓN AL ERROR DE PÉRDIDA DE IA:
+            // Solo actualizamos designMode si se envía explícitamente y es diferente
+            if (designMode && designMode !== site.designMode) {
+                site.designMode = designMode;
+            }
             if (aiPrompt !== undefined) site.aiPrompt = aiPrompt;
 
-            // SOLUCIÓN AL ERROR DE VUELTA A TEMPLATE 1:
-            // Si el sitio está en modo IA, NO sobreescribimos con una plantilla clásica por defecto.
-            // Solo actualizamos la plantilla si el usuario explícitamente cambió a modo clásico 'template'.
-            if (site.designMode !== 'ai_generated') {
-                site.template = template || 'template1';
+            // Si el sitio es IA, no sobreescribimos el template con valores basura del formulario
+            if (site.designMode !== 'ai_generated' && template) {
+                site.template = template;
             }
 
             // =========================================================
@@ -215,20 +225,28 @@ module.exports = {
                 });
             }
 
-            site.name = name;
+            site.name = name || site.name;
             site.showInMarketplace = isShowInMarketplace; 
-            site.primaryColor = primaryColor;
-            site.secondaryColor = secondaryColor;
+            site.primaryColor = primaryColor || site.primaryColor;
+            site.secondaryColor = secondaryColor || site.secondaryColor;
             
-            site.content = { heroTitle, heroSubtitle, aboutText };
+            site.content = { 
+                heroTitle: heroTitle !== undefined ? heroTitle : site.content.heroTitle, 
+                heroSubtitle: heroSubtitle !== undefined ? heroSubtitle : site.content.heroSubtitle, 
+                aboutText: aboutText !== undefined ? aboutText : site.content.aboutText 
+            };
             site.contact = {
                 whatsapp: cleanWhatsapp,
                 phone: phone || whatsapp,
-                email: contactEmail,
-                address,
-                schedule
+                email: contactEmail !== undefined ? contactEmail : site.contact.email,
+                address: address !== undefined ? address : site.contact.address,
+                schedule: schedule !== undefined ? schedule : site.contact.schedule
             };
-            site.social = { facebook, instagram, tiktok };
+            site.social = { 
+                facebook: facebook !== undefined ? facebook : site.social.facebook, 
+                instagram: instagram !== undefined ? instagram : site.social.instagram, 
+                tiktok: tiktok !== undefined ? tiktok : site.social.tiktok 
+            };
 
             if (req.file) site.logoUrl = req.file.path; 
 
@@ -317,11 +335,21 @@ module.exports = {
             
             if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada', errorCode: 'NOT_FOUND' });
             
-            if (!site.isActive || site.subscriptionStatus === 'suspended') {
-                return res.status(403).json({ success: false, message: 'Tienda suspendida por falta de pago o inactividad', errorCode: 'SUSPENDED' });
+            // Lógica del muro de pago y estado
+            let needsPayment = false;
+            
+            if (site.subscriptionStatus === 'trial' && site.trialEndsAt && new Date() > site.trialEndsAt) {
+                site.subscriptionStatus = 'expired';
+                await site.save();
+            }
+
+            if (!site.isActive || ['suspended', 'pending_payment', 'expired'].includes(site.subscriptionStatus)) {
+                needsPayment = true;
             }
 
             await Site.updateOne({ _id: site._id }, { $inc: { views: 1 } });
+
+            const paymentAlias = process.env.ADMIN_PAYMENT_ALIAS || 'WUEPY.PAGOS';
 
             // =========================================================
             // 🔥 MAGIA DE LA IA: DETECCIÓN Y RENDERIZACIÓN MULTIPÁGINA
@@ -349,7 +377,9 @@ module.exports = {
                     site,
                     products,    
                     categories,  
-                    message: 'Esta tienda es servida por la Bóveda IA de Wuepy'
+                    needsPayment,
+                    paymentAlias,
+                    message: needsPayment ? 'Tienda requiere pago para habilitarse por completo' : 'Esta tienda es servida por la Bóveda IA de Wuepy'
                 });
             }
 
@@ -365,7 +395,9 @@ module.exports = {
                 isAiGenerated: false,
                 site,
                 products,
-                categories
+                categories,
+                needsPayment,
+                paymentAlias
             });
 
         } catch (error) {
@@ -385,6 +417,16 @@ module.exports = {
 
             const site = await Site.findOne({ subdomain });
             if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada' });
+
+            let needsPayment = false;
+            if (site.subscriptionStatus === 'trial' && site.trialEndsAt && new Date() > site.trialEndsAt) {
+                site.subscriptionStatus = 'expired';
+                await site.save();
+            }
+            if (!site.isActive || ['suspended', 'pending_payment', 'expired'].includes(site.subscriptionStatus)) {
+                needsPayment = true;
+            }
+            const paymentAlias = process.env.ADMIN_PAYMENT_ALIAS || 'WUEPY.PAGOS';
 
             const product = await Product.findOne({ _id: productId, site: site._id }).lean();
             if (!product) return res.status(404).json({ success: false, message: 'Producto no encontrado' });
@@ -413,7 +455,9 @@ module.exports = {
                     htmlContent: targetPage ? targetPage.htmlContent : '',
                     site,
                     product,
-                    related
+                    related,
+                    needsPayment,
+                    paymentAlias
                 });
             }
 
@@ -423,7 +467,9 @@ module.exports = {
                 isAiGenerated: false,
                 site,
                 product,
-                related
+                related,
+                needsPayment,
+                paymentAlias
             });
 
         } catch (error) {
@@ -443,6 +489,16 @@ module.exports = {
 
             const site = await Site.findOne({ subdomain });
             if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada' });
+
+            let needsPayment = false;
+            if (site.subscriptionStatus === 'trial' && site.trialEndsAt && new Date() > site.trialEndsAt) {
+                site.subscriptionStatus = 'expired';
+                await site.save();
+            }
+            if (!site.isActive || ['suspended', 'pending_payment', 'expired'].includes(site.subscriptionStatus)) {
+                needsPayment = true;
+            }
+            const paymentAlias = process.env.ADMIN_PAYMENT_ALIAS || 'WUEPY.PAGOS';
 
             let filter = { site: site._id, isActive: { $ne: false } };
             
@@ -472,7 +528,9 @@ module.exports = {
                     products,
                     categories,
                     searchQuery: query,
-                    currentCategory: category
+                    currentCategory: category,
+                    needsPayment,
+                    paymentAlias
                 });
             }
 
@@ -484,7 +542,9 @@ module.exports = {
                 products,
                 categories,
                 searchQuery: query,
-                currentCategory: category
+                currentCategory: category,
+                needsPayment,
+                paymentAlias
             });
 
         } catch (error) {

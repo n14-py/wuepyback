@@ -21,16 +21,16 @@ const employeeSchema = new mongoose.Schema({
 // ESQUEMA DE RECIBOS DE PAGO (Suscripciones Manuales)
 // ==========================================
 const paymentReceiptSchema = new mongoose.Schema({
-    amount: { type: Number, required: true },
+    amount: { type: Number, required: true }, // Ej: 30000, 60000, 150000
     currency: { type: String, enum: ['PYG', 'USD'], default: 'PYG' },
-    receiptUrl: { type: String, required: true }, // URL de la imagen (R2/Bunny Storage)
+    receiptUrl: { type: String, required: true }, // URL de la imagen en Bunny/R2
     planRequested: { type: String, enum: ['basico', 'medio', 'profesional'], required: true },
     monthsPaid: { type: Number, required: true, default: 1 },
     status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
-    aliasOrBankUsed: { type: String, default: '' }, 
+    aliasOrBankUsed: { type: String, default: '' }, // A qué alias transfirió
     submittedAt: { type: Date, default: Date.now },
     reviewedAt: { type: Date },
-    adminNotes: { type: String, default: '' } 
+    adminNotes: { type: String, default: '' } // Por si rechazas, decirle "Foto borrosa"
 });
 
 // ==========================================
@@ -52,50 +52,52 @@ const siteSchema = new mongoose.Schema({
     bannerUrl: { type: String, default: '' },
     
     // --- MARKETPLACE GLOBAL (Visión AliExpress Paraguay) ---
-    showInMarketplace: { type: Boolean, default: true }, // Si sus productos salen en Wuepy Global
+    showInMarketplace: { type: Boolean, default: true }, 
     
     // --- PLANES Y ESTADO DE SUSCRIPCIÓN ---
+    // Básico: 30.000 Gs (1 Web) | Medio: 60.000 Gs (3 Webs + IA) | Profesional: 150.000 Gs (10 Webs)
     plan: { type: String, enum: ['basico', 'medio', 'profesional'], default: 'basico' },
     subscriptionStatus: { 
         type: String, 
         enum: ['trial', 'active', 'pending_payment', 'expired', 'suspended'], 
         default: 'trial' 
     },
-    trialEndsAt: { type: Date }, // 1 Mes Gratis para todos al iniciar
+    trialEndsAt: { type: Date }, 
     nextBillingDate: { type: Date }, 
+    expirationWarningSent: { type: Boolean, default: false }, // Control para no spamear avisos de "por vencer"
+    bonusDays: { type: Number, default: 0 }, // Días ganados por el programa "Invita y Gana"
     paymentReceipts: [paymentReceiptSchema], 
     
     // --- PROGRAMA 1: WUEPY APOYA (6 Meses Gratis - Fidelización) ---
     wuepyApoya: {
         status: { type: String, enum: ['none', 'pending', 'approved', 'rejected'], default: 'none' },
-        startupStory: { type: String, default: '' }, // Historia en texto
-        videoEvidenceUrl: { type: String, default: '' }, // URL del video subido desde el Dashboard
+        startupStory: { type: String, default: '' }, 
+        videoEvidenceUrl: { type: String, default: '' }, 
         freeMonthsGranted: { type: Number, default: 0 }
     },
 
     // --- PROGRAMA 2: WUEPY INVIERTE (Microcréditos a Fabricantes) ---
-    // Visión a futuro: Apoyar a fabricantes paraguayos (Ej: Guampas/Termos) para exportar sin comisiones
     wuepyInvierte: {
         status: { type: String, enum: ['none', 'eligible', 'pending', 'active', 'completed'], default: 'none' },
         requestedAmount: { type: Number, default: 0 },
         approvedAmount: { type: Number, default: 0 },
-        amountRepaid: { type: Number, default: 0 }, // Se va sumando a medida que venden en la web
-        businessPitch: { type: String, default: '' }, // ¿Para qué necesitan el capital?
-        evidenceFiles: [{ type: String }] // URLs con fotos del taller, la fábrica, productos, etc.
+        amountRepaid: { type: Number, default: 0 }, 
+        businessPitch: { type: String, default: '' }, 
+        evidenceFiles: [{ type: String }] 
     },
     
-    // --- IA Y MOTOR DE DISEÑO (Orquestador Gemma) ---
+    // --- IA Y MOTOR DE DISEÑO ---
     designMode: { type: String, enum: ['template', 'ai_generated'], default: 'template' },
     aiPrompt: { type: String, default: '' },
-    customHtmlFolder: { type: String, default: '' }, // Se mantiene por retrocompatibilidad
+    customHtmlFolder: { type: String, default: '' }, 
     
-    // NUEVO CAMPO: Aquí guardaremos el código HTML generado por la IA directamente en la BD
+    // Almacenamiento directo del código generado por DeepSeek
     aiGeneratedPages: [{
-        filename: { type: String, required: true }, // Ej: 'index.html', 'nosotros.html'
-        htmlContent: { type: String, required: true } // El código HTML completo
+        filename: { type: String, required: true }, 
+        htmlContent: { type: String, required: true } 
     }],
     
-    // --- CONFIGURACIÓN VISUAL DIRECTA (Si usa 'template') ---
+    // --- CONFIGURACIÓN VISUAL DIRECTA ---
     template: { type: String, default: 'template1' },
     primaryColor: { type: String, default: '#3b82f6' },
     secondaryColor: { type: String, default: '#1e293b' },
@@ -103,7 +105,7 @@ const siteSchema = new mongoose.Schema({
     // --- CONFIGURACIÓN DE MONEDA ---
     currency: { type: String, enum: ['PYG', 'USD'], default: 'PYG' },
     
-    // --- EMPLEADOS (Accesos sectorizados) ---
+    // --- EMPLEADOS ---
     employees: [employeeSchema],
     
     // --- CONTACTO Y REDES ---
@@ -133,7 +135,7 @@ const siteSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
-// Middleware para actualizar el `updatedAt` automáticamente antes de cada save
+// Middleware para actualizar el `updatedAt` automáticamente
 siteSchema.pre('save', function(next) {
     this.updatedAt = Date.now();
     next();
