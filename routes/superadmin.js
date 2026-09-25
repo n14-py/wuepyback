@@ -225,20 +225,22 @@ router.post('/programs/apoya/approve', ensureSuperAdmin, async (req, res) => {
         const site = await Site.findById(siteId);
         if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada.' });
 
+        const { addMonths } = require('../utils/storeRules');
+        const months = Math.min(24, Math.max(1, parseInt(req.body.freeMonths, 10) || 6));
         site.wuepyApoya.status = 'approved';
-        site.wuepyApoya.freeMonthsGranted = 6;
+        site.wuepyApoya.freeMonthsGranted = months;
         
         const now = new Date();
-        let baseDate = site.subscriptionStatus === 'active' && site.nextBillingDate && site.nextBillingDate > now 
-                        ? new Date(site.nextBillingDate) 
-                        : now;
-        
-        baseDate.setMonth(baseDate.getMonth() + 6);
-        site.nextBillingDate = baseDate;
+        const currentEnd = site.nextBillingDate && new Date(site.nextBillingDate) > now
+            ? new Date(site.nextBillingDate)
+            : (site.trialEndsAt && new Date(site.trialEndsAt) > now ? new Date(site.trialEndsAt) : now);
+        const until = addMonths(currentEnd, months);
+        site.nextBillingDate = until;
+        site.trialEndsAt = until;
         site.subscriptionStatus = 'active'; 
         
         await site.save();
-        return res.status(200).json({ success: true, message: `¡Éxito! 6 Meses Gratis otorgados a la tienda ${site.name}.` });
+        return res.status(200).json({ success: true, message: `¡Éxito! ${months} meses gratis otorgados a la tienda ${site.name}. Vence el ${until.toLocaleDateString('es-PY')}.`, freeMonths: months, until });
     } catch (error) {
         return res.status(500).json({ success: false, message: 'Ocurrió un error al otorgar los meses gratis.' });
     }

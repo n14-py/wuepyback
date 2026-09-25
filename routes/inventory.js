@@ -27,9 +27,8 @@ const checkPlanLimits = async (req, res, next) => {
         const productCount = await Product.countDocuments({ site: site._id });
 
         let limit = 0;
-        if (site.plan === 'basico') limit = 30;
-        if (site.plan === 'medio') limit = 80;
-        if (site.plan === 'profesional') limit = Infinity;
+        const { planOf } = require('../utils/storeRules');
+        limit = planOf(site.plan).products;
 
         if (productCount >= limit && limit !== Infinity) {
             return res.status(403).json({ 

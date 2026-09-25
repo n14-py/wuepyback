@@ -19,6 +19,7 @@ const Expense = require('../models/Expense');
 
 // Servicio de Inteligencia Artificial (Orquestador)
 const agentAiService = require('../services/agentAiService');
+const { cleanSlug, planOf, addMonths } = require('../utils/storeRules');
 
 // Aduana de Seguridad
 const { ensureAuthenticated, ensureStoreOwner, ensureSiteAccess } = require('../middleware/auth');
@@ -28,13 +29,25 @@ const { ensureAuthenticated, ensureStoreOwner, ensureSiteAccess } = require('../
 // ==========================================================================
 const R2Storage = require('../utils/r2Storage');
 
-const r2StorageEngine = new R2Storage({
+const r2Ready = process.env.R2_ENDPOINT && process.env.R2_ACCESS_KEY && process.env.R2_SECRET_KEY && process.env.R2_BUCKET_NAME && process.env.R2_PUBLIC_DOMAIN;
+const r2StorageEngine = r2Ready ? new R2Storage({
     endpoint: process.env.R2_ENDPOINT, 
     accessKeyId: process.env.R2_ACCESS_KEY,
     secretAccessKey: process.env.R2_SECRET_KEY,
     bucket: process.env.R2_BUCKET_NAME,
     publicDomain: process.env.R2_PUBLIC_DOMAIN 
-});
+}) : {
+    _handleFile(req, file, cb) {
+        const chunks = [];
+        file.stream.on('data', (chunk) => chunks.push(chunk));
+        file.stream.on('error', cb);
+        file.stream.on('end', () => {
+            const buffer = Buffer.concat(chunks);
+            cb(null, { path: `data:${file.mimetype};base64,${buffer.toString('base64')}`, filename: file.originalname || 'archivo' });
+        });
+    },
+    _removeFile(req, file, cb) { cb(null); }
+};
 
 const upload = multer({ 
     storage: r2StorageEngine,
@@ -92,7 +105,10 @@ router.post('/create-site', ensureStoreOwner, upload.single('logo'), async (req,
             startupStory, contactEmail, whatsapp, currency
         } = req.body;
 
-        const cleanSubdomain = subdomain.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+        const cleanSubdomain = cleanSlug(subdomain, name);
+        if (!cleanSubdomain) {
+            return res.status(400).json({ success: false, message: 'El enlace de la tienda no es válido. No puede quedar vacío ni llamarse undefined.' });
+        }
         const existingSite = await Site.findOne({ subdomain: cleanSubdomain });
         
         if (existingSite) {
@@ -193,7 +209,14 @@ router.post('/site/:siteId/update-general', ensureStoreOwner, async (req, res) =
 router.post('/site/:siteId/update-design', ensureStoreOwner, upload.fields([{ name: 'logo', maxCount: 1 }, { name: 'banner', maxCount: 1 }]), async (req, res) => {
     try {
         const { currency, template, primaryColor, secondaryColor } = req.body;
-        const updateData = { currency: currency || 'PYG', template, primaryColor, secondaryColor, designMode: 'template' };
+        const requestedMode = req.body.designMode === 'ai_generated' ? 'ai_generated' : 'template';
+        const updateData = {
+            currency: currency || 'PYG',
+            template: template || 'template1',
+            primaryColor,
+            secondaryColor,
+            designMode: requestedMode
+        };
 
         if (req.files && req.files['logo']) updateData.logoUrl = req.files['logo'][0].path;
         if (req.files && req.files['banner']) updateData.bannerUrl = req.files['banner'][0].path;
@@ -440,24 +463,32 @@ router.post('/site/:siteId/pos/checkout', ensureSiteAccess, async (req, res) => 
             customerName, customerPhone, discount, deliveryFee
         } = req.body;
 
-        let cart = typeof cartData === 'string' ? JSON.parse(cartData) : cartData;
+        const rawCart = cartData || req.body.items || req.body.cart;
+        let cart = typeof rawCart === 'string' ? JSON.parse(rawCart) : rawCart;
         
         if (!cart || cart.length === 0) return res.status(400).json({ success: false, message: 'El carrito está vacío.' });
 
         const finalItems = [];
         for (let item of cart) {
+            const qty = Math.max(1, parseInt(item.quantity, 10) || 1);
+            const price = Number(item.price) || 0;
             if (!item.isCustom) {
-                const product = await Product.findOneAndUpdate(
-                    { _id: item._id, site: site._id, stock: { $gte: item.quantity } },
-                    { $inc: { stock: -item.quantity } },
-                    { new: true }
-                );
-                if(!product) {
-                    return res.status(400).json({ success: false, message: `Stock insuficiente para: ${item.name}` });
+                const productId = item.productId || item._id;
+                const product = await Product.findOne({ _id: productId, site: site._id });
+                if (!product) {
+                    return res.status(400).json({ success: false, message: `No encontramos el producto: ${item.name || 'ítem'}` });
                 }
-                finalItems.push({ productId: product._id, name: product.name, price: item.price, quantity: item.quantity, isCustom: false });
+                const stock = Number(product.stock);
+                if (Number.isFinite(stock) && stock < qty) {
+                    return res.status(400).json({ success: false, message: `Stock insuficiente para: ${product.name}` });
+                }
+                if (Number.isFinite(stock)) {
+                    product.stock = stock - qty;
+                    await product.save();
+                }
+                finalItems.push({ productId: product._id, name: product.name, price, quantity: qty, isCustom: false, sku: product.sku || '' });
             } else {
-                finalItems.push({ productId: null, name: item.name, price: item.price, quantity: item.quantity, isCustom: true });
+                finalItems.push({ productId: null, name: item.name || 'Ítem libre', price, quantity: qty, isCustom: true });
             }
         }
 
@@ -593,7 +624,84 @@ router.get('/site/:siteId/finances/export', ensureStoreOwner, async (req, res) =
     }
 });
 
-// Postulaciones
+// Postulaciones (ruta del frontend y la histórica)
 router.post('/programs/apoya', siteController.enviarPostulacionApoya);
+router.post('/apoya', siteController.enviarPostulacionApoya);
+
+router.get('/site/:siteId/overview', ensureSiteAccess, async (req, res) => {
+    const site = await Site.findOne({ _id: req.params.siteId }).lean();
+    if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada.' });
+    const products = await Product.countDocuments({ site: site._id });
+    const sales = await Sale.countDocuments({ site: site._id, status: { $ne: 'cancelled' } });
+    return res.status(200).json({ success: true, site, stats: { views: site.views || 0, products, sales } });
+});
+
+router.get('/billing/:siteId', ensureStoreOwner, async (req, res) => {
+    const site = await Site.findOne({ _id: req.params.siteId, owner: req.user._id }).lean();
+    if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada.' });
+    site.freeMonths = (site.wuepyApoya && site.wuepyApoya.freeMonthsGranted) || 0;
+    return res.status(200).json({ success: true, site });
+});
+
+router.post('/site/:siteId/switch-design', ensureStoreOwner, async (req, res) => {
+    const { designMode, template, primaryColor, secondaryColor, currency } = req.body;
+    const mode = designMode === 'ai_generated' ? 'ai_generated' : 'template';
+    const site = await Site.findOne({ _id: req.params.siteId, owner: req.user._id });
+    if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada.' });
+    if (mode === 'ai_generated' && (!site.aiGeneratedPages || site.aiGeneratedPages.length === 0) && !site.aiPrompt) {
+        return res.status(400).json({ success: false, message: 'Todavía no hay un diseño de IA guardado. Generá uno primero.' });
+    }
+    site.designMode = mode;
+    if (template) site.template = template;
+    if (primaryColor) site.primaryColor = primaryColor;
+    if (secondaryColor) site.secondaryColor = secondaryColor;
+    if (currency) site.currency = currency;
+    await site.save();
+    return res.status(200).json({ success: true, message: 'Modo de diseño guardado en la cuenta.', designMode: site.designMode, hasAi: (site.aiGeneratedPages || []).length > 0 });
+});
+
+router.post('/site/:siteId/sitemap', ensureStoreOwner, async (req, res) => {
+    const site = await Site.findOne({ _id: req.params.siteId, owner: req.user._id }).lean();
+    if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada.' });
+    const publicUrl = `https://${site.subdomain}.wuepy.com/sitemap.xml`;
+    return res.status(200).json({ success: true, publicUrl, message: 'Sitemap listo para indexar.' });
+});
+
+router.post('/site/:siteId/products/ai-copy', ensureSiteAccess, async (req, res) => {
+    const title = (req.body.title || req.body.name || '').toString().trim();
+    const hint = (req.body.hint || '').toString().trim();
+    if (!title) return res.status(400).json({ success: false, message: 'Falta el título del producto.' });
+    const description = `${title} disponible en la tienda. ${hint ? hint.replace(/\.$/, '') + '. ' : ''}Ideal para el día a día, con atención por WhatsApp y envío coordinado en Paraguay. Consultá stock y tiempos de entrega antes de comprar.`;
+    return res.status(200).json({ success: true, description, text: description });
+});
+
+router.post('/site/:siteId/finances/transaction', ensureStoreOwner, async (req, res) => {
+    const { description, amount, category } = req.body;
+    const expense = new Expense({ site: req.params.siteId, description: description || 'Egreso', amount: Number(amount) || 0, category: category || 'Operativo' });
+    await expense.save();
+    return res.status(201).json({ success: true, message: 'Egreso contabilizado.' });
+});
+
+router.get('/delivery/:siteId', ensureSiteAccess, async (req, res) => {
+    const site = await Site.findOne({ _id: req.params.siteId }).lean();
+    if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada.' });
+    const filter = { site: site._id, requiresDelivery: true, status: { $in: ['in_transit', 'pending', 'completed'] } };
+    if (req.user.role === 'delivery') filter['delivery.assignedTo'] = req.user._id;
+    const orders = await Sale.find(filter).sort({ createdAt: -1 }).limit(50).lean();
+    return res.status(200).json({ success: true, site, orders });
+});
+
+router.post('/delivery/:siteId/status', ensureSiteAccess, async (req, res) => {
+    const { orderId, status } = req.body;
+    const sale = await Sale.findOne({ _id: orderId, site: req.params.siteId });
+    if (!sale) return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+    sale.status = status || 'completed';
+    if (sale.status === 'completed') {
+        sale.paymentStatus = 'paid';
+        if (sale.delivery) sale.delivery.deliveredAt = new Date();
+    }
+    await sale.save();
+    return res.status(200).json({ success: true, message: 'Estado actualizado.' });
+});
 
 module.exports = router;
