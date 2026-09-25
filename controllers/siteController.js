@@ -6,7 +6,9 @@ const path = require('path');
 const Site = require('../models/Site');
 const Product = require('../models/Product'); 
 const agentAiService = require('../services/agentAiService');
-const { cleanSlug, planOf, subscriptionExpired } = require('../utils/storeRules'); 
+const { cleanSlug, planOf, subscriptionExpired } = require('../utils/storeRules');
+const { applyAccountPlan } = require('../utils/accountPlan');
+const User = require('../models/User'); 
 
 module.exports = {
     // ==========================================
@@ -39,23 +41,23 @@ module.exports = {
                 });
             }
 
-            const chosenPlan = planOf(plan);
-            const ownedSites = await Site.find({ owner: req.user._id }).select('plan designMode').lean();
-            const ownerPlan = ownedSites.reduce((best, site) => {
-                const rank = { basico: 1, medio: 2, profesional: 3 };
-                return (rank[site.plan] || 0) > (rank[best] || 0) ? site.plan : best;
-            }, plan || 'basico');
-            const limitPlan = planOf(ownerPlan);
-            if (ownedSites.length >= Math.max(chosenPlan.maxSites, limitPlan.maxSites)) {
+            const account = await User.findById(req.user._id);
+            const alreadyChose = account && account.plan;
+            const accountPlanId = alreadyChose ? account.plan : (['basico', 'medio', 'profesional'].includes(plan) ? plan : 'basico');
+            const chosenPlan = planOf(accountPlanId);
+            const ownedSites = await Site.find({ owner: req.user._id }).select('plan designMode lockedByPlan').lean();
+            if (ownedSites.length >= chosenPlan.maxSites) {
                 return res.status(403).json({
                     success: false,
-                    message: `Tu plan permite ${Math.max(chosenPlan.maxSites, limitPlan.maxSites)} tienda(s).`
+                    message: alreadyChose
+                        ? `Tu plan ${accountPlanId} permite ${chosenPlan.maxSites} tienda(s). Subí de plan en facturación para crear otra.`
+                        : `Tu plan permite ${chosenPlan.maxSites} tienda(s).`
                 });
             }
             if ((designMode === 'ai_generated') && ownedSites.filter(s => s.designMode === 'ai_generated').length >= chosenPlan.aiSites) {
                 return res.status(403).json({
                     success: false,
-                    message: `El plan ${plan || 'basico'} permite ${chosenPlan.aiSites} web(s) con IA.`
+                    message: `El plan ${accountPlanId} permite ${chosenPlan.aiSites} web(s) con IA.`
                 });
             }
 
@@ -88,7 +90,7 @@ module.exports = {
                 name,
                 subdomain: cleanSubdomain,
                 businessType: businessType || 'otro', 
-                plan: plan || 'basico',
+                plan: accountPlanId,
                 subscriptionStatus: initialStatus, 
                 trialEndsAt: trialEndDate,   
                 
@@ -120,6 +122,7 @@ module.exports = {
             if (req.file) newSite.logoUrl = req.file.path; 
 
             await newSite.save();
+            if (!alreadyChose) await applyAccountPlan(req.user._id, accountPlanId);
 
             // =========================================================
             // 🔥 ACTIVACIÓN DEL ORQUESTADOR IA (NÚCLEO INFINITO) 🔥

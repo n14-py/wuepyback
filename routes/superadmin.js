@@ -121,12 +121,12 @@ router.post('/billing/approve', ensureSuperAdmin, async (req, res) => {
 
         site.subscriptionStatus = 'active';
         site.nextBillingDate = currentBillingDate;
-        
-        if (receipt.planRequested && receipt.planRequested !== site.plan) {
-            site.plan = receipt.planRequested;
-        }
-
         await site.save();
+
+        if (receipt.planRequested) {
+            const { applyAccountPlan } = require('../utils/accountPlan');
+            await applyAccountPlan(site.owner, receipt.planRequested);
+        }
 
         return res.status(200).json({ success: true, message: `¡Pago aprobado! La tienda ${site.name} ahora está activa hasta el ${currentBillingDate.toLocaleDateString('es-PY')}.` });
 
@@ -203,12 +203,13 @@ router.post('/sites/update-subscription', ensureSuperAdmin, async (req, res) => 
         if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada.' });
 
         site.subscriptionStatus = status;
-        site.plan = plan;
-
         if (trialEndsAt) site.trialEndsAt = new Date(trialEndsAt);
         if (nextBillingDate) site.nextBillingDate = new Date(nextBillingDate);
-
         await site.save();
+        if (plan) {
+            const { applyAccountPlan } = require('../utils/accountPlan');
+            await applyAccountPlan(site.owner, plan);
+        }
         return res.status(200).json({ success: true, message: `Se forzaron los cambios de suscripción para ${site.name}.` });
 
     } catch (error) {

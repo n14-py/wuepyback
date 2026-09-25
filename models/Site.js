@@ -57,6 +57,7 @@ const siteSchema = new mongoose.Schema({
     // --- PLANES Y ESTADO DE SUSCRIPCIÓN ---
     // Básico: 30.000 Gs (1 Web) | Medio: 60.000 Gs (3 Webs + IA) | Profesional: 150.000 Gs (10 Webs)
     plan: { type: String, enum: ['basico', 'medio', 'profesional'], default: 'basico' },
+    lockedByPlan: { type: Boolean, default: false },
     subscriptionStatus: { 
         type: String, 
         enum: ['trial', 'active', 'pending_payment', 'expired', 'suspended'], 
