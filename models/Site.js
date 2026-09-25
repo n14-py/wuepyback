@@ -87,6 +87,10 @@ const siteSchema = new mongoose.Schema({
     },
     
     // --- IA Y MOTOR DE DISEÑO ---
+    aiUsage: {
+        month: { type: String, default: '' },
+        count: { type: Number, default: 0 }
+    },
     designMode: { type: String, enum: ['template', 'ai_generated'], default: 'template' },
     aiPrompt: { type: String, default: '' },
     customHtmlFolder: { type: String, default: '' }, 

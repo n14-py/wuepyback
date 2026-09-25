@@ -5,7 +5,8 @@
 const path = require('path');
 const Site = require('../models/Site');
 const Product = require('../models/Product'); 
-const agentAiService = require('../services/agentAiService'); 
+const agentAiService = require('../services/agentAiService');
+const { cleanSlug, planOf, subscriptionExpired } = require('../utils/storeRules'); 
 
 module.exports = {
     // ==========================================
@@ -30,9 +31,34 @@ module.exports = {
             } = req.body;
             
             // Limpieza absoluta del subdominio para evitar caracteres raros
-            const cleanSubdomain = subdomain.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
+            const cleanSubdomain = cleanSlug(subdomain, name);
+            if (!cleanSubdomain) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Escribí el nombre del negocio. El enlace no puede quedar vacío ni llamarse undefined.'
+                });
+            }
 
-            // Verificamos si alguien más ya tomó este nombre
+            const chosenPlan = planOf(plan);
+            const ownedSites = await Site.find({ owner: req.user._id }).select('plan designMode').lean();
+            const ownerPlan = ownedSites.reduce((best, site) => {
+                const rank = { basico: 1, medio: 2, profesional: 3 };
+                return (rank[site.plan] || 0) > (rank[best] || 0) ? site.plan : best;
+            }, plan || 'basico');
+            const limitPlan = planOf(ownerPlan);
+            if (ownedSites.length >= Math.max(chosenPlan.maxSites, limitPlan.maxSites)) {
+                return res.status(403).json({
+                    success: false,
+                    message: `Tu plan permite ${Math.max(chosenPlan.maxSites, limitPlan.maxSites)} tienda(s).`
+                });
+            }
+            if ((designMode === 'ai_generated') && ownedSites.filter(s => s.designMode === 'ai_generated').length >= chosenPlan.aiSites) {
+                return res.status(403).json({
+                    success: false,
+                    message: `El plan ${plan || 'basico'} permite ${chosenPlan.aiSites} web(s) con IA.`
+                });
+            }
+
             const existingSite = await Site.findOne({ subdomain: cleanSubdomain });
             if (existingSite) {
                 return res.status(400).json({ 
@@ -283,6 +309,13 @@ module.exports = {
             const finalPrompt = aiPrompt || site.aiPrompt;
             if (!finalPrompt) return res.status(400).json({ success: false, message: 'Se necesita una idea para que la IA trabaje.' });
 
+            const limits = planOf(site.plan);
+            const month = new Date().toISOString().slice(0, 7);
+            if (!site.aiUsage || site.aiUsage.month !== month) site.aiUsage = { month, count: 0 };
+            if (site.aiUsage.count >= limits.aiUpdatesPerMonth) {
+                return res.status(403).json({ success: false, message: `Este mes ya usaste las ${limits.aiUpdatesPerMonth} actualizaciones de IA de tu plan.` });
+            }
+
             console.log(`[API Wuepy] 💥 Regenerando sitio IA para ${site.subdomain}`);
             
             const aiResult = await agentAiService.orquestarDisenoWeb(site._id, finalPrompt);
@@ -291,7 +324,17 @@ module.exports = {
                 return res.status(500).json({ success: false, message: 'Error de la IA al regenerar: ' + aiResult.error });
             }
 
-            return res.status(200).json({ success: true, message: '¡Diseño regenerado con éxito! Revisa tu tienda.' });
+            const nextCount = (site.aiUsage.count || 0) + 1;
+            await Site.updateOne({ _id: site._id }, {
+                $set: {
+                    designMode: 'ai_generated',
+                    aiPrompt: finalPrompt,
+                    'aiUsage.month': month,
+                    'aiUsage.count': nextCount
+                }
+            });
+
+            return res.status(200).json({ success: true, message: '¡Diseño regenerado con éxito! Revisa tu tienda.', aiUpdatesThisMonth: nextCount });
 
         } catch (error) {
             console.error("Error al regenerar diseño IA:", error);
@@ -338,12 +381,11 @@ module.exports = {
             // Lógica del muro de pago y estado
             let needsPayment = false;
             
-            if (site.subscriptionStatus === 'trial' && site.trialEndsAt && new Date() > site.trialEndsAt) {
-                site.subscriptionStatus = 'expired';
-                await site.save();
-            }
-
-            if (!site.isActive || ['suspended', 'pending_payment', 'expired'].includes(site.subscriptionStatus)) {
+            if (subscriptionExpired(site)) {
+                if (site.subscriptionStatus !== 'suspended' && site.subscriptionStatus !== 'pending_payment') {
+                    site.subscriptionStatus = 'expired';
+                    await site.save();
+                }
                 needsPayment = true;
             }
 
@@ -419,11 +461,11 @@ module.exports = {
             if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada' });
 
             let needsPayment = false;
-            if (site.subscriptionStatus === 'trial' && site.trialEndsAt && new Date() > site.trialEndsAt) {
-                site.subscriptionStatus = 'expired';
-                await site.save();
-            }
-            if (!site.isActive || ['suspended', 'pending_payment', 'expired'].includes(site.subscriptionStatus)) {
+            if (subscriptionExpired(site)) {
+                if (site.subscriptionStatus !== 'suspended' && site.subscriptionStatus !== 'pending_payment') {
+                    site.subscriptionStatus = 'expired';
+                    await site.save();
+                }
                 needsPayment = true;
             }
             const paymentAlias = process.env.ADMIN_PAYMENT_ALIAS || 'WUEPY.PAGOS';
@@ -491,11 +533,11 @@ module.exports = {
             if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada' });
 
             let needsPayment = false;
-            if (site.subscriptionStatus === 'trial' && site.trialEndsAt && new Date() > site.trialEndsAt) {
-                site.subscriptionStatus = 'expired';
-                await site.save();
-            }
-            if (!site.isActive || ['suspended', 'pending_payment', 'expired'].includes(site.subscriptionStatus)) {
+            if (subscriptionExpired(site)) {
+                if (site.subscriptionStatus !== 'suspended' && site.subscriptionStatus !== 'pending_payment') {
+                    site.subscriptionStatus = 'expired';
+                    await site.save();
+                }
                 needsPayment = true;
             }
             const paymentAlias = process.env.ADMIN_PAYMENT_ALIAS || 'WUEPY.PAGOS';
@@ -550,6 +592,24 @@ module.exports = {
         } catch (error) {
             console.error('Error Búsqueda API:', error);
             return res.status(500).json({ success: false, message: 'Error buscando productos' });
+        }
+    },
+
+    buildSitemap: async (req, res) => {
+        try {
+            const subdomain = req.params.subdomain;
+            const site = await Site.findOne({ subdomain }).lean();
+            if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada' });
+            const products = await Product.find({ site: site._id, isActive: { $ne: false } }).select('_id updatedAt').lean();
+            const origin = `https://${site.subdomain}.wuepy.com`;
+            const urls = [origin + '/', origin + '/search.html'];
+            products.forEach(p => urls.push(`${origin}/p/${p._id}`));
+            const xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+                urls.map(u => `  <url><loc>${u}</loc></url>`).join('\n') + '\n</urlset>';
+            res.set('Content-Type', 'application/xml; charset=utf-8');
+            return res.status(200).send(xml);
+        } catch (error) {
+            return res.status(500).json({ success: false, message: 'No se pudo armar el sitemap.' });
         }
     }
 };

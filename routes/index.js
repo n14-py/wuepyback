@@ -14,6 +14,7 @@ const Product = require('../models/Product');
 router.get('/store/public/:subdomain', siteController.renderStoreHome);
 router.get('/store/public/:subdomain/p/:id', siteController.renderStoreProduct);
 router.get('/store/public/:subdomain/search', siteController.renderStoreSearch);
+router.get('/store/public/:subdomain/sitemap', siteController.buildSitemap);
 
 // ==========================================================================
 // 1. RUTA PRINCIPAL (MARKETPLACE WUEPY O INICIO DE TIENDA)
