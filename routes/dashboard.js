@@ -79,7 +79,15 @@ router.get('/', ensureAuthenticated, async (req, res) => {
 
         // Si es el dueño, devolvemos sus tiendas
         const sites = await Site.find({ owner: req.user._id }).sort({ createdAt: -1 }).lean();
-        return res.status(200).json({ success: true, user: req.user, sites: sites });
+        const User = require('../models/User');
+        const account = await User.findById(req.user._id).select('plan planChosenAt').lean();
+        return res.status(200).json({
+            success: true,
+            user: req.user,
+            accountPlan: account && account.plan ? account.plan : null,
+            planChosen: !!(account && account.plan),
+            sites
+        });
     } catch (error) {
         console.error('Error Crítico en Dashboard Index:', error);
         return res.status(500).json({ success: false, message: 'Hubo un error al cargar tus tiendas.' });
@@ -562,10 +570,42 @@ router.get('/site/:siteId/finances', ensureStoreOwner, async (req, res) => {
             stockValue: stockValue
         };
 
-        const recentSales = await Sale.find({ site: site._id }).sort({ createdAt: -1 }).limit(10).lean();
-        const recentExpenses = await Expense.find({ site: site._id }).sort({ date: -1 }).limit(10).lean();
+        const period = req.query.period || 'month';
+        const since = new Date();
+        if (period === 'day') since.setHours(0, 0, 0, 0);
+        else if (period === 'week') since.setDate(since.getDate() - 7);
+        else if (period === 'month') since.setDate(1), since.setHours(0, 0, 0, 0);
+        else since.setFullYear(2000);
 
-        return res.status(200).json({ success: true, user: req.user, site, stats, recentSales, recentExpenses });
+        const sales = await Sale.find({
+            site: site._id,
+            createdAt: { $gte: since },
+            status: { $ne: 'cancelled' }
+        }).sort({ createdAt: -1 }).lean();
+        const expenses = await Expense.find({ site: site._id, date: { $gte: since } }).sort({ date: -1 }).lean();
+
+        const transactions = [
+            ...sales.map(sale => ({
+                id: String(sale._id),
+                type: 'income',
+                amount: Number(sale.totalAmount) || 0,
+                date: sale.createdAt,
+                description: sale.customer && sale.customer.name ? `Venta a ${sale.customer.name}` : 'Venta en caja',
+                category: sale.saleChannel === 'pos' ? 'POS' : (sale.saleChannel || 'Venta'),
+                reference: sale.paymentMethod || 'caja'
+            })),
+            ...expenses.map(exp => ({
+                id: String(exp._id),
+                type: 'expense',
+                amount: Number(exp.amount) || 0,
+                date: exp.date || exp.createdAt,
+                description: exp.description || 'Egreso',
+                category: exp.category || 'Operativo',
+                reference: 'Manual'
+            }))
+        ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        return res.status(200).json({ success: true, user: req.user, site, stats, recentSales: sales.slice(0, 10), recentExpenses: expenses.slice(0, 10), transactions });
     } catch (error) {
         return res.status(500).json({ success: false, message: 'Fallo al procesar métricas contables.' });
     }

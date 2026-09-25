@@ -32,7 +32,7 @@ function addMonths(date, months) {
 
 function subscriptionExpired(site, now = new Date()) {
     if (!site) return true;
-    if (site.isActive === false) return true;
+    if (site.isActive === false || site.lockedByPlan) return true;
     if (['suspended', 'pending_payment', 'expired'].includes(site.subscriptionStatus)) return true;
     if (site.subscriptionStatus === 'trial' && site.trialEndsAt && now > new Date(site.trialEndsAt)) return true;
     if (site.subscriptionStatus === 'active' && site.nextBillingDate && now > new Date(site.nextBillingDate)) return true;

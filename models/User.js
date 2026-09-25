@@ -35,6 +35,8 @@ const userSchema = new mongoose.Schema({
     suspensionReason: { type: String, default: '' },
 
     // --- CONTACTO Y NOTIFICACIONES ---
+    plan: { type: String, enum: ['basico', 'medio', 'profesional'] },
+    planChosenAt: { type: Date },
     phone: { type: String, default: '' }, // Número para avisos de WhatsApp (integración futura de facturación)
     receivesWuepyUpdates: { type: Boolean, default: true }, // Novedades de la plataforma para retener a los emprendedores
 

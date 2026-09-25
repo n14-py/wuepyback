@@ -109,8 +109,9 @@ NO ESCRIBAS CÓDIGO HTML. Solo devuelve un objeto JSON estricto con los siguient
     "metaDescription": "Descripción para Google (Máx 150 caracteres)",
     "metaKeywords": "palabra1, palabra2, nicho, negocio, tienda"
   },
+    "benefits": ["Beneficio corto 1", "Beneficio corto 2", "Beneficio corto 3"],
   "design": {
-    "tailwindColor": "Elige UN color de Tailwind que represente al nicho (Ej: blue-600, emerald-500, rose-600, amber-500, purple-600, slate-900). SOLO EL NOMBRE."
+    "hexColor": "#4f46e5"
   }
 }
 `;
@@ -118,7 +119,9 @@ NO ESCRIBAS CÓDIGO HTML. Solo devuelve un objeto JSON estricto con los siguient
             const aiResponseText = await this.callAIWithRetry(systemPrompt, `Idea del cliente: "${userPrompt}"`);
             const aiData = this.extractJSON(aiResponseText);
 
-            const chosenColor = aiData.design?.tailwindColor || 'blue-600';
+            const chosenColor = (site.primaryColor && String(site.primaryColor).startsWith('#'))
+                ? site.primaryColor
+                : (aiData.design?.hexColor || '#4f46e5');
 
             // =========================================================
             // 🔥 SOLUCIÓN CRÍTICA AL BUG DE LA PLANTILLA 1 Y EL COLOR 🔥
@@ -146,7 +149,10 @@ NO ESCRIBAS CÓDIGO HTML. Solo devuelve un objeto JSON estricto con los siguient
             const pagesConfig = [
                 {
                     name: 'index.html',
-                    content: this.getRandomBlock(aiBlocks.heroes) + this.getRandomBlock(aiBlocks.catalogs)
+                    content: this.getRandomBlock(aiBlocks.heroes) +
+                        `<section class="w-full py-10 px-4 bg-white border-y border-slate-100"><div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6 text-center"><div class="p-6 rounded-2xl bg-slate-50"><p class="font-black text-lg">{{BENEFIT_1}}</p></div><div class="p-6 rounded-2xl bg-slate-50"><p class="font-black text-lg">{{BENEFIT_2}}</p></div><div class="p-6 rounded-2xl bg-slate-50"><p class="font-black text-lg">{{BENEFIT_3}}</p></div></div></section>` +
+                        this.getRandomBlock(aiBlocks.about) +
+                        this.getRandomBlock(aiBlocks.catalogs)
                 },
                 {
                     name: 'catalogo.html',
@@ -171,24 +177,28 @@ NO ESCRIBAS CÓDIGO HTML. Solo devuelve un objeto JSON estricto con los siguient
             // =========================================================
             console.log(`[IA V7] Inyectando datos reales, SEO y configuración Tailwind...`);
             
+            const initial = (site.name || 'W').trim().charAt(0).toUpperCase();
             let finalLogoHtml = '';
             if (site.logoUrl) {
-                const baseUrl = process.env.NODE_ENV === 'production' ? 'https://wuepy.com' : 'http://localhost:3000';
-                const fullLogoUrl = site.logoUrl.startsWith('http') ? site.logoUrl : `${baseUrl}/${site.logoUrl}`;
-                finalLogoHtml = `<img src="${fullLogoUrl}" alt="${site.name}" class="h-12 w-auto object-contain">`;
+                const fullLogoUrl = site.logoUrl.startsWith('http') || site.logoUrl.startsWith('data:') ? site.logoUrl : `https://wuepy.com/${site.logoUrl}`;
+                finalLogoHtml = `<span class="inline-flex items-center gap-3"><img src="${fullLogoUrl}" alt="${site.name}" class="h-12 w-12 rounded-xl object-cover bg-white"><span class="font-black text-xl tracking-tight">{{SITE_NAME}}</span></span>`;
             } else {
-                finalLogoHtml = `<span class="font-black text-2xl tracking-tighter text-${chosenColor}">{{SITE_NAME}}</span>`;
+                finalLogoHtml = `<span class="inline-flex items-center gap-3"><span class="inline-flex h-12 w-12 items-center justify-center rounded-xl text-white font-black text-xl" style="background:${chosenColor}">${initial}</span><span class="font-black text-xl tracking-tight">{{SITE_NAME}}</span></span>`;
             }
+            const benefits = (aiData.benefits || ['Atención por WhatsApp', 'Envíos en Paraguay', 'Stock real']).slice(0, 3);
 
             const realSiteData = {
                 SITE_NAME: site.name || 'Mi Tienda',
                 HERO_TITLE: site.content?.heroTitle || 'Bienvenido',
                 HERO_SUBTITLE: site.content?.heroSubtitle || 'La mejor calidad, a un clic.',
                 ABOUT_TEXT: site.content?.aboutText || 'Nuestra misión es la excelencia.',
-                WHATSAPP: site.contact?.whatsapp || 'No especificado',
+                WHATSAPP: (site.contact?.whatsapp || '').replace(/[^0-9]/g, '') || '595900000000',
                 EMAIL: site.contact?.email || 'No especificado',
                 ADDRESS: site.contact?.address || 'Ubicación no especificada',
-                PRIMARY_COLOR: chosenColor, // Inyectamos el color exacto que eligió la IA
+                PRIMARY_COLOR: 'brand',
+                BENEFIT_1: benefits[0] || 'Atención por WhatsApp',
+                BENEFIT_2: benefits[1] || 'Envíos en Paraguay',
+                BENEFIT_3: benefits[2] || 'Stock real',
                 LOGO_URL: finalLogoHtml
             };
 
@@ -211,6 +221,7 @@ NO ESCRIBAS CÓDIGO HTML. Solo devuelve un objeto JSON estricto con los siguient
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{brand:'${chosenColor}'}}}}</script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -244,6 +255,7 @@ NO ESCRIBAS CÓDIGO HTML. Solo devuelve un objeto JSON estricto con los siguient
     </main>
 
     {{FOOTER_BLOCK}}
+    <a href="https://wa.me/{{WHATSAPP}}" target="_blank" class="fixed bottom-6 right-6 z-[60] h-14 w-14 rounded-full bg-emerald-500 text-white shadow-2xl flex items-center justify-center text-3xl" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
 </body>
 </html>`;
 
