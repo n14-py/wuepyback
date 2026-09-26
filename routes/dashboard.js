@@ -19,7 +19,8 @@ const Expense = require('../models/Expense');
 
 // Servicio de Inteligencia Artificial (Orquestador)
 const agentAiService = require('../services/agentAiService');
-const { cleanSlug, planOf, addMonths } = require('../utils/storeRules');
+const { cleanSlug, planOf, addMonths, normalizeWhatsapp } = require('../utils/storeRules');
+const checkoutLocks = new Map();
 
 // Aduana de Seguridad
 const { ensureAuthenticated, ensureStoreOwner, ensureSiteAccess } = require('../middleware/auth');
@@ -125,7 +126,7 @@ router.post('/create-site', ensureStoreOwner, upload.single('logo'), async (req,
 
         const isRequestingSupport = requestSupport === 'on' || requestSupport === true || requestSupport === 'true';
         let logoUrl = req.file ? req.file.path : '';
-        const cleanWhatsapp = whatsapp ? whatsapp.replace(/[^0-9]/g, '') : '';
+        const cleanWhatsapp = normalizeWhatsapp(whatsapp);
 
         // Creamos la tienda base
         const newSite = new Site({
@@ -194,7 +195,7 @@ router.get('/site/:siteId/settings', ensureStoreOwner, async (req, res) => {
 router.post('/site/:siteId/update-general', ensureStoreOwner, async (req, res) => {
     try {
         const { name, whatsapp, address, heroTitle, aboutText, facebook, instagram, tiktok, showInMarketplace } = req.body;
-        const cleanWhatsapp = whatsapp ? whatsapp.replace(/[^0-9]/g, '') : '';
+        const cleanWhatsapp = normalizeWhatsapp(whatsapp);
         const isShowInMarketplace = showInMarketplace === 'on' || showInMarketplace === true || showInMarketplace === 'true';
         
         await Site.findOneAndUpdate(
@@ -461,73 +462,107 @@ router.get('/site/:siteId/pos', ensureSiteAccess, async (req, res) => {
 });
 
 router.post('/site/:siteId/pos/checkout', ensureSiteAccess, async (req, res) => {
+    const siteId = req.params.siteId;
+    const clientRequestId = String(req.body.clientRequestId || req.body.idempotencyKey || '').slice(0, 80);
+    const lockKey = `${siteId}:${req.user._id}:${clientRequestId || 'open'}`;
+    if (checkoutLocks.has(lockKey)) {
+        return res.status(409).json({ success: false, message: 'Esa venta ya se está registrando. Esperá un momento.' });
+    }
+    checkoutLocks.set(lockKey, Date.now());
     try {
-        const siteId = req.params.siteId;
         const site = await Site.findOne({ _id: siteId });
-        
-        const { 
-            cartData, totalAmount, paymentMethod, saleChannel,
-            requiresDelivery, deliveryAddress, assignedDeliveryId,
-            customerName, customerPhone, discount, deliveryFee
-        } = req.body;
+        if (!site) return res.status(404).json({ success: false, message: 'Tienda no encontrada.' });
 
-        const rawCart = cartData || req.body.items || req.body.cart;
-        let cart = typeof rawCart === 'string' ? JSON.parse(rawCart) : rawCart;
-        
-        if (!cart || cart.length === 0) return res.status(400).json({ success: false, message: 'El carrito está vacío.' });
-
-        const finalItems = [];
-        for (let item of cart) {
-            const qty = Math.max(1, parseInt(item.quantity, 10) || 1);
-            const price = Number(item.price) || 0;
-            if (!item.isCustom) {
-                const productId = item.productId || item._id;
-                const product = await Product.findOne({ _id: productId, site: site._id });
-                if (!product) {
-                    return res.status(400).json({ success: false, message: `No encontramos el producto: ${item.name || 'ítem'}` });
-                }
-                const stock = Number(product.stock);
-                if (Number.isFinite(stock) && stock < qty) {
-                    return res.status(400).json({ success: false, message: `Stock insuficiente para: ${product.name}` });
-                }
-                if (Number.isFinite(stock)) {
-                    product.stock = stock - qty;
-                    await product.save();
-                }
-                finalItems.push({ productId: product._id, name: product.name, price, quantity: qty, isCustom: false, sku: product.sku || '' });
-            } else {
-                finalItems.push({ productId: null, name: item.name || 'Ítem libre', price, quantity: qty, isCustom: true });
+        if (clientRequestId) {
+            const existing = await Sale.findOne({ site: site._id, clientRequestId });
+            if (existing) {
+                return res.status(200).json({ success: true, duplicate: true, saleId: existing._id, total: existing.totalAmount, message: 'Esta venta ya estaba registrada.' });
             }
         }
 
-        const isDelivery = requiresDelivery === 'on' || requiresDelivery === true || requiresDelivery === 'true';
-        
+        const { paymentMethod, saleChannel, requiresDelivery, deliveryAddress, assignedDeliveryId, customerName, customerPhone, discount, deliveryFee } = req.body;
+        const rawCart = req.body.cart || req.body.cartData || req.body.items;
+        let cart = typeof rawCart === 'string' ? JSON.parse(rawCart) : rawCart;
+        if (!Array.isArray(cart) || cart.length === 0) {
+            return res.status(400).json({ success: false, message: 'El carrito está vacío.' });
+        }
+
+        const merged = new Map();
+        for (const item of cart) {
+            const qty = Math.max(1, parseInt(item.quantity, 10) || 1);
+            const key = item.isCustom ? `custom:${item.name}` : String(item.productId || item._id);
+            const prev = merged.get(key);
+            if (prev) prev.quantity += qty;
+            else merged.set(key, { ...item, quantity: qty });
+        }
+
+        const finalItems = [];
+        for (const item of merged.values()) {
+            if (!item.isCustom) {
+                const product = await Product.findOne({ _id: item.productId || item._id, site: site._id });
+                if (!product) return res.status(400).json({ success: false, message: `No encontramos el producto: ${item.name || 'ítem'}` });
+                const stock = Number(product.stock);
+                if (Number.isFinite(stock) && stock < item.quantity) {
+                    return res.status(400).json({ success: false, message: `Stock insuficiente para: ${product.name}` });
+                }
+                const unitPrice = Number(product.price) || 0;
+                if (Number.isFinite(stock)) {
+                    product.stock = stock - item.quantity;
+                    await product.save();
+                }
+                finalItems.push({
+                    productId: product._id,
+                    name: product.name,
+                    price: unitPrice,
+                    quantity: item.quantity,
+                    isCustom: false,
+                    sku: product.sku || '',
+                    stockLeft: Number.isFinite(stock) ? stock - item.quantity : null
+                });
+            } else {
+                finalItems.push({ productId: null, name: item.name || 'Ítem libre', price: Number(item.price) || 0, quantity: item.quantity, isCustom: true });
+            }
+        }
+
+        const isDelivery = requiresDelivery === true || requiresDelivery === 'true' || requiresDelivery === 'on';
+        const subtotal = finalItems.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
+        const discountValue = Number(discount) || 0;
+        const deliveryValue = Number(deliveryFee) || 0;
         const newSale = new Sale({
             site: site._id,
             registeredBy: req.user._id,
-            saleChannel: saleChannel || 'pos',
-            customer: { name: customerName || 'Ocasional', phone: customerPhone || '' },
-            items: finalItems,
-            subtotal: cart.reduce((acc, i) => acc + (i.price * i.quantity), 0),
-            discount: Number(discount) || 0,
-            deliveryFee: Number(deliveryFee) || 0,
-            totalAmount: Number(totalAmount),
+            clientRequestId,
+            saleChannel: ['pos', 'web_store', 'wuepy_marketplace', 'whatsapp'].includes(saleChannel) ? saleChannel : 'pos',
+            customer: { name: customerName || 'Cliente ocasional', phone: customerPhone || '' },
+            items: finalItems.map(({ stockLeft, ...row }) => row),
+            subtotal,
+            discount: discountValue,
+            deliveryFee: deliveryValue,
+            totalAmount: Math.max(0, subtotal + deliveryValue - discountValue),
             paymentMethod: paymentMethod || 'efectivo',
             paymentStatus: paymentMethod === 'efectivo' && !isDelivery ? 'paid' : 'pending',
             requiresDelivery: isDelivery,
-            status: isDelivery ? 'in_transit' : 'completed' 
+            status: isDelivery ? 'in_transit' : 'completed'
         });
-
-        if (isDelivery) {
-            newSale.delivery = { address: deliveryAddress || '', assignedTo: assignedDeliveryId || '' };
-        }
-
+        if (isDelivery) newSale.delivery = { address: deliveryAddress || '', assignedTo: assignedDeliveryId || '' };
         await newSale.save();
-        return res.status(201).json({ success: true, message: `¡Ticket Registrado! Monto: ${site.currency === 'PYG' ? 'Gs.' : '$'} ${Number(totalAmount).toLocaleString('es-ES')}` });
 
+        const lines = finalItems.map(i => `${i.quantity}x ${i.name}`).join(', ');
+        return res.status(201).json({
+            success: true,
+            saleId: newSale._id,
+            total: newSale.totalAmount,
+            items: finalItems,
+            message: `Venta registrada: ${lines}. Total ${Number(newSale.totalAmount).toLocaleString('es-PY')} Gs.`
+        });
     } catch (error) {
+        if (error && error.code === 11000) {
+            return res.status(200).json({ success: true, duplicate: true, message: 'Esta venta ya estaba registrada.' });
+        }
         console.error("Error en POS checkout:", error);
         return res.status(500).json({ success: false, message: 'Error procesando cobro.' });
+    } finally {
+        setTimeout(() => checkoutLocks.delete(lockKey), 4000);
     }
 });
 
@@ -584,14 +619,29 @@ router.get('/site/:siteId/finances', ensureStoreOwner, async (req, res) => {
         }).sort({ createdAt: -1 }).lean();
         const expenses = await Expense.find({ site: site._id, date: { $gte: since } }).sort({ date: -1 }).lean();
 
+        const salesView = sales.map(sale => ({
+            id: String(sale._id),
+            date: sale.createdAt,
+            total: Number(sale.totalAmount) || 0,
+            paymentMethod: sale.paymentMethod,
+            channel: sale.saleChannel,
+            customer: sale.customer && sale.customer.name,
+            items: (sale.items || []).map(item => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price,
+                lineTotal: Number(item.price) * Number(item.quantity)
+            }))
+        }));
+
         const transactions = [
-            ...sales.map(sale => ({
-                id: String(sale._id),
+            ...salesView.map(sale => ({
+                id: sale.id,
                 type: 'income',
-                amount: Number(sale.totalAmount) || 0,
-                date: sale.createdAt,
-                description: sale.customer && sale.customer.name ? `Venta a ${sale.customer.name}` : 'Venta en caja',
-                category: sale.saleChannel === 'pos' ? 'POS' : (sale.saleChannel || 'Venta'),
+                amount: sale.total,
+                date: sale.date,
+                description: (sale.items || []).map(item => `${item.quantity}x ${item.name}`).join(', ') || 'Venta',
+                category: sale.channel === 'pos' ? 'POS' : (sale.channel || 'Venta'),
                 reference: sale.paymentMethod || 'caja'
             })),
             ...expenses.map(exp => ({
@@ -605,7 +655,17 @@ router.get('/site/:siteId/finances', ensureStoreOwner, async (req, res) => {
             }))
         ].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        return res.status(200).json({ success: true, user: req.user, site, stats, recentSales: sales.slice(0, 10), recentExpenses: expenses.slice(0, 10), transactions });
+        return res.status(200).json({
+            success: true,
+            user: req.user,
+            site,
+            stats,
+            sales: salesView,
+            inventory: products.map(p => ({ id: String(p._id), name: p.name, stock: p.stock, price: p.price })),
+            recentSales: salesView.slice(0, 20),
+            recentExpenses: expenses.slice(0, 10),
+            transactions
+        });
     } catch (error) {
         return res.status(500).json({ success: false, message: 'Fallo al procesar métricas contables.' });
     }
