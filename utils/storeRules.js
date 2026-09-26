@@ -6,6 +6,16 @@ const PLANS = {
 
 const BLOCKED_SLUGS = new Set(['undefined', 'null', 'www', 'wuepy', 'api', 'admin', 'dashboard']);
 
+function normalizeWhatsapp(value) {
+    let digits = String(value || '').replace(/\D/g, '');
+    if (!digits) return '';
+    if (digits.startsWith('00')) digits = digits.slice(2);
+    if (digits.startsWith('5950')) digits = '595' + digits.slice(4);
+    if (digits.startsWith('09')) digits = '595' + digits.slice(1);
+    if (digits.startsWith('9') && digits.length === 9) digits = '595' + digits;
+    return digits;
+}
+
 function cleanSlug(subdomain, fallbackName) {
     const raw = (subdomain || fallbackName || '').toString();
     const slug = raw
@@ -39,4 +49,4 @@ function subscriptionExpired(site, now = new Date()) {
     return false;
 }
 
-module.exports = { PLANS, cleanSlug, planOf, addMonths, subscriptionExpired };
+module.exports = { PLANS, cleanSlug, planOf, addMonths, subscriptionExpired, normalizeWhatsapp };

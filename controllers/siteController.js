@@ -6,7 +6,7 @@ const path = require('path');
 const Site = require('../models/Site');
 const Product = require('../models/Product'); 
 const agentAiService = require('../services/agentAiService');
-const { cleanSlug, planOf, subscriptionExpired } = require('../utils/storeRules');
+const { cleanSlug, planOf, subscriptionExpired, normalizeWhatsapp } = require('../utils/storeRules');
 const { applyAccountPlan } = require('../utils/accountPlan');
 const User = require('../models/User'); 
 
@@ -69,7 +69,7 @@ module.exports = {
                 });
             }
 
-            const cleanWhatsapp = whatsapp ? whatsapp.replace(/[^0-9]/g, '') : '';
+            const cleanWhatsapp = normalizeWhatsapp(whatsapp);
 
             // Verificar cuántos sitios tiene el usuario para otorgar el trial solo al primero
             const userSitesCount = await Site.countDocuments({ owner: req.user._id });
@@ -214,7 +214,7 @@ module.exports = {
                 return res.status(403).json({ success: false, message: 'Acceso denegado.' });
             }
 
-            const cleanWhatsapp = whatsapp ? whatsapp.replace(/[^0-9]/g, '') : '';
+            const cleanWhatsapp = normalizeWhatsapp(whatsapp);
             const isShowInMarketplace = showInMarketplace === 'on' || showInMarketplace === true || showInMarketplace === 'true';
 
             // SOLUCIÓN AL ERROR DE PÉRDIDA DE IA:
