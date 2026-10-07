@@ -146,4 +146,17 @@ siteSchema.pre('save', function(next) {
     next();
 });
 
+siteSchema.set('toJSON', {
+    virtuals: true,
+    transform(doc, ret) {
+        const { normalizeWhatsapp } = require('../utils/storeRules');
+        const wa = normalizeWhatsapp(ret.contact && ret.contact.whatsapp);
+        if (ret.contact) ret.contact.whatsapp = wa;
+        ret.whatsappNumber = wa;
+        ret.whatsappUrl = wa ? `https://wa.me/${wa}` : '';
+        return ret;
+    }
+});
+siteSchema.set('toObject', { virtuals: true });
+
 module.exports = mongoose.model('Site', siteSchema);

@@ -192,7 +192,7 @@ NO ESCRIBAS CÓDIGO HTML. Solo devuelve un objeto JSON estricto con los siguient
                 HERO_TITLE: site.content?.heroTitle || 'Bienvenido',
                 HERO_SUBTITLE: site.content?.heroSubtitle || 'La mejor calidad, a un clic.',
                 ABOUT_TEXT: site.content?.aboutText || 'Nuestra misión es la excelencia.',
-                WHATSAPP: (site.contact?.whatsapp || '').replace(/[^0-9]/g, '') || '595900000000',
+                WHATSAPP: require('../utils/storeRules').normalizeWhatsapp(site.contact?.whatsapp) || '595900000000',
                 EMAIL: site.contact?.email || 'No especificado',
                 ADDRESS: site.contact?.address || 'Ubicación no especificada',
                 PRIMARY_COLOR: 'brand',

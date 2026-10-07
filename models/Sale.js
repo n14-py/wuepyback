@@ -97,6 +97,7 @@ const saleSchema = new mongoose.Schema({
     },
 
     // --- AUDITORÍA Y FECHAS ---
+    clientRequestId: { type: String, default: '' },
     internalNotes: { type: String, default: '' }, // Notas solo visibles para admin/vendedor
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
@@ -105,6 +106,11 @@ const saleSchema = new mongoose.Schema({
 // ==========================================
 // MIDDLEWARES
 // ==========================================
+saleSchema.index(
+    { site: 1, clientRequestId: 1 },
+    { unique: true, partialFilterExpression: { clientRequestId: { $type: 'string', $gt: '' } } }
+);
+
 saleSchema.pre('save', function(next) {
     this.updatedAt = Date.now();
     
@@ -114,8 +120,10 @@ saleSchema.pre('save', function(next) {
         this.items.forEach(item => {
             calcSubtotal += (item.price * item.quantity);
         });
+        this.discount = Number(this.discount) || 0;
+        this.deliveryFee = Number(this.deliveryFee) || 0;
         this.subtotal = calcSubtotal;
-        this.totalAmount = (this.subtotal + (this.deliveryFee || 0)) - (this.discount || 0);
+        this.totalAmount = Math.max(0, calcSubtotal + this.deliveryFee - this.discount);
     }
 
     // Si es POS tradicional, normalmente no requiere delivery y se completa al instante
